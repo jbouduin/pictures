@@ -20,7 +20,7 @@ export class Component2Component implements OnInit {
   // </editor-fold>
 
   // <editor-fold desc='UI Trigger methods'>
-  public public click(): void {
+  public click(): void {
     window.open('https://github.com');
   }
   // </editor-fold>

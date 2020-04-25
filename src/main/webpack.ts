@@ -11,7 +11,9 @@ module.exports = env => {
       path: path.resolve(__dirname, '../../dist/main'),
       filename: 'electron-main.js'
     },
-    externals: [ ],
+    externals: [
+      { sqlite3: 'commonjs sqlite3' }
+    ],
     devtool: 'source-map',
     module: {
       rules: [

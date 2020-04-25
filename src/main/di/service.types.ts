@@ -1,5 +1,6 @@
 const SERVICETYPES = {
-  ConfigurationService: Symbol('ConfigurationService')
+  ConfigurationService: Symbol('ConfigurationService'),
+  DatabaseService: Symbol('DatabaseService')
 };
 
 export default SERVICETYPES;

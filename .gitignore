@@ -46,3 +46,4 @@ testem.log
 .DS_Store
 Thumbs.db
 configuration/environments/development/*.json
+pictures.sqlite
