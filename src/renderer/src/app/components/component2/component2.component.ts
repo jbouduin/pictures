@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { IpcService } from 'src/app/ipc.service';
 
 @Component({
   selector: 'app-component2',
@@ -7,13 +8,20 @@ import { Component, OnInit } from '@angular/core';
 })
 export class Component2Component implements OnInit {
 
-  constructor() { }
+  // <editor-fold desc='Constructor & C°'>
+  public constructor(private ipcService: IpcService) { }
+  // </editor-fold>
 
-  ngOnInit() {
+  // <editor-fold desc='Angular interface methods'>
+  public ngOnInit() {
+    this.ipcService.getConfigurationAsync()
+      .then(configuration => console.log(configuration));
   }
+  // </editor-fold>
 
-  public click(): void {
-    // window.open('https://github.com', '_blank', 'nodeIntegration=no')
+  // <editor-fold desc='UI Trigger methods'>
+  public public click(): void {
     window.open('https://github.com');
   }
+  // </editor-fold>
 }

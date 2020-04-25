@@ -28,7 +28,9 @@
     "release": "npm run build:prod:all  && npm run package"
   },
   "private": true,
-  "dependencies": {},
+  "dependencies": {
+    "inversify": "^5.0.1"
+  },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.901.0",
     "@angular/animations": "~9.1.0",

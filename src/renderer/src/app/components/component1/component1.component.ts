@@ -7,22 +7,29 @@ import { IpcService } from 'src/app/ipc.service';
   styleUrls: ['./component1.component.css']
 })
 export class Component1Component implements OnInit {
-  arch = '-';
-  hostname = '-';
-  platform = '-';
-  release = '-';
 
-  constructor(private ipcService: IpcService, private ngZone: NgZone) { }
+  // <editor-fold desc='Public properties'>
+  public arch = '-';
+  public hostname = '-';
+  public platform = '-';
+  public release = '-';
+  // </editor-fold>
 
-  ngOnInit() {
+  // <editor-fold desc='Constructor & C°'>
+  public constructor(private ipcService: IpcService, private ngZone: NgZone) { }
+  // </editor-fold>
+
+  // <editor-fold desc='Angular interface methods'>
+  public ngOnInit() {
     this.ipcService.getSystemInfoAsync()
       .then(systemInfo => {
         this.ngZone.run(() => {
-          this.arch = systemInfo.Arch;
-          this.hostname = systemInfo.Hostname;
-          this.platform = systemInfo.Platform;
-          this.release = systemInfo.Release;
+          this.arch = systemInfo.arch;
+          this.hostname = systemInfo.hostname;
+          this.platform = systemInfo.platform;
+          this.release = systemInfo.release;
           });
       });
   }
+  // </editor-fold>
 }

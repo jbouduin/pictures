@@ -1,0 +1,38 @@
+{
+  "targets": [
+    {
+      "connectionName": "mysql_local",
+      "targetType": "pictures"
+    }, {
+      "connectionName": "mysql_local",
+      "targetType": "temp"
+    }
+  ],
+  "connections": [
+    {
+      "connectionName": "pictures",
+      "databaseName": "pictures.sqlite",
+      "connectionType": "sqlite",
+      "hostName": "",
+      "port": 0,
+      "user": "",
+      "password": ""
+    }, {
+      "connectionName": "temp",
+      "databaseName": "temp.sqlite",
+      "connectionType": "sqlite",
+      "hostName": "",
+      "port": 0,
+      "user": "",
+      "password": ""
+    }, {
+      "connectionName": "mysql_local",
+      "databaseName": "xxx",
+      "connectionType": "mysql",
+      "hostName": "xxx",
+      "port": 3306,
+      "user": "xxx",
+      "password": "xxx"
+    }
+  ]
+}
