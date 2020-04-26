@@ -1,10 +1,12 @@
 import { app, BrowserWindow, ipcMain, Menu } from 'electron';
 import * as path from 'path';
 import { DtoConfiguration, DtoSystemInfo } from '../ipc';
+import { DtoDataRequest } from '../ipc';
 import * as os from 'os';
 
 import container from './di/inversify.config';
 import { IConfigurationService } from './configuration';
+import { IDataRouterService } from './data';
 import { IDatabaseService } from './database';
 
 import SERVICETYPES from './di/service.types';
@@ -27,7 +29,7 @@ function createWindow() {
       container.get<IDatabaseService>(SERVICETYPES.DatabaseService)
         .initialize()
         .then( connection => {
-          console.log(configuration);
+          // console.log(configuration);
           win = new BrowserWindow({
             width: 800,
             height: 600,
@@ -75,8 +77,27 @@ ipcMain.on('request-systeminfo', () => {
 
 ipcMain.on('request-configuration', () => {
   const configuration: DtoConfiguration = container.get<IConfigurationService>(SERVICETYPES.ConfigurationService).configuration;
-  console.log(JSON.stringify(configuration));
+  // console.log(JSON.stringify(configuration));
   if (win) {
     win.webContents.send('configuration', JSON.stringify(configuration));
   }
 });
+
+ipcMain.on('data', async (event, arg) => {
+  const dtoRequest: DtoDataRequest<any> = JSON.parse(arg);
+  // console.log(`Request received ${dtoRequest}`);
+  const result = await container.get<IDataRouterService>(SERVICETYPES.DataRouterService)
+    .route(dtoRequest);
+  event.reply('data', JSON.stringify(result));
+})
+
+ipcMain.on('data-sync', (event, arg) => {
+  const dtoRequest: DtoDataRequest<any> = JSON.parse(arg);
+  // console.log(`Request received ${dtoRequest}`);
+  const result = container.get<IDataRouterService>(SERVICETYPES.DataRouterService)
+    .route(dtoRequest)
+    .then(result => {
+      // console.log(`Response ${result}`);
+      event.returnValue = JSON.stringify(result);
+    });
+})

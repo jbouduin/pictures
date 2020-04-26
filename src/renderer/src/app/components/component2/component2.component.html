@@ -1,7 +1,10 @@
 <div class="app-div">
-    <h3>Introduction</h3>
-    <p>
-        angular-electron-boilerplate is a Electron template that can be used as a starting point for building modern x-platform apps.
-    </p>
-    <button (click)="click()">Google button</button>
+  <p>
+    <button (click)="pingAsync()">ping (async)</button>
+    <button (click)="pingSync()">ping (sync)</button>
+  </p>
+  <h3>Configuration</h3>
+  <pre>
+      {{configuration}}
+  </pre>
 </div>

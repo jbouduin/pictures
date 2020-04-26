@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { DtoConfiguration, DtoSystemInfo } from '../../../ipc';
+import { DtoDataRequest, DtoDataResponse } from '../../../ipc';
 
 @Injectable({
   providedIn: 'root'
@@ -32,6 +33,23 @@ export class IpcService {
         resolve(result);
       });
       window.api.electronIpcSend('request-configuration');
+    });
+  }
+
+  public dataRequestSync<T,U>(request: DtoDataRequest<T>): DtoDataResponse<U> {
+    const json = JSON.stringify(request);
+    const result = window.api.electronIpcSendSync('data-sync', json);
+    const response: DtoDataResponse<U> = JSON.parse(result);
+    return response;
+  }
+
+  public dataRequest<T,U>(request: DtoDataRequest<T>): Promise<DtoDataResponse<U>> {
+    return new Promise((resolve, reject) => {
+      window.api.electronIpcOnce('data', (event, arg) => {
+        const result: DtoDataResponse<U> = JSON.parse(arg);
+        resolve(result);
+      });
+      window.api.electronIpcSend('data', JSON.stringify(request));
     });
   }
   // </editor-fold>

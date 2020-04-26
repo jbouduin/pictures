@@ -59,12 +59,9 @@ export class Configuration {
         delete require.cache[absolutePath];
 
         const propPath = this.filePathToPath(file, true);
-        console.log(`before require ${absolutePath}`);
-        const data = fs.readFileSync(absolutePath, 'utf8'); //,  (err, data)  => {
-          // if (err) throw err;
+        const data = fs.readFileSync(absolutePath, 'utf8');
         const obj = JSON.parse(data);
         const mod = this.templateConfiguration(obj, '');
-        console.log(obj);
         if (propPath.length === 0) {
           _.merge(root, mod);
         } else {

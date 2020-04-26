@@ -26,14 +26,16 @@ export class DatabaseService implements IDatabaseService {
     @inject(SERVICETYPES.ConfigurationService) private configurationService: IConfigurationService) { }
   // </editor-fold>
 
-  // <editor-fold desc='IDatabaseService interface methods'>
+  // <editor-fold desc='IService interface methods'>
   public initialize(): Promise<TypeOrmConnection> {
     console.log('in initialize DatabaseService');
     return this.connectByName(
           this.getConnectionNameForTargetType(TargetType.PICTURES),
           [Collection, Exif, Picture]);
   }
+  // </editor-fold>
 
+  // <editor-fold desc='IDatabaseService interface methods'>
   public getCollectionRepository(): Repository<Collection> {
     return this
       .getConnectionByTargetType(TargetType.PICTURES)
