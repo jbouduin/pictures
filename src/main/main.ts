@@ -26,6 +26,7 @@ function createWindow() {
   container.get<IConfigurationService>(SERVICETYPES.ConfigurationService)
     .initialize()
     .then( configuration => {
+      container.get<IDataRouterService>(SERVICETYPES.DataRouterService).initialize();
       container.get<IDatabaseService>(SERVICETYPES.DatabaseService)
         .initialize()
         .then( connection => {
@@ -87,7 +88,7 @@ ipcMain.on('data', async (event, arg) => {
   const dtoRequest: DtoDataRequest<any> = JSON.parse(arg);
   // console.log(`Request received ${dtoRequest}`);
   const result = await container.get<IDataRouterService>(SERVICETYPES.DataRouterService)
-    .route(dtoRequest);
+    .routeRequest(dtoRequest);
   event.reply('data', JSON.stringify(result));
 })
 
@@ -95,7 +96,7 @@ ipcMain.on('data-sync', (event, arg) => {
   const dtoRequest: DtoDataRequest<any> = JSON.parse(arg);
   // console.log(`Request received ${dtoRequest}`);
   const result = container.get<IDataRouterService>(SERVICETYPES.DataRouterService)
-    .route(dtoRequest)
+    .routeRequest(dtoRequest)
     .then(result => {
       // console.log(`Response ${result}`);
       event.returnValue = JSON.stringify(result);

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { IpcService } from 'src/app/ipc.service';
 
-import { DataStatus, DataVerb, DtoDataRequest, DtoDataResponse } from '../../../../../ipc';
+import { DataStatus, DataVerb, DtoConfiguration, DtoDataRequest, DtoDataResponse } from '../../../../../ipc';
 
 @Component({
   selector: 'app-component2',
@@ -45,6 +45,50 @@ export class Component2Component implements OnInit {
   public pingSync(): void {
     const result: DtoDataResponse<string> = this.ipcService.dataRequestSync<string, string>(this.ping);
     alert(`Status: ${DataStatus[result.status]} \n Data: ${result.data}`);
+  }
+
+  public getList(): void {
+    const request: DtoDataRequest<string> = {
+      verb: DataVerb.GET,
+      path: '/collection',
+      data: ''
+    };
+    this.ipcService
+      .dataRequest<string, any>(request)
+      .then(result => alert(`Status: ${DataStatus[result.status]} \n Data: ${result.data}`));
+  }
+
+  public getSingle(): void {
+    const request: DtoDataRequest<string> = {
+      verb: DataVerb.GET,
+      path: '/collection/1',
+      data: ''
+    };
+    this.ipcService
+      .dataRequest<string, any>(request)
+      .then(result => alert(`Status: ${DataStatus[result.status]} \n Data: ${result.data}`));
+  }
+
+  public getPictures(): void {
+    const request: DtoDataRequest<string> = {
+      verb: DataVerb.GET,
+      path: '/collection/1/pictures',
+      data: ''
+    };
+    this.ipcService
+      .dataRequest<string, any>(request)
+      .then(result => alert(`Status: ${DataStatus[result.status]} \n Data: ${result.data}`));
+  }
+
+  public refreshConfig(): void {
+    const request: DtoDataRequest<string> = {
+      verb: DataVerb.GET,
+      path: '/configuration',
+      data: ''
+    };
+    this.ipcService
+      .dataRequest<string, DtoConfiguration>(request)
+      .then(result => this.configuration = JSON.stringify(result.data, null, 2));
   }
   // </editor-fold>
 }

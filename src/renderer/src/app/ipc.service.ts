@@ -36,16 +36,20 @@ export class IpcService {
     });
   }
 
+  // TODO find a solution for handling errors coming back
   public dataRequestSync<T,U>(request: DtoDataRequest<T>): DtoDataResponse<U> {
     const json = JSON.stringify(request);
     const result = window.api.electronIpcSendSync('data-sync', json);
+    console.log(result);
     const response: DtoDataResponse<U> = JSON.parse(result);
     return response;
   }
 
+  // TODO reject if an error comes back
   public dataRequest<T,U>(request: DtoDataRequest<T>): Promise<DtoDataResponse<U>> {
     return new Promise((resolve, reject) => {
       window.api.electronIpcOnce('data', (event, arg) => {
+        console.log(arg);
         const result: DtoDataResponse<U> = JSON.parse(arg);
         resolve(result);
       });
