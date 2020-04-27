@@ -3,29 +3,27 @@ import { NgModule } from '@angular/core';
 import { MaterialModule } from './material.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { CoreModule } from '@core';
+import { CollectionModule } from './collection';
+import { ShellModule } from './shell';
+
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { Component1Component } from './components/component1/component1.component';
-import { Component2Component } from './components/component2/component2.component';
-import { NavlistComponent } from './components/navlist/navlist.component';
-
-import { CoreModule } from '@core';
 
 @NgModule({
   declarations: [
-    AppComponent,
-    Component1Component,
-    Component2Component,
-    NavlistComponent
+    AppComponent
   ],
   imports: [
-    CoreModule,
     BrowserModule,
-    AppRoutingModule,
     BrowserAnimationsModule,
-    MaterialModule
+    MaterialModule,
+    CoreModule,
+    ShellModule,
+    CollectionModule,
+    AppRoutingModule // must be imported as the last module as it contains the fallback route
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [ AppComponent ]
 })
 export class AppModule { }

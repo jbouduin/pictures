@@ -1,19 +1,17 @@
-import { Component } from '@angular/core';
-import { IpcService } from '@core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
-  title = 'angular-electron-boilerplate';
+export class AppComponent implements OnInit {
 
-  constructor(private ipcService: IpcService) {
-  }
+  // <editor-fold desc='Constructor & C°'>
+  public constructor() { }
+  // </editor-fold>
 
-  clickDevTools() {
-    console.log('test');
-    this.ipcService.openDevTools();
-  }
+  // <editor-fold desc='Angular interface methods'>
+  public ngOnInit(): void { }
+  // </editor-fold>
 }
