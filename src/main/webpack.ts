@@ -28,9 +28,7 @@ module.exports = env => {
     resolve: {
       extensions: ['.js', '.ts', '.tsx', '.jsx', '.json'],
       plugins: [new TsconfigPathsPlugin({ configFile: './src/main/tsconfig.json' })],
-      alias: {
-        // TODO
-      }
+      alias: { }
     },
     node: {
       __dirname: true,
