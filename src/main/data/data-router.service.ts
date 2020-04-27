@@ -7,9 +7,9 @@ import 'reflect-metadata';
 
 import { DataStatus, DataVerb, DtoDataRequest, DtoDataResponse } from '../../ipc';
 
-import { IConfigurationService } from '../configuration';
 import { IService } from '../di/service';
 
+import { IConfigurationService } from './configuration';
 import { ICollectionService } from './pictures/collection.service';
 import { RoutedRequest } from './routed-request';
 

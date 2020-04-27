@@ -1,4 +1,4 @@
-import { TargetType, DtoTarget } from '../../../ipc';
+import { TargetType, DtoTarget } from '../../../../ipc';
 
 export class CfgTarget implements DtoTarget {
   public connectionName: string;

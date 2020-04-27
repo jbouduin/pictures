@@ -6,7 +6,7 @@ import 'reflect-metadata';
 
 import { ConnectionType, TargetType } from '../../ipc';
 import { DtoConfiguration, DtoConnection } from '../../ipc';
-import { IConfigurationService } from '../configuration';
+import { IConfigurationService } from '../data';
 import { IService } from '../di/service';
 
 import SERVICETYPES from '../di/service.types';

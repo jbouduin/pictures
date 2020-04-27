@@ -2,9 +2,11 @@ import { inject, injectable } from 'inversify';
 import * as path from 'path';
 import 'reflect-metadata';
 
-import { DataStatus, DtoConfiguration, DtoEnvironment, DtoDataResponse } from '../../ipc';
+import { DataStatus, DtoConfiguration, DtoEnvironment, DtoDataResponse } from '../../../ipc';
 
-import { IDataService, IDataRouterService, RoutedRequest } from '../data';
+import { IDataRouterService } from '../data-router.service';
+import { IDataService } from '../data-service';
+import { RoutedRequest } from '../routed-request';
 import { Configuration } from './configuration';
 
 export interface IConfigurationService extends IDataService<Configuration> {

@@ -5,7 +5,7 @@ import { DtoDataRequest } from '../ipc';
 import * as os from 'os';
 
 import container from './di/inversify.config';
-import { IConfigurationService } from './configuration';
+import { IConfigurationService } from './data';
 import { IDataRouterService } from './data';
 import { IDatabaseService } from './database';
 

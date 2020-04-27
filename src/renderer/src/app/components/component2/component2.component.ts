@@ -30,8 +30,7 @@ export class Component2Component implements OnInit {
 
   // <editor-fold desc='Angular interface methods'>
   public ngOnInit() {
-    this.ipcService.getConfigurationAsync()
-      .then(configuration => this.configuration = JSON.stringify(configuration, null, 2));
+    this.refreshConfig();
   }
   // </editor-fold>
 

@@ -1,7 +1,7 @@
 import { Container } from 'inversify';
 
 import { ICollectionService, CollectionService } from '../data';
-import { IConfigurationService, ConfigurationService } from '../configuration';
+import { IConfigurationService, ConfigurationService } from '../data';
 import { IDataRouterService, DataRouterService } from '../data';
 import { IDatabaseService, DatabaseService } from '../database';
 import SERVICETYPES from './service.types';

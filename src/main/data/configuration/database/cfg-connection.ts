@@ -1,4 +1,4 @@
-import { ConnectionType, DtoConnection } from '../../../ipc';
+import { ConnectionType, DtoConnection } from '../../../../ipc';
 
 export class CfgConnection implements DtoConnection {
   public connectionName: string;

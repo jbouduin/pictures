@@ -19,20 +19,10 @@ export class IpcService {
   public getSystemInfoAsync(): Promise<DtoSystemInfo> {
     return new Promise((resolve, reject) => {
       window.api.electronIpcOnce('systeminfo', (event, arg) => {
-        const systemInfo: DtoSystemInfo = JSON.parse(arg); //DtoSystemInfo.deserialize(arg);
+        const systemInfo: DtoSystemInfo = JSON.parse(arg);
         resolve(systemInfo);
       });
       window.api.electronIpcSend('request-systeminfo');
-    });
-  }
-
-  public getConfigurationAsync(): Promise<DtoConfiguration> {
-    return new Promise((resolve, reject) => {
-      window.api.electronIpcOnce('configuration', (event, arg) => {
-        const result: DtoConfiguration = JSON.parse(arg);
-        resolve(result);
-      });
-      window.api.electronIpcSend('request-configuration');
     });
   }
 
