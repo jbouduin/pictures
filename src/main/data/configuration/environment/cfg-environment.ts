@@ -1,4 +1,4 @@
-import { TargetType, DtoEnvironment } from '../../../../ipc';
+import { TargetType, DtoEnvironment } from '@ipc';
 
 import { CfgDatabase } from '../database/cfg-database';
 

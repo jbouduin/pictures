@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { DtoConfiguration, DtoSystemInfo } from '../../../ipc';
-import { DtoDataRequest, DtoDataResponse } from '../../../ipc';
+import { DtoConfiguration, DtoSystemInfo } from '@ipc';
+import { DtoDataRequest, DtoDataResponse } from '@ipc';
 
 @Injectable({
   providedIn: 'root'

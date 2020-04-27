@@ -1,4 +1,5 @@
 import * as path from 'path';
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 module.exports = env => {
   if (!env) { env = 'development'; }
@@ -26,6 +27,7 @@ module.exports = env => {
     },
     resolve: {
       extensions: ['.js', '.ts', '.tsx', '.jsx', '.json'],
+      plugins: [new TsconfigPathsPlugin({ configFile: './src/main/tsconfig.json' })],
       alias: {
         // TODO
       }

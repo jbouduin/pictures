@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain, Menu } from 'electron';
 import * as path from 'path';
-import { DtoConfiguration, DtoSystemInfo } from '../ipc';
-import { DtoDataRequest } from '../ipc';
+import { DtoConfiguration, DtoSystemInfo } from '@ipc';
+import { DtoDataRequest } from '@ipc';
 import * as os from 'os';
 
 import container from './di/inversify.config';

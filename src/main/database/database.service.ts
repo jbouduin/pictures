@@ -4,8 +4,8 @@ import { Connection as TypeOrmConnection } from 'typeorm';
 import { Repository } from 'typeorm';
 import 'reflect-metadata';
 
-import { ConnectionType, TargetType } from '../../ipc';
-import { DtoConfiguration, DtoConnection } from '../../ipc';
+import { ConnectionType, TargetType } from '@ipc';
+import { DtoConfiguration, DtoConnection } from '@ipc';
 import { IConfigurationService } from '../data';
 import { IService } from '../di/service';
 

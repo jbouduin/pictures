@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { IpcService } from 'src/app/ipc.service';
 
-import { DataStatus, DataVerb, DtoConfiguration, DtoDataRequest, DtoDataResponse } from '../../../../../ipc';
+import { DataStatus, DataVerb, DtoConfiguration, DtoDataRequest, DtoDataResponse } from '@ipc';
 
 @Component({
   selector: 'app-component2',

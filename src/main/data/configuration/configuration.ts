@@ -3,7 +3,7 @@ import * as glob from 'glob';
 import * as _ from 'lodash';
 import * as path from 'path';
 
-import { ConnectionType, DtoConnection } from '../../../ipc';
+import { ConnectionType, DtoConnection } from '@ipc';
 
 import { CfgApplication } from './application/cfg-application';
 import { CfgEnvironment } from './environment/cfg-environment';

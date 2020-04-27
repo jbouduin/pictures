@@ -5,7 +5,7 @@ import { match, MatchResult } from 'path-to-regexp';
 import * as Collections from 'typescript-collections';
 import 'reflect-metadata';
 
-import { DataStatus, DataVerb, DtoDataRequest, DtoDataResponse } from '../../ipc';
+import { DataStatus, DataVerb, DtoDataRequest, DtoDataResponse } from '@ipc';
 
 import { IService } from '../di/service';
 

@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify';
 import * as path from 'path';
 import 'reflect-metadata';
 
-import { DataStatus, DtoConfiguration, DtoEnvironment, DtoDataResponse } from '../../../ipc';
+import { DataStatus, DtoConfiguration, DtoEnvironment, DtoDataResponse } from '@ipc';
 
 import { IDataRouterService } from '../data-router.service';
 import { IDataService } from '../data-service';
