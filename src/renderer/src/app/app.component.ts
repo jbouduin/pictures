@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IpcService } from './ipc.service';
+import { IpcService } from '@core';
 
 @Component({
   selector: 'app-root',

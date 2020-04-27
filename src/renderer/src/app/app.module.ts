@@ -9,6 +9,8 @@ import { Component1Component } from './components/component1/component1.componen
 import { Component2Component } from './components/component2/component2.component';
 import { NavlistComponent } from './components/navlist/navlist.component';
 
+import { CoreModule } from '@core';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -17,6 +19,7 @@ import { NavlistComponent } from './components/navlist/navlist.component';
     NavlistComponent
   ],
   imports: [
+    CoreModule,
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,

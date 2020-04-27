@@ -3,6 +3,8 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths" : {
+      "@core": ["./src/app/core"],
+      "@core/*": ["./src/app/core/*"],
       "@ipc": ["../ipc"],
       "@ipc/*": ["../ipc*"],
     },
@@ -16,7 +18,8 @@
     "importHelpers": true,
     "target": "es5", // https://github.com/electron/electron/issues/12011
     "types": [
-      "../window-interface"
+      "../window-interface",
+      "node"
     ],
     "typeRoots": [
       "node_modules/@types"

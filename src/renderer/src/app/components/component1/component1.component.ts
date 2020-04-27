@@ -1,5 +1,6 @@
 import { Component, OnInit, NgZone } from '@angular/core';
-import { IpcService } from 'src/app/ipc.service';
+
+import { IpcService } from '@core';
 
 @Component({
   selector: 'app-component1',

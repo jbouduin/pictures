@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { IpcService } from 'src/app/ipc.service';
+import { IpcService } from '@core';
 
 import { DataStatus, DataVerb, DtoConfiguration, DtoDataRequest, DtoDataResponse } from '@ipc';
 
