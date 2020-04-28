@@ -1,1 +1,22 @@
-<p>collection-card works!</p>
+  <mat-card class="thumb-card">
+    <mat-card-content >
+      <div fxLayout="column">
+        <div class="thumb-card-header" fxLayout="row" fxFlex="50px" fxLayoutAlign="center center">
+          {{collection.name}}
+        </div>
+        <div [ngStyle]="thumbnailStyle">
+        </div>
+        <div class="thumb-card-footer" fxLayout="row" fxLayoutAlign="space-between center">
+          <div class="thumb-footer-text">
+            <div fxLayout="row" fxLayoutAlign="start center">
+              {{collection.pictures}} <mat-icon>camera_alt</mat-icon>
+            </div>
+          </div>
+          <div class="thumb-actions">
+            <mat-icon>edit</mat-icon>
+            <mat-icon>delete</mat-icon>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>

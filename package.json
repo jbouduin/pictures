@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "main": "./dist/main/electron-main.js",
   "scripts": {
-    "start": "electron .",
+    "start": "electron . --allow-file-access-from-files",
     "dev": "nodemon",
     "build:dev:renderer": "ng build",
     "build:prod:renderer": "ng build --prod",

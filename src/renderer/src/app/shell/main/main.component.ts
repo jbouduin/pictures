@@ -14,9 +14,7 @@ export class MainComponent implements OnInit, OnDestroy {
   @ViewChild('sidenav', { static: false }) sidenav!: MatSidenav;
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor(private media: MediaObserver) {
-    console.log('in main.component constructor');
-  }
+  public constructor(private media: MediaObserver) { }
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methzods'>

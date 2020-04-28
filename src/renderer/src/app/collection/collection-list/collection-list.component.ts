@@ -1,4 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { DataVerb, DtoCollection, DtoDataRequest } from '@ipc';
+
+import { IpcService } from '@core';
 
 @Component({
   selector: 'app-collection-list',
@@ -7,11 +10,31 @@ import { Component, OnInit } from '@angular/core';
 })
 export class CollectionListComponent implements OnInit {
 
+  // <editor-fold desc='Public properties'>
+  public collections: Array<DtoCollection>;
+  // </editor-fold>
+
   // <editor-fold desc='Constructor & C°'>
-  public constructor() { }
+  public constructor(private ipcService: IpcService) {
+    this.collections = new Array<DtoCollection>();
+  }
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methods'>
-  public ngOnInit(): void { }
+  public ngAfterViewInit(): void {
+
+  }
+
+  public ngOnInit(): void {
+    const request: DtoDataRequest<string> = {
+      verb: DataVerb.GET,
+      path: '/collection',
+      data: ''
+    };
+
+    this.ipcService
+      .dataRequest<string, Array<DtoCollection>>(request)
+      .then(result => this.collections = result.data);
+  }
   // </editor-fold>
 }
