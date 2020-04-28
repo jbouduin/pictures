@@ -1,8 +1,11 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
-import { DataVerb, DtoCollection, DtoDataRequest } from '@ipc';
+import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { DataVerb, DtoListCollection, DtoNewCollection, DtoDataRequest } from '@ipc';
 
 import { IpcService } from '@core';
 import { FloatingButtonHost } from '@shared';
+
+import { CollectionDialogComponent } from '../collection-dialog/collection-dialog.component';
 
 @Component({
   selector: 'app-collection-list',
@@ -12,20 +15,18 @@ import { FloatingButtonHost } from '@shared';
 export class CollectionListComponent implements FloatingButtonHost, OnInit {
 
   // <editor-fold desc='Public properties'>
-  public collections: Array<DtoCollection>;
+  public collections: Array<DtoListCollection>;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor(private ipcService: IpcService) {
-    this.collections = new Array<DtoCollection>();
+  public constructor(
+    private dialog: MatDialog,
+    private ipcService: IpcService) {
+    this.collections = new Array<DtoListCollection>();
   }
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methods'>
-  public ngAfterViewInit(): void {
-
-  }
-
   public ngOnInit(): void {
     const request: DtoDataRequest<string> = {
       verb: DataVerb.GET,
@@ -34,14 +35,41 @@ export class CollectionListComponent implements FloatingButtonHost, OnInit {
     };
 
     this.ipcService
-      .dataRequest<string, Array<DtoCollection>>(request)
+      .dataRequest<string, Array<DtoListCollection>>(request)
       .then(result => this.collections = result.data);
   }
   // </editor-fold>
 
-  // <editor-fold desc='Floatingbuttonhost interface members'>
+  // <editor-fold desc='FloatingButtonhost interface members'>
   public floatingButtonClick(): void {
-    alert('click');
+    const dtoNewCollection: DtoNewCollection = {
+      name: undefined,
+      path: undefined
+    };
+    const dialogRef = this.dialog.open(
+      CollectionDialogComponent,
+      {
+        width: '600px',
+        data: dtoNewCollection
+      }
+    );
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        if ('id' in result) {
+          alert ('not implemented');
+        } else {
+          console.log(result);
+          const request: DtoDataRequest<DtoNewCollection> = {
+            verb: DataVerb.POST,
+            path: '/collection',
+            data: result
+          };
+          this.ipcService
+            .dataRequest<DtoNewCollection, DtoListCollection>(request)
+            .then(result => this.collections.splice(0, 0, result.data));
+        }
+      }
+    });
   }
 
   public get floatingButtonIcon(): string {

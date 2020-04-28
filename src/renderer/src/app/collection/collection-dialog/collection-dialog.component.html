@@ -1,0 +1,27 @@
+<h1 mat-dialog-title>{{dialogTitle}}</h1>
+<div mat-dialog-content [formGroup]="collectionData">
+  <div>
+    <mat-form-field class="full-width">
+      <mat-label>Name</mat-label>
+      <input matInput required
+        placeholder="enter a name for your collection"
+        formControlName="name"
+        [(ngModel)]="dtoCollection.name"/>
+      <mat-error>{{ getErrorMessage('name') }}</mat-error>
+    </mat-form-field>
+  </div>
+  <div>
+    <mat-form-field class="full-width">
+      <mat-label>Folder</mat-label>
+      <input matInput required
+        placeholder="enter the location of your collection"
+        formControlName="path"
+        [(ngModel)]="dtoCollection.path"/>
+      <mat-error>{{ getErrorMessage('path') }}</mat-error>
+    </mat-form-field>
+  </div>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="cancel()">Cancel</button>
+  <button mat-button [mat-dialog-close]="dtoCollection" cdkFocusInitial [disabled]="collectionData.invalid">Ok</button>
+</div>

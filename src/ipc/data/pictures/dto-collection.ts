@@ -1,9 +1,18 @@
 import {DtoBase } from '../dto-base';
-import { DtoPicture } from './dto-picture';
 
-export interface DtoCollection extends DtoBase {
+export interface DtoGetCollection extends DtoBase {
   name: string;
-  //description: string;
+  path: string;
+}
+
+export interface DtoListCollection {
+  id: number;
+  name: string;
   path: string;
   pictures: number;
+}
+
+export interface DtoNewCollection {
+  name: string;
+  path: string;
 }

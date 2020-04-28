@@ -3,6 +3,7 @@ import { inject, injectable } from 'inversify';
 import * as _ from 'lodash';
 import { match, MatchResult } from 'path-to-regexp';
 import * as Collections from 'typescript-collections';
+import * as util from 'util';
 import 'reflect-metadata';
 
 import { DataStatus, DataVerb, DtoDataRequest, DtoDataResponse } from '@ipc';
@@ -19,14 +20,9 @@ export interface IDataRouterService extends IService<boolean> {
   // delete(path: string, callback: (RoutedRequest, Promise<DtoDataResponse<any>>) => void);
   get(path: string, callback: (request: RoutedRequest) => Promise<DtoDataResponse<any>>);
   // patch(path: string, callback: (RoutedRequest, Promise<DtoDataResponse<any>>) => void);
-  // post(path: string, callback: (RoutedRequest, Promise<DtoDataResponse<any>>) => void);
+  post(path: string, callback: (request: RoutedRequest) => Promise<DtoDataResponse<any>>);
   // put(path: string, callback: (RoutedRequest, Promise<DtoDataResponse<any>>) => void);
   routeRequest(request: DtoDataRequest<any>): Promise<DtoDataResponse<any>>;
-}
-
-interface RouteKey {
-  verb: DataVerb,
-  path: string
 }
 
 type RouteCallback = (request: RoutedRequest) => Promise<DtoDataResponse<any>>;
@@ -36,6 +32,7 @@ export class DataRouterService implements IDataRouterService {
 
   // <editor-fold desc='Private properties'>
   private getRoutes: Collections.Dictionary<string, RouteCallback>;
+  private postRoutes: Collections.Dictionary<string, RouteCallback>;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
@@ -43,6 +40,7 @@ export class DataRouterService implements IDataRouterService {
     @inject(SERVICETYPES.ConfigurationService) private configurationService: IConfigurationService,
     @inject(SERVICETYPES.CollectionService) private collectionService: ICollectionService) {
     this.getRoutes = new Collections.Dictionary<string, RouteCallback>();
+    this.postRoutes = new Collections.Dictionary<string, RouteCallback>();
   }
   // </editor-fold>
 
@@ -53,6 +51,8 @@ export class DataRouterService implements IDataRouterService {
     this.collectionService.setRoutes(this);
     console.log('registered GET routes:');
     this.getRoutes.keys().forEach(route => console.log(route));
+    console.log('registered POST routes:');
+    this.postRoutes.keys().forEach(route => console.log(route));
     return Promise.resolve(true);
   }
   // </editor-fold>
@@ -62,16 +62,26 @@ export class DataRouterService implements IDataRouterService {
     this.getRoutes.setValue(path, callback);
   }
 
+  public post(path: string, callback: RouteCallback) {
+    this.postRoutes.setValue(path, callback);
+  }
+
   public routeRequest(request: DtoDataRequest<any>): Promise<DtoDataResponse<any>> {
     let result: Promise<DtoDataResponse<any>>;
-    console.log(request);
+    console.log(`routing ${DataVerb[request.verb]} ${request.path}`);
     let routeDictionary: Collections.Dictionary<string, RouteCallback>;
     switch(request.verb) {
       case (DataVerb.GET): {
         routeDictionary = this.getRoutes;
+        break;
+      }
+      case (DataVerb.POST): {
+        routeDictionary = this.postRoutes;
+        break;
       }
     }
     if (!routeDictionary) {
+      console.log('not allowed');
       const response: DtoDataResponse<string> = {
         status: DataStatus.NotAllowed,
         data: 'Not implemented'
@@ -90,6 +100,7 @@ export class DataRouterService implements IDataRouterService {
     request: DtoDataRequest<any>,
     routeDictionary: Collections.Dictionary<string, RouteCallback>): Promise<DtoDataResponse<any>> {
     let result: Promise<DtoDataResponse<any>>;
+
     const matchedKey = routeDictionary.keys().find(key => {
       const matcher = match(key);
       const matchResult = matcher(request.path);
@@ -107,8 +118,9 @@ export class DataRouterService implements IDataRouterService {
         routedRequest.path = matchResult2.path;
         routedRequest.params = matchResult2.params;
         routedRequest.data = request.data;
-        const route = this.getRoutes.getValue(matchedKey);
+        const route = routeDictionary.getValue(matchedKey);
         if (route) {
+          console.log(routedRequest);
           result = route(routedRequest);
         }
       } else {

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { DtoCollection } from '@ipc';
+import { DtoListCollection } from '@ipc';
 
 import { ConfigurationService } from '@core';
 
@@ -9,7 +9,7 @@ import { ConfigurationService } from '@core';
   styleUrls: ['./collection-card.component.scss']
 })
 export class CollectionCardComponent implements OnInit {
-  @Input() collection: DtoCollection;
+  @Input() collection: DtoListCollection;
 
   // <editor-fold desc='Public properties'>
   public thumbnailStyle: Object;

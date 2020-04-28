@@ -1,10 +1,16 @@
 import { DtoBase } from '../dto-base';
-import { DtoCollection } from './dto-collection';
+import { DtoGetCollection, DtoListCollection } from './dto-collection';
 import { DtoExif } from './dto-exif';
 
-export interface DtoPicture extends DtoBase {
+export interface DtoGetPicture extends DtoBase {
   fileName: string;
   path: string;
-  collection: DtoCollection;
-  exifs: Array<DtoExif>;
+  collection: DtoGetCollection;
+}
+
+export interface DtoListPicture {
+  id: number;
+  fileName: string;
+  path: string;
+  collection: DtoListCollection
 }
