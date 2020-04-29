@@ -15,7 +15,10 @@ export class Picture extends BaseEntity {
   public path: string;
 
   @Index()
-  @ManyToOne(type => Collection, collection => collection.pictures, { nullable: false })
+  @ManyToOne(
+    type => Collection,
+    collection => collection.pictures,
+    { nullable: false, onDelete: 'CASCADE'})
   public collection: Collection;
 
   @OneToMany(type => Exif, exif => exif.picture)

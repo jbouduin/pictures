@@ -60,7 +60,8 @@ export class CollectionService implements ICollectionService {
           };
           return result;
         },
-        () => {
+        (error) => {
+          console.log(error);
           const result: DtoDataResponse<string> = {
             status: DataStatus.Error,
             data: undefined
