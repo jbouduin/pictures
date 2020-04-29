@@ -5,6 +5,7 @@ import { DataVerb, DtoListCollection, DtoNewCollection, DtoDataRequest } from '@
 import { IpcService } from '@core';
 import { FloatingButtonHost } from '@shared';
 
+import { CollectionCardParams } from '../collection-card/collection-card.params';
 import { CollectionDialogComponent } from '../collection-dialog/collection-dialog.component';
 
 @Component({
@@ -15,14 +16,14 @@ import { CollectionDialogComponent } from '../collection-dialog/collection-dialo
 export class CollectionListComponent implements FloatingButtonHost, OnInit {
 
   // <editor-fold desc='Public properties'>
-  public collections: Array<DtoListCollection>;
+  public collectionCardParamsArray: Array<CollectionCardParams>;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
   public constructor(
     private dialog: MatDialog,
     private ipcService: IpcService) {
-    this.collections = new Array<DtoListCollection>();
+    this.collectionCardParamsArray = new Array<CollectionCardParams>();
   }
   // </editor-fold>
 
@@ -36,7 +37,9 @@ export class CollectionListComponent implements FloatingButtonHost, OnInit {
 
     this.ipcService
       .dataRequest<string, Array<DtoListCollection>>(request)
-      .then(result => this.collections = result.data);
+      .then(result => this.collectionCardParamsArray =
+        result.data.map(collection => new CollectionCardParams(collection, this.deleteCallBack.bind(this)))
+      );
   }
   // </editor-fold>
 
@@ -66,7 +69,11 @@ export class CollectionListComponent implements FloatingButtonHost, OnInit {
           };
           this.ipcService
             .dataRequest<DtoNewCollection, DtoListCollection>(request)
-            .then(result => this.collections.splice(0, 0, result.data));
+            .then(result => this.collectionCardParamsArray.splice(
+              0,
+              0,
+              new CollectionCardParams(result.data, this.deleteCallBack.bind(this)))
+            );
         }
       }
     });
@@ -74,6 +81,16 @@ export class CollectionListComponent implements FloatingButtonHost, OnInit {
 
   public get floatingButtonIcon(): string {
     return 'add';
+  }
+  // </editor-fold>
+
+  // <editor-fold desc='Private methods'>
+  private deleteCallBack(id: number): void {
+    this.collectionCardParamsArray.forEach( (item, index) => {
+       if (item.collection.id === id) {
+         this.collectionCardParamsArray.splice(index,1);
+       }
+     });
   }
   // </editor-fold>
 }

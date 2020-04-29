@@ -5,8 +5,11 @@ import { DataVerb, DtoDataRequest } from '@ipc';
 import { DtoCollection, DtoListCollection } from '@ipc';
 
 import { ConfigurationService, IpcService } from '@core';
+import { ConfirmationDialogComponent, ConfirmationDialogParams } from '@shared';
 
 import { CollectionDialogComponent } from '../collection-dialog/collection-dialog.component';
+
+import { CollectionCardParams } from './collection-card.params';
 
 @Component({
   selector: 'app-collection-card',
@@ -14,10 +17,12 @@ import { CollectionDialogComponent } from '../collection-dialog/collection-dialo
   styleUrls: ['./collection-card.component.scss']
 })
 export class CollectionCardComponent implements OnInit {
-  @Input() collection: DtoListCollection;
+  @Input() collectionCardParams: CollectionCardParams;
 
   // <editor-fold desc='Public properties'>
   public thumbnailStyle: Object;
+  public collection: DtoListCollection;
+
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
@@ -29,6 +34,7 @@ export class CollectionCardComponent implements OnInit {
 
   // <editor-fold desc='Angular interface methods'>
   public ngOnInit(): void {
+    this.collection = this.collectionCardParams.collection;
     const path = this.configurationService.configuration.appPath.replace(/\\/g, '/');
     const imageSrc = `file:${path}/dist/renderer/assets/thumb.png`;
     this.thumbnailStyle = {
@@ -80,7 +86,39 @@ export class CollectionCardComponent implements OnInit {
   }
 
   public delete(): void {
-    alert('delete clicked');
+    const dialogParams = new ConfirmationDialogParams();
+    dialogParams.okButtonLabel = 'Delete';
+    dialogParams.title = `Delete collection '${this.collection.name}'?`;
+    dialogParams.text =
+    `Click on 'Delete' to remove the collection.
+This will remove the collection and all related data from the database. Physical files on disk will remain untouched.`;
+
+    const dialogRef = this.dialog.open(
+      ConfirmationDialogComponent,
+      {
+        width: '600px',
+        data: dialogParams
+      }
+    );
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        const request: DtoDataRequest<string> = {
+          verb: DataVerb.DELETE,
+          path: `/collection/${this.collection.id}`,
+          data: undefined
+        };
+        this.ipcService
+          .dataRequest<string, string>(request)
+          .then( result => {
+            this.collectionCardParams.deleteCallBack(this.collection.id);
+          },
+          () => {
+            alert('something went wrong');
+          }
+        );
+
+      }
+    });
   }
   // </editor-fold>
 

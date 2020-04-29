@@ -3,9 +3,10 @@ import { CommonModule } from '@angular/common';
 import { MaterialModule } from '../material.module';
 
 import { FloatingButtonComponent } from './floating-button/floating-button.component';
+import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-dialog.component';
 
 @NgModule({
-  declarations: [FloatingButtonComponent],
+  declarations: [FloatingButtonComponent, ConfirmationDialogComponent],
   imports: [
     CommonModule,
     MaterialModule

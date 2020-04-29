@@ -30,6 +30,8 @@ export class CollectionService implements ICollectionService {
 
   // <editor-fold desc='IDataService interface methods'>
   public setRoutes(router: IDataRouterService): void {
+    // DELETE
+    router.delete('/collection/:collection', this.deleteCollection.bind(this));
     // GET
     router.get('/collection', this.getCollections.bind(this));
     router.get('/collection/:collection', this.getCollection.bind(this));
@@ -41,7 +43,31 @@ export class CollectionService implements ICollectionService {
   }
   // </editor-fold>
 
-  // <editor-fold desc='GET route callbacks'>
+  // <editor-fold desc='DELETE route callback'>
+  public deleteCollection(request: RoutedRequest): Promise<DtoDataResponse<string>> {
+    return this.databaseService
+      .getCollectionRepository()
+      .delete(request.params.collection)
+      .then(
+        () => {
+          const result: DtoDataResponse<string> = {
+            status: DataStatus.Ok,
+            data: undefined
+          };
+          return result;
+        },
+        () => {
+          const result: DtoDataResponse<string> = {
+            status: DataStatus.Error,
+            data: undefined
+          };
+          return result;
+        }
+      )
+  }
+  // </editor-fold>
+
+  // <editor-fold desc='GET routes callbacks'>
   private getCollections(request: RoutedRequest): Promise<DtoDataResponse<Array<DtoListCollection>>> {
     return this.databaseService
       .getCollectionRepository()

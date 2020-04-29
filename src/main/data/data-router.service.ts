@@ -17,9 +17,9 @@ import { RoutedRequest } from './routed-request';
 import SERVICETYPES from '../di/service.types';
 
 export interface IDataRouterService extends IService<boolean> {
-  // delete(path: string, callback: (RoutedRequest, Promise<DtoDataResponse<any>>) => void);
+  delete(path: string, callback: (request: RoutedRequest) => Promise<DtoDataResponse<any>>);
   get(path: string, callback: (request: RoutedRequest) => Promise<DtoDataResponse<any>>);
-  // patch(path: string, callback: (RoutedRequest, Promise<DtoDataResponse<any>>) => void);
+  // PATCH is not used
   post(path: string, callback: (request: RoutedRequest) => Promise<DtoDataResponse<any>>);
   put(path: string, callback: (request: RoutedRequest) => Promise<DtoDataResponse<any>>);
   routeRequest(request: DtoDataRequest<any>): Promise<DtoDataResponse<any>>;
@@ -31,6 +31,7 @@ type RouteCallback = (request: RoutedRequest) => Promise<DtoDataResponse<any>>;
 export class DataRouterService implements IDataRouterService {
 
   // <editor-fold desc='Private properties'>
+  private deleteRoutes: Collections.Dictionary<string, RouteCallback>;
   private getRoutes: Collections.Dictionary<string, RouteCallback>;
   private postRoutes: Collections.Dictionary<string, RouteCallback>;
   private putRoutes: Collections.Dictionary<string, RouteCallback>;
@@ -40,6 +41,7 @@ export class DataRouterService implements IDataRouterService {
   public constructor(
     @inject(SERVICETYPES.ConfigurationService) private configurationService: IConfigurationService,
     @inject(SERVICETYPES.CollectionService) private collectionService: ICollectionService) {
+    this.deleteRoutes = new Collections.Dictionary<string, RouteCallback>();
     this.getRoutes = new Collections.Dictionary<string, RouteCallback>();
     this.postRoutes = new Collections.Dictionary<string, RouteCallback>();
     this.putRoutes = new Collections.Dictionary<string, RouteCallback>();
@@ -51,6 +53,8 @@ export class DataRouterService implements IDataRouterService {
     console.log('in initialize DataRouterService');
     this.configurationService.setRoutes(this);
     this.collectionService.setRoutes(this);
+    console.log('registered DELETE routes:');
+    this.deleteRoutes.keys().forEach(route => console.log(route));
     console.log('registered GET routes:');
     this.getRoutes.keys().forEach(route => console.log(route));
     console.log('registered POST routes:');
@@ -62,6 +66,10 @@ export class DataRouterService implements IDataRouterService {
   // </editor-fold>
 
   // <editor-fold desc='IDataRouterService interface methods'>
+  public delete(path: string, callback: RouteCallback) {
+    this.deleteRoutes.setValue(path, callback);
+  }
+
   public get(path: string, callback: RouteCallback) {
     this.getRoutes.setValue(path, callback);
   }
@@ -79,6 +87,10 @@ export class DataRouterService implements IDataRouterService {
     console.log(`routing ${DataVerb[request.verb]} ${request.path}`);
     let routeDictionary: Collections.Dictionary<string, RouteCallback>;
     switch(request.verb) {
+      case (DataVerb.DELETE): {
+        routeDictionary = this.deleteRoutes;
+        break;
+      }
       case (DataVerb.GET): {
         routeDictionary = this.getRoutes;
         break;
