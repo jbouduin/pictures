@@ -4,12 +4,13 @@ import 'reflect-metadata';
 
 import { DataStatus, DtoConfiguration, DtoEnvironment, DtoDataResponse } from '@ipc';
 
+import { IService } from '../../di';
 import { IDataRouterService } from '../data-router.service';
 import { IDataService } from '../data-service';
 import { RoutedRequest } from '../routed-request';
 import { Configuration } from './configuration';
 
-export interface IConfigurationService extends IDataService<Configuration> {
+export interface IConfigurationService extends IDataService, IService<Configuration> {
   configuration: DtoConfiguration;
   environment: DtoEnvironment;
 }

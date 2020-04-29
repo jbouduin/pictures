@@ -1,4 +1,5 @@
-import {DtoBase } from '../dto-base';
+import { ScanStatus } from '../../system';
+import { DtoBase } from '../dto-base';
 
 export interface DtoCollection extends DtoBase {
   name: string;
@@ -10,6 +11,7 @@ export interface DtoListCollection {
   name: string;
   path: string;
   pictures: number;
+  scanStatus: ScanStatus;
 }
 
 export interface DtoNewCollection {

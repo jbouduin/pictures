@@ -7,6 +7,7 @@ import { Exif } from './exif';
 @Entity()
 export class Picture extends BaseEntity {
 
+  // TODO unique index on filename + pathname
   @Column('nvarchar', { length: 256, nullable: false })
   public fileName: string;
 

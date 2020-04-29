@@ -30,6 +30,7 @@
   "private": true,
   "dependencies": {
     "@angular/flex-layout": "^9.0.0-beta.29",
+    "glob-promise": "^3.4.0",
     "inversify": "^5.0.1",
     "path-to-regexp": "^6.1.0",
     "sqlite3": "^4.1.1",
