@@ -1,5 +1,15 @@
 <h1 mat-dialog-title>{{dialogTitle}}</h1>
 <div mat-dialog-content [formGroup]="collectionData">
+  <div *ngIf="isUpdate" fxLayout="row" fxLayoutAlign="space-between center">
+    <mat-form-field >
+      <mat-label>Id</mat-label>
+      <input matInput [value]="id" [disabled]="true"/>
+    </mat-form-field>
+    <mat-form-field >
+      <mat-label>Version</mat-label>
+      <input matInput [value]="version" [disabled]="true"/>
+    </mat-form-field>
+  </div>
   <div>
     <mat-form-field class="full-width">
       <mat-label>Name</mat-label>
@@ -16,8 +26,19 @@
       <input matInput required
         placeholder="enter the location of your collection"
         formControlName="path"
-        [(ngModel)]="dtoCollection.path"/>
+        [(ngModel)]="dtoCollection.path"
+        [disabled]="isUpdate"/>
       <mat-error>{{ getErrorMessage('path') }}</mat-error>
+    </mat-form-field>
+  </div>
+  <div *ngIf="isUpdate" fxLayout="row" fxLayoutAlign="space-between center">
+    <mat-form-field >
+      <mat-label>Created</mat-label>
+      <input matInput [value]="created | date:'d.M.yyyy HH:mm:SS'" [disabled]="true"/>
+    </mat-form-field>
+    <mat-form-field >
+      <mat-label>Updated</mat-label>
+      <input matInput [value]="modified | date:'d.M.yyyy HH:mm:SS'" [disabled]="true"/>
     </mat-form-field>
   </div>
 </div>

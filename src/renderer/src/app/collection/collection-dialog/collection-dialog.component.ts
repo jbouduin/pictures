@@ -2,7 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 
-import { DtoGetCollection, DtoNewCollection } from '@ipc';
+import { DtoCollection, DtoNewCollection } from '@ipc';
 
 @Component({
   selector: 'app-collection-dialog',
@@ -16,11 +16,49 @@ export class CollectionDialogComponent implements OnInit {
   public collectionData: FormGroup;
   // </editor-fold>
 
+  // <editor-fold desc='Public get Methods'>
+  public get created(): Date {
+    if (this.isUpdate) {
+      return (this.dtoCollection as DtoCollection).created;
+    } else {
+      return undefined;
+    }
+  }
+
+  public get id(): number {
+    if (this.isUpdate) {
+      return (this.dtoCollection as DtoCollection).id;
+    } else {
+      return undefined;
+    }
+  }
+
+  public get isUpdate(): boolean {
+    return 'id' in this.dtoCollection;
+  }
+
+  public get modified(): Date {
+    if (this.isUpdate) {
+      return (this.dtoCollection as DtoCollection).modified;
+    } else {
+      return undefined;
+    }
+  }
+
+  public get version(): number {
+    if (this.isUpdate) {
+      return (this.dtoCollection as DtoCollection).version;
+    } else {
+      return undefined;
+    }
+  }
+  // </editor-fold>
+
   // <editor-fold desc='Constructor & C°'>
   public constructor(
     private formBuilder: FormBuilder,
     private dialogRef: MatDialogRef<CollectionDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public dtoCollection: DtoNewCollection | DtoGetCollection) {
+    @Inject(MAT_DIALOG_DATA) public dtoCollection: DtoNewCollection | DtoCollection) {
 
     this.dialogTitle = 'id' in dtoCollection ?
       'Edit collection' :
@@ -28,7 +66,7 @@ export class CollectionDialogComponent implements OnInit {
 
     this.collectionData = this.formBuilder.group({
         name: new FormControl('', [Validators.required]),
-        path: new FormControl('', [Validators.required])
+        path: new FormControl( { value: '', disabled: this.isUpdate }, [Validators.required])
       });
   }
   // </editor-fold>

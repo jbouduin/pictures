@@ -13,8 +13,12 @@
             </div>
           </div>
           <div class="thumb-actions">
-            <mat-icon>edit</mat-icon>
-            <mat-icon>delete</mat-icon>
+            <button class="icon-button hover green" (click)="edit()">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button class="icon-button hover red" (click)="delete()">
+              <mat-icon>delete</mat-icon>
+            </button>
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 
-import { DataStatus, DtoListCollection, DtoDataResponse } from '@ipc';
+import { DataStatus, DtoCollection, DtoListCollection, DtoDataResponse } from '@ipc';
 
 import { IDatabaseService } from '../../database';
 import { IDataRouterService } from '../data-router.service';
@@ -31,17 +31,18 @@ export class CollectionService implements ICollectionService {
   // <editor-fold desc='IDataService interface methods'>
   public setRoutes(router: IDataRouterService): void {
     // GET
-    router.get('/collection', this.getCollection.bind(this));
-    router.get('/collection/:collection', this.notImplemented);
+    router.get('/collection', this.getCollections.bind(this));
+    router.get('/collection/:collection', this.getCollection.bind(this));
     router.get('/collection/:collection/pictures', this.notImplemented);
     // POST
     router.post('/collection', this.createCollection.bind(this));
+    // PUT
+    router.put('/collection/:collection', this.updateCollection.bind(this));
   }
   // </editor-fold>
 
   // <editor-fold desc='GET route callbacks'>
-
-  private getCollection(request: RoutedRequest): Promise<DtoDataResponse<Array<DtoListCollection>>> {
+  private getCollections(request: RoutedRequest): Promise<DtoDataResponse<Array<DtoListCollection>>> {
     return this.databaseService
       .getCollectionRepository()
       .createQueryBuilder('collection')
@@ -62,16 +63,46 @@ export class CollectionService implements ICollectionService {
       .then( dtoListCollections => {
         const result: DtoDataResponse<Array<DtoListCollection>> = {
           status: DataStatus.Ok,
-          data: dtoListCollections
+          data: dtoListCollections,
         };
         return result;
       });
   }
 
+  private getCollection(request: RoutedRequest): Promise<DtoDataResponse<DtoCollection>> {
+    return this.databaseService
+      .getCollectionRepository()
+      .findOneOrFail(request.params.collection)
+      .then(
+        collection => {
+          const dtoCollection: DtoCollection = {
+            id: collection.id,
+            created: collection.created,
+            modified: collection.modified,
+            version: collection.version,
+            name: collection.name,
+            path: collection.path
+          }
+          const result: DtoDataResponse<DtoCollection> = {
+            status: DataStatus.Ok,
+            data: dtoCollection
+          };
+          return result;
+        },
+        () => {
+          const result: DtoDataResponse<DtoCollection> = {
+            status: DataStatus.Conflict,
+            data: undefined
+          };
+          return result;
+        }
+      );
+  }
+
   private notImplemented(request: RoutedRequest): Promise<DtoDataResponse<any>> {
     const result: DtoDataResponse<string> = {
       status: DataStatus.Error,
-      data: 'Not implemented'
+      data: undefined
     };
     return Promise.resolve(result);
   }
@@ -101,6 +132,49 @@ export class CollectionService implements ICollectionService {
         };
         return result;
       });
+  }
+  // </editor-fold>
+
+
+  // <editor-fold desc='PUT route callback'>
+  public updateCollection(request: RoutedRequest): Promise<DtoDataResponse<DtoListCollection>> {
+    const repository = this.databaseService.getCollectionRepository();
+    return repository
+      .findOneOrFail(request.params.collection)
+      .then(
+        collection => {
+          collection.name = request.data.name;
+          return repository.save(collection).then(
+            savedCollection => {
+              const dtoListCollection: DtoListCollection = {
+                id: savedCollection.id,
+                name: savedCollection.name,
+                path: savedCollection.path,
+                pictures: 0
+              };
+              const result: DtoDataResponse<DtoListCollection> = {
+                status: DataStatus.Ok,
+                data: dtoListCollection,
+              };
+              return result;
+            },
+            () => {
+              const result: DtoDataResponse<DtoListCollection> = {
+                status: DataStatus.Conflict,
+                data: undefined
+              };
+              return result;
+            }
+          );
+        },
+        () => {
+          const result: DtoDataResponse<DtoListCollection> = {
+            status: DataStatus.Conflict,
+            data: undefined
+          };
+          return result;
+        }
+      );
   }
   // </editor-fold>
 }

@@ -1,7 +1,12 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { DtoListCollection } from '@ipc';
+import { MatDialog } from '@angular/material/dialog';
 
-import { ConfigurationService } from '@core';
+import { DataVerb, DtoDataRequest } from '@ipc';
+import { DtoCollection, DtoListCollection } from '@ipc';
+
+import { ConfigurationService, IpcService } from '@core';
+
+import { CollectionDialogComponent } from '../collection-dialog/collection-dialog.component';
 
 @Component({
   selector: 'app-collection-card',
@@ -13,29 +18,69 @@ export class CollectionCardComponent implements OnInit {
 
   // <editor-fold desc='Public properties'>
   public thumbnailStyle: Object;
-  public footerText: string;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor(private configurationService: ConfigurationService) { }
+  public constructor(
+    private dialog: MatDialog,
+    private configurationService: ConfigurationService,
+    private ipcService: IpcService) { }
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methods'>
   public ngOnInit(): void {
     const path = this.configurationService.configuration.appPath.replace(/\\/g, '/');
-    const imageSrc = `file:${path}/dist/renderer/assets/thumb_150.png`;
+    const imageSrc = `file:${path}/dist/renderer/assets/thumb.png`;
     this.thumbnailStyle = {
       'background-image': `url(${imageSrc})`,
-      'width': '150px',
-      'height': '150px',
+      'width': '180px',
+      'height': '180px',
       'background-position': 'center center',
+      'background-size': 'cover',
       'margin-left': '-5px'
     };
-    this.footerText = this.collection.pictures === 0 ?
-      'empty' :
-      this.collection.pictures > 1 ?
-        `${this.collection.pictures} pictures` :
-        `${this.collection.pictures} picture`;
+  }
+  // </editor-fold>
+
+  // <editor-fold desc='UI Trigger methods'>
+  public edit(): void {
+    const request: DtoDataRequest<string> = {
+      verb: DataVerb.GET,
+      path: `/collection/${this.collection.id}`,
+      data: ''
+    };
+    this.ipcService
+      .dataRequest<string, DtoCollection>(request)
+      .then(dtoCollection => {
+        const dialogRef = this.dialog.open(
+          CollectionDialogComponent,
+          {
+            width: '600px',
+            data: dtoCollection.data
+          }
+        );
+        dialogRef.afterClosed().subscribe(result => {
+          if (result) {
+            if ('id' in result) {
+              console.log(result);
+              const request: DtoDataRequest<DtoCollection> = {
+                verb: DataVerb.PUT,
+                path: `/collection/${this.collection.id}`,
+                data: result
+              };
+              this.ipcService
+                .dataRequest<DtoCollection, DtoListCollection>(request)
+                .then(result => this.collection = result.data);
+            } else {
+              alert ('not implemented');
+            }
+          }
+        });
+    });
+  }
+
+  public delete(): void {
+    alert('delete clicked');
   }
   // </editor-fold>
 

@@ -1,7 +1,7 @@
 ## Dto*
 Contains all fields of the entity. Usually given as input for edit or view detail dialogs. Used to save changes
 ```typescript
-export interface DtoGetCollection extends DtoBase {
+export interface DtoCollection extends DtoBase {
   name: string;
   path: string;
 }
@@ -21,7 +21,7 @@ export interface DtoListCollection {
 ## DtoNew*
 The data to be used to create a new entitity
 ```typescript
-export interface DtoSetCollection {
+export interface DtoNewCollection {
   name: string;
   path: string;
 }

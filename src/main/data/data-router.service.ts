@@ -21,7 +21,7 @@ export interface IDataRouterService extends IService<boolean> {
   get(path: string, callback: (request: RoutedRequest) => Promise<DtoDataResponse<any>>);
   // patch(path: string, callback: (RoutedRequest, Promise<DtoDataResponse<any>>) => void);
   post(path: string, callback: (request: RoutedRequest) => Promise<DtoDataResponse<any>>);
-  // put(path: string, callback: (RoutedRequest, Promise<DtoDataResponse<any>>) => void);
+  put(path: string, callback: (request: RoutedRequest) => Promise<DtoDataResponse<any>>);
   routeRequest(request: DtoDataRequest<any>): Promise<DtoDataResponse<any>>;
 }
 
@@ -33,6 +33,7 @@ export class DataRouterService implements IDataRouterService {
   // <editor-fold desc='Private properties'>
   private getRoutes: Collections.Dictionary<string, RouteCallback>;
   private postRoutes: Collections.Dictionary<string, RouteCallback>;
+  private putRoutes: Collections.Dictionary<string, RouteCallback>;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
@@ -41,6 +42,7 @@ export class DataRouterService implements IDataRouterService {
     @inject(SERVICETYPES.CollectionService) private collectionService: ICollectionService) {
     this.getRoutes = new Collections.Dictionary<string, RouteCallback>();
     this.postRoutes = new Collections.Dictionary<string, RouteCallback>();
+    this.putRoutes = new Collections.Dictionary<string, RouteCallback>();
   }
   // </editor-fold>
 
@@ -53,6 +55,8 @@ export class DataRouterService implements IDataRouterService {
     this.getRoutes.keys().forEach(route => console.log(route));
     console.log('registered POST routes:');
     this.postRoutes.keys().forEach(route => console.log(route));
+    console.log('registered PUT routes:');
+    this.putRoutes.keys().forEach(route => console.log(route));
     return Promise.resolve(true);
   }
   // </editor-fold>
@@ -64,6 +68,10 @@ export class DataRouterService implements IDataRouterService {
 
   public post(path: string, callback: RouteCallback) {
     this.postRoutes.setValue(path, callback);
+  }
+
+  public put(path: string, callback: RouteCallback) {
+    this.putRoutes.setValue(path, callback);
   }
 
   public routeRequest(request: DtoDataRequest<any>): Promise<DtoDataResponse<any>> {
@@ -79,12 +87,16 @@ export class DataRouterService implements IDataRouterService {
         routeDictionary = this.postRoutes;
         break;
       }
+      case (DataVerb.PUT): {
+        routeDictionary = this.putRoutes;
+        break;
+      }
     }
     if (!routeDictionary) {
       console.log('not allowed');
       const response: DtoDataResponse<string> = {
         status: DataStatus.NotAllowed,
-        data: 'Not implemented'
+        data: undefined
       };
       result = Promise.resolve(response);
     }

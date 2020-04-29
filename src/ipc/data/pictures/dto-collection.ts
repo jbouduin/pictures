@@ -1,6 +1,6 @@
 import {DtoBase } from '../dto-base';
 
-export interface DtoGetCollection extends DtoBase {
+export interface DtoCollection extends DtoBase {
   name: string;
   path: string;
 }
