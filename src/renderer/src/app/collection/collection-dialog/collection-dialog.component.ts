@@ -4,6 +4,8 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialo
 
 import { DtoCollection, DtoNewCollection } from '@ipc';
 
+import { CollectionController } from '../collection.controller';
+
 @Component({
   selector: 'app-collection-dialog',
   templateUrl: './collection-dialog.component.html',
@@ -57,7 +59,8 @@ export class CollectionDialogComponent implements OnInit {
   // <editor-fold desc='Constructor & C°'>
   public constructor(
     private formBuilder: FormBuilder,
-    private dialogRef: MatDialogRef<CollectionDialogComponent>,
+    //private dialogRef: MatDialogRef<CollectionDialogComponent>,
+    private collectionController: CollectionController,
     @Inject(MAT_DIALOG_DATA) public dtoCollection: DtoNewCollection | DtoCollection) {
 
     this.dialogTitle = 'id' in dtoCollection ?
@@ -77,7 +80,17 @@ export class CollectionDialogComponent implements OnInit {
 
   // <editor-fold desc='UI triggered methods'>
   public cancel(): void {
-    this.dialogRef.close();
+    this.collectionController.cancelDialog();
+  }
+
+  public save(): void {
+    this.collectionController
+      .commitEdit(this.dtoCollection as DtoCollection);
+  }
+
+  public create(): void {
+    this.collectionController
+      .commitCreate(this.dtoCollection as DtoNewCollection);
   }
 
   public getErrorMessage(name: string): string | undefined {

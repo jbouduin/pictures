@@ -44,5 +44,19 @@
 </div>
 <div mat-dialog-actions>
   <button mat-button (click)="cancel()">Cancel</button>
-  <button mat-button [mat-dialog-close]="dtoCollection" cdkFocusInitial [disabled]="collectionData.invalid">Ok</button>
+  <button
+    *ngIf="isUpdate"
+    mat-button
+    cdkFocusInitial
+    [disabled]="collectionData.invalid"
+    (click)="save()">
+      Save
+  </button>
+  <button
+    *ngIf="!isUpdate"
+    mat-button
+    [disabled]="collectionData.invalid"
+    (click)="create()">
+      Create
+  </button>
 </div>
