@@ -93,11 +93,27 @@ export class CollectionService implements ICollectionService {
         return dtoConnections;
       })
       .then( dtoListCollections => {
-        const result: DtoDataResponse<Array<DtoListCollection>> = {
-          status: DataStatus.Ok,
-          data: dtoListCollections,
-        };
-        return result;
+        return this.databaseService
+          .getPictureRepository()
+          .createQueryBuilder('picture')
+          .select("picture.collectionId")
+          .addSelect("COUNT(*) AS count")
+          .groupBy("picture.collectionId")
+          .getRawMany()
+          .then(rawMany => {
+            console.log(rawMany);
+            dtoListCollections.forEach(dtoListCollection => {
+              const cnt = rawMany.find(count => count.collectionId === dtoListCollection.id);
+              if (cnt) {
+                dtoListCollection.pictures = cnt.count;
+              }
+            });
+            const result: DtoDataResponse<Array<DtoListCollection>> = {
+              status: DataStatus.Ok,
+              data: dtoListCollections,
+            };
+            return result;
+          })
       });
   }
 
@@ -242,7 +258,6 @@ export class CollectionService implements ICollectionService {
           // save each file in a separate transaction
           promises.push(this.pictureService.addPicture(collection, file));
           if (((index + 1) % 10 === 0) || (index === total - 1)) {
-            console.log(index);
             Promise
               .all(promises)
               .then( pictures => {
