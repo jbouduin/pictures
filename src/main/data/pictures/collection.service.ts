@@ -74,47 +74,53 @@ export class CollectionService implements ICollectionService {
 
   // <editor-fold desc='GET routes callbacks'>
   private getCollections(request: RoutedRequest): Promise<DtoDataResponse<Array<DtoListCollection>>> {
-    return this.databaseService
+    const collectionQry = this.databaseService
       .getCollectionRepository()
       .createQueryBuilder('collection')
-      .orderBy('collection.name')
-      .getMany()
-      .then( collections => {
-        const dtoConnections: Array<DtoListCollection> = collections.map(collection => {
-          const result: DtoListCollection = {
-            id: collection.id,
-            name: collection.name,
-            path: collection.path,
-            pictures: 0,
-            scanStatus: ScanStatus.NoScan
-          };
-          return result;
-        });
-        return dtoConnections;
-      })
-      .then( dtoListCollections => {
-        return this.databaseService
-          .getPictureRepository()
-          .createQueryBuilder('picture')
-          .select("picture.collectionId")
+      .select('id')
+      .addSelect('name')
+      .addSelect('path')
+      .leftJoin( (cntQry) => {
+        return cntQry
+          .select('collectionId')
+          .addSelect("path as thumbPath")
+          .addSelect("fileName")
           .addSelect("COUNT(*) AS count")
+          .from('picture', null)
+          .orderBy("path", "DESC")
+          .addOrderBy("fileName", "DESC")
           .groupBy("picture.collectionId")
-          .getRawMany()
-          .then(rawMany => {
-            console.log(rawMany);
-            dtoListCollections.forEach(dtoListCollection => {
-              const cnt = rawMany.find(count => count.collectionId === dtoListCollection.id);
-              if (cnt) {
-                dtoListCollection.pictures = cnt.count;
-              }
-            });
-            const result: DtoDataResponse<Array<DtoListCollection>> = {
-              status: DataStatus.Ok,
-              data: dtoListCollections,
-            };
-            return result;
-          })
+        },
+        'cnt',
+        'cnt.collectionId = collection.Id',
+      )
+      .addSelect('cnt.count')
+      .addSelect('cnt.thumbPath')
+      .addSelect('cnt.fileName')
+      .orderBy('collection.name');
+    console.log(collectionQry.getQuery());
+
+    return collectionQry.getRawMany().then(collections => {
+      // collections.forEach(c => console.log(c));
+      const dtoCollections: Array<DtoListCollection> = collections.map(collection => {
+        const result: DtoListCollection = {
+          id: collection.id,
+          name: collection.name,
+          path: collection.path,
+          pictures: collection.count || 0,
+          scanStatus: ScanStatus.NoScan,
+          thumb: collection.thumbPath ?
+            `${collection.thumbPath}/${collection.fileName}` :
+            undefined
+        };
+        return result;
       });
+      const result: DtoDataResponse<Array<DtoListCollection>> = {
+        status: DataStatus.Ok,
+        data: dtoCollections,
+      };
+      return result;
+    });
   }
 
   private getCollection(request: RoutedRequest): Promise<DtoDataResponse<DtoCollection>> {
@@ -182,7 +188,8 @@ export class CollectionService implements ICollectionService {
           name: collection.name,
           path: collection.path,
           pictures: 0,
-          scanStatus: scanStatus.status
+          scanStatus: scanStatus.status,
+          thumb: undefined,
         };
         const result: DtoDataResponse<DtoListCollection> = {
           status: DataStatus.Ok,
@@ -212,7 +219,8 @@ export class CollectionService implements ICollectionService {
                 name: savedCollection.name,
                 path: savedCollection.path,
                 pictures: 0,
-                scanStatus: ScanStatus.NoScan
+                scanStatus: ScanStatus.NoScan,
+                thumb: undefined
               };
               const result: DtoDataResponse<DtoListCollection> = {
                 status: DataStatus.Ok,

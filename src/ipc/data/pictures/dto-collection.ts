@@ -12,6 +12,7 @@ export interface DtoListCollection {
   path: string;
   pictures: number;
   scanStatus: ScanStatus;
+  thumb: string;
 }
 
 export interface DtoNewCollection {

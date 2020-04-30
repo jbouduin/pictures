@@ -35,10 +35,11 @@ export class CollectionCardComponent implements OnInit {
   // <editor-fold desc='Angular interface methods'>
   public ngOnInit(): void {
     this.collection = this.collectionCardParams.collection;
-    const path = this.configurationService.configuration.appPath.replace(/\\/g, '/');
-    const imageSrc = `file:${path}/dist/renderer/assets/thumb.png`;
+    const imageSrc = (this.collection.thumb ?
+      `file:${this.collection.path}/${this.collection.thumb}` :
+      `file:${this.configurationService.configuration.appPath}/dist/renderer/assets/thumb.png`).replace(/\\/g, '/')
     this.thumbnailStyle = {
-      'background-image': `url(${imageSrc})`,
+      'background-image': `url(${encodeURI(imageSrc)})`,
       'width': '180px',
       'height': '180px',
       'background-position': 'center center',
