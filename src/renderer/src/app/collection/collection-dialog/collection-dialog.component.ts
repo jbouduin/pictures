@@ -2,7 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 
-import { DtoCollection, DtoNewCollection } from '@ipc';
+import { DtoCollection, DtoNewCollection, DataStatus } from '@ipc';
 
 import { CollectionController } from '../collection.controller';
 
@@ -91,6 +91,11 @@ export class CollectionDialogComponent implements OnInit {
   public create(): void {
     this.collectionController
       .commitCreate(this.dtoCollection as DtoNewCollection);
+      // .then(result => {
+      //   if (!result) {
+      //     alert('not created');
+      //   }
+      // });
   }
 
   public getErrorMessage(name: string): string | undefined {

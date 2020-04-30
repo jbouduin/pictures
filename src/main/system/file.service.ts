@@ -29,11 +29,8 @@ export class FileService implements IFileService {
       nocase: true,
       cwd: forwardSlashed
     }
-    //const pattern = `${forwardSlashed}/**/*.+(${fileTypes.join('|')})`;
     const pattern = `**/*.+(${fileTypes.join('|')})`;
     return glob(pattern, options);
-    // .then(files => files.forEach(file => console.log(file)));
-    // return Promise.resolve(new Array<string>());
   }
   // </editor-fold>
 }

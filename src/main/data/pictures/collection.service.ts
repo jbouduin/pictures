@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 
-import { DataStatus, DtoCollection, DtoListCollection, DtoDataResponse, DtoScan, ScanStatus } from '@ipc';
+import { DataStatus, DtoCollection, DtoListCollection, DtoDataResponse, DtoUntypedDataResponse, DtoScan, ScanStatus } from '@ipc';
 
 import { Collection, Picture } from '../../database';
 import { IDatabaseService } from '../../database';
@@ -48,23 +48,22 @@ export class CollectionService implements ICollectionService {
   // </editor-fold>
 
   // <editor-fold desc='DELETE route callback'>
-  private deleteCollection(request: RoutedRequest): Promise<DtoDataResponse<string>> {
+  private deleteCollection(request: RoutedRequest): Promise<DtoUntypedDataResponse> {
     return this.databaseService
       .getCollectionRepository()
       .delete(request.params.collection)
       .then(
         () => {
-          const result: DtoDataResponse<string> = {
-            status: DataStatus.Ok,
-            data: undefined
+          const result: DtoUntypedDataResponse = {
+            status: DataStatus.Ok
           };
           return result;
         },
         (error) => {
           console.log(error);
-          const result: DtoDataResponse<string> = {
+          const result: DtoUntypedDataResponse = {
             status: DataStatus.Error,
-            data: undefined
+            message: `${error.name}: ${error.message}`
           };
           return result;
         }
@@ -100,27 +99,36 @@ export class CollectionService implements ICollectionService {
       .orderBy('collection.name');
     console.log(collectionQry.getQuery());
 
-    return collectionQry.getRawMany().then(collections => {
-      // collections.forEach(c => console.log(c));
-      const dtoCollections: Array<DtoListCollection> = collections.map(collection => {
-        const result: DtoListCollection = {
-          id: collection.id,
-          name: collection.name,
-          path: collection.path,
-          pictures: collection.count || 0,
-          scanStatus: ScanStatus.NoScan,
-          thumb: collection.thumbPath ?
-            `${collection.thumbPath}/${collection.fileName}` :
-            undefined
+    return collectionQry.getRawMany().then(
+      collections => {
+        const dtoCollections: Array<DtoListCollection> = collections.map(collection => {
+          const result: DtoListCollection = {
+            id: collection.id,
+            name: collection.name,
+            path: collection.path,
+            pictures: collection.count || 0,
+            scanStatus: ScanStatus.NoScan,
+            thumb: collection.thumbPath ?
+              `${collection.thumbPath}/${collection.fileName}` :
+              undefined
+          };
+          return result;
+        });
+        const result: DtoDataResponse<Array<DtoListCollection>> = {
+          status: DataStatus.Ok,
+          data: dtoCollections,
         };
         return result;
-      });
-      const result: DtoDataResponse<Array<DtoListCollection>> = {
-        status: DataStatus.Ok,
-        data: dtoCollections,
-      };
-      return result;
-    });
+      },
+      error => {
+        console.log(error);
+        const result: DtoDataResponse<Array<DtoListCollection>> = {
+          status: DataStatus.Error,
+          message: `${error.name}: ${error.message}`
+        };
+        return result;
+      }
+    );
   }
 
   private getCollection(request: RoutedRequest): Promise<DtoDataResponse<DtoCollection>> {
@@ -143,20 +151,20 @@ export class CollectionService implements ICollectionService {
           };
           return result;
         },
-        () => {
+        error => {
           const result: DtoDataResponse<DtoCollection> = {
             status: DataStatus.Conflict,
-            data: undefined
+            message: `${error.name}: ${error.message}`
           };
           return result;
         }
       );
   }
 
-  private notImplemented(request: RoutedRequest): Promise<DtoDataResponse<any>> {
-    const result: DtoDataResponse<string> = {
+  private notImplemented(request: RoutedRequest): Promise<DtoUntypedDataResponse> {
+    const result: DtoUntypedDataResponse = {
       status: DataStatus.Error,
-      data: undefined
+      data: `Route ${request.route} is not implemented`
     };
     return Promise.resolve(result);
   }
@@ -170,7 +178,7 @@ export class CollectionService implements ICollectionService {
     if (!this.fileService.directoryExists(request.data.path)) {
       const result: DtoDataResponse<DtoListCollection> = {
         status: DataStatus.Error,
-        data: undefined
+        message: `The directory '${request.data.path}' could not be found`
       };
       return Promise.resolve(result);
     }
@@ -180,8 +188,8 @@ export class CollectionService implements ICollectionService {
       path: request.data.path
     });
 
-    return repository.save(newCollection)
-      .then(collection => {
+    return repository.save(newCollection).then(
+      collection => {
         const scanStatus = this.scanDirectory(collection);
         const listItem: DtoListCollection = {
           id: collection.id,
@@ -196,7 +204,15 @@ export class CollectionService implements ICollectionService {
           data: listItem
         };
         return result;
-      });
+      },
+      error => {
+        const result: DtoDataResponse<DtoListCollection> = {
+          status: DataStatus.Conflict,
+          message: `${error.name}: ${error.message}`
+        };
+        return result;
+      }
+    );
   }
 
   // private scanCollection(request: RoutedRequest): Promise<DtoDataResponse<string> {
@@ -256,28 +272,34 @@ export class CollectionService implements ICollectionService {
     };
     this.fileService
       .scanDirectory(collection.path, this.fileTypes)
-      .then(files => {
-        const total = files.length;
-        let done = 0;
-        console.log(`found ${total} files`);
-        // TODO send a status to the renderer with the number of files found
-        let promises = new Array<Promise<Picture>>();
-        files.forEach( (file, index) => {
-          // save each file in a separate transaction
-          promises.push(this.pictureService.addPicture(collection, file));
-          if (((index + 1) % 10 === 0) || (index === total - 1)) {
-            Promise
-              .all(promises)
-              .then( pictures => {
-                done += pictures.length;
-                // TODO send current status to renderer
-                console.log(`processed ${done}/${total}pictures`);
-                // TODO if (done === total) send finished to renderer
-              });
-            promises = new Array<Promise<Picture>>();
-          }
-        });
-      });
+      .then(
+        files => {
+          const total = files.length;
+          let done = 0;
+          console.log(`found ${total} files`);
+          // TODO send a status to the renderer with the number of files found
+          let promises = new Array<Promise<Picture>>();
+          files.forEach( (file, index) => {
+            // save each file in a separate transaction
+            promises.push(this.pictureService.addPicture(collection, file));
+            if (((index + 1) % 10 === 0) || (index === total - 1)) {
+              Promise
+                .all(promises)
+                .then( pictures => {
+                  done += pictures.length;
+                  // TODO send current status to renderer
+                  console.log(`processed ${done}/${total}pictures`);
+                  // TODO if (done === total) send finished to renderer
+                });
+              promises = new Array<Promise<Picture>>();
+            }
+          });
+        },
+        error => {
+          console.log(error);
+        }
+      );
+
     return result;
   }
   // </editor-fold>
