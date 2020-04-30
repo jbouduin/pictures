@@ -21,8 +21,7 @@ export class ConfigurationService {
   private getConfiguration(): DtoConfiguration {
     const request: DtoDataRequest<string> = {
       verb: DataVerb.GET,
-      path: '/configuration',
-      data: ''
+      path: '/configuration'
     };
     this._configuration = this.ipcService
       .dataRequestSync<string, DtoConfiguration>(request).data;

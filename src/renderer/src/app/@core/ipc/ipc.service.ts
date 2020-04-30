@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { DtoConfiguration, DtoSystemInfo } from '@ipc';
-import { DtoDataRequest, DtoDataResponse } from '@ipc';
+import { DataStatus, DtoDataRequest, DtoDataResponse, DtoUntypedDataRequest } from '@ipc';
 
 @Injectable({
   providedIn: 'root'
@@ -26,22 +26,49 @@ export class IpcService {
     });
   }
 
-  // TODO find a solution for handling errors coming back
+  // be carefull when using sync, as errors coming from main are not handled
+  public untypedDataRequestSync<T>(request: DtoUntypedDataRequest): DtoDataResponse<T> {
+    return this.dataRequestSync<any, T>(request);
+  }
+
   public dataRequestSync<T,U>(request: DtoDataRequest<T>): DtoDataResponse<U> {
     const json = JSON.stringify(request);
     const result = window.api.electronIpcSendSync('data-sync', json);
     console.log(result);
-    const response: DtoDataResponse<U> = JSON.parse(result);
+    let response: DtoDataResponse<U>;
+    try {
+      response = JSON.parse(result);
+    } catch (error) {
+      response = {
+        status: DataStatus.RendererError,
+        message: `${error.name}: ${error.message}`
+      }
+    }
     return response;
   }
 
-  // TODO reject if an error comes back
+  public untypedDataRequest<T>(request: DtoUntypedDataRequest): Promise<DtoDataResponse<T>> {
+    return this.dataRequest<any, T>(request);
+  }
+
   public dataRequest<T,U>(request: DtoDataRequest<T>): Promise<DtoDataResponse<U>> {
     return new Promise((resolve, reject) => {
       window.api.electronIpcOnce('data', (event, arg) => {
         console.log(arg);
-        const result: DtoDataResponse<U> = JSON.parse(arg);
-        resolve(result);
+        try {
+          const result: DtoDataResponse<U> = JSON.parse(arg);
+          if (result.status < DataStatus.BadRequest) {
+            resolve(result);
+          } else {
+            reject(result);
+          }
+        } catch (error) {
+          const errorResult: DtoDataResponse<U> = {
+            status: DataStatus.RendererError,
+            message: `${error.name}: ${error.message}`
+          }
+          reject(errorResult);
+        }
       });
       window.api.electronIpcSend('data', JSON.stringify(request));
     });

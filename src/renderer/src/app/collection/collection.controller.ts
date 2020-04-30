@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 import { IpcService } from '@core';
-import { DataVerb, DtoDataRequest } from '@ipc';
+import { DataVerb, DtoDataRequest, DtoUntypedDataRequest } from '@ipc';
 import { DtoCollection, DtoListCollection, DtoNewCollection } from '@ipc';
 import { ConfirmationDialogComponent, ConfirmationDialogParams } from '@shared';
 
@@ -43,14 +43,13 @@ export class CollectionController {
     }
   }
   public loadList(): Promise<Array<DtoListCollection>> {
-    const request: DtoDataRequest<string> = {
+    const request: DtoUntypedDataRequest = {
       verb: DataVerb.GET,
-      path: '/collection',
-      data: ''
+      path: '/collection'
     };
 
     return this.ipcService
-      .dataRequest<string, Array<DtoListCollection>>(request)
+      .untypedDataRequest<Array<DtoListCollection>>(request)
       .then(result => this.collections = result.data);
   }
   // </editor-fold>
@@ -62,6 +61,7 @@ export class CollectionController {
       path: undefined
     };
 
+    // todo create a CollectionDialogComponent factory to avoid circular references
     this.collectionDialog = this.dialog.open(
       CollectionDialogComponent,
       {
@@ -80,35 +80,45 @@ export class CollectionController {
     };
     return this.ipcService
       .dataRequest<DtoNewCollection, DtoListCollection>(request)
-      .then(result => {
-        this.collections.splice(0, 0, result.data);
-        if (this.collectionDialog) {
-          this.collectionDialog.close()
-        };
-        return result.data;
-      });
+      .then(
+        result => {
+          this.collections.splice(0, 0, result.data);
+          if (this.collectionDialog) {
+            this.collectionDialog.close()
+          };
+          return result.data;
+        },
+        error => {
+          alert(error.message);
+          return error.data;
+        }
+      );
   }
   // </editor-fold>
 
   // <editor-fold desc='Public Edit related methods'>
   public edit(dtoListCollection: DtoListCollection): void {
-    const request: DtoDataRequest<string> = {
+    const request: DtoUntypedDataRequest = {
       verb: DataVerb.GET,
       path: `/collection/${dtoListCollection.id}`,
-      data: ''
     };
     this.ipcService
-      .dataRequest<string, DtoCollection>(request)
-      .then(dtoCollection => {
-        this.collectionDialog = this.dialog.open(
-          CollectionDialogComponent,
-          {
-            width: '600px',
-            data: dtoCollection.data
-          }
-        );
-        this.collectionDialog.afterClosed().subscribe( () => this.collectionDialog = undefined);
-    });
+      .untypedDataRequest<DtoCollection>(request)
+      .then(
+        dtoCollection => {
+          this.collectionDialog = this.dialog.open(
+            CollectionDialogComponent,
+            {
+              width: '600px',
+              data: dtoCollection.data
+            }
+          );
+          this.collectionDialog.afterClosed().subscribe( () => this.collectionDialog = undefined);
+        },
+        error => {
+          alert(error.message);
+        }
+      );
   }
 
   public commitEdit(dtoCollection: DtoCollection): Promise<DtoListCollection> {
@@ -119,14 +129,20 @@ export class CollectionController {
     };
     return this.ipcService
       .dataRequest<DtoCollection, DtoListCollection>(request)
-      .then(result => {
-        const index = this.collections.findIndex( collection => collection.id === result.data.id);
-        this.collections[index] = result.data;
-        if (this.collectionDialog) {
-          this.collectionDialog.close()
-        };
-        return result.data;
-      });
+      .then(
+        result => {
+          const index = this.collections.findIndex( collection => collection.id === result.data.id);
+          this.collections[index] = result.data;
+          if (this.collectionDialog) {
+            this.collectionDialog.close()
+          };
+          return result.data;
+        },
+        error => {
+          alert(error.message);
+          return error.data;
+        }
+      );
   }
   // </editor-fold>
 
@@ -148,21 +164,21 @@ This will remove the collection and all related data from the database. Physical
     );
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        const request: DtoDataRequest<string> = {
+        const request: DtoUntypedDataRequest = {
           verb: DataVerb.DELETE,
-          path: `/collection/${dtoListCollection.id}`,
-          data: undefined
+          path: `/collection/${dtoListCollection.id}`
         };
         this.ipcService
-          .dataRequest<string, string>(request)
-          .then( result => {
-            const index = this.collections.findIndex( collection => collection.id === dtoListCollection.id);
-            this.collections.splice(index, 1);
-          },
-          () => {
-            alert('something went wrong');
-          }
-        );
+          .untypedDataRequest<string>(request)
+          .then(
+            result => {
+              const index = this.collections.findIndex( collection => collection.id === dtoListCollection.id);
+              this.collections.splice(index, 1);
+            },
+            error => {
+              alert(error.message);
+            }
+          );
       }
     });
   }

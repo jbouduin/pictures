@@ -9,5 +9,7 @@ export enum DataVerb {
 export interface DtoDataRequest<T> {
   verb: DataVerb,
   path: string,
-  data: T
+  data?: T
 }
+
+export interface DtoUntypedDataRequest extends DtoDataRequest<any> { }
