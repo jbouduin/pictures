@@ -1,5 +1,6 @@
 export enum DataStatus {
   Ok = 200,
+  Accepted = 202,
   Created = 201,
   NoContent = 204,
   BadRequest = 400,

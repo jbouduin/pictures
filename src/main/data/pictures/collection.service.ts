@@ -40,10 +40,9 @@ export class CollectionService implements ICollectionService {
     router.get('/collection/:collection/pictures', this.notImplemented);
     // POST
     router.post('/collection', this.createCollection.bind(this));
-    // router.post('/collection/:collection/scan', this.scanCollection.bind(this));
+    router.post('/collection/:collection/scan', this.scanCollection.bind(this));
     // PUT
     router.put('/collection/:collection', this.updateCollection.bind(this));
-    this.fileService.scanDirectory('c:/temp/scans', this.fileTypes);
   }
   // </editor-fold>
 
@@ -215,9 +214,26 @@ export class CollectionService implements ICollectionService {
     );
   }
 
-  // private scanCollection(request: RoutedRequest): Promise<DtoDataResponse<string> {
-  //
-  // }
+  private scanCollection(request: RoutedRequest): Promise<DtoUntypedDataResponse> {
+    return this.databaseService.getCollectionRepository()
+    .findOneOrFail(request.params.collection)
+    .then(
+      collection => {
+        this.scanDirectory(collection);
+        const result: DtoUntypedDataResponse = {
+          status: DataStatus.Accepted
+        };
+        return result;
+      },
+      error => {
+        const result: DtoUntypedDataResponse = {
+          status: DataStatus.Error,
+          message: `${error.name}: ${error.message}`
+        };
+        return result;
+      }
+    );
+  }
   // </editor-fold>
 
   // <editor-fold desc='PUT route callback'>

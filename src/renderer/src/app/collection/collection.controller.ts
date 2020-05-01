@@ -146,7 +146,7 @@ export class CollectionController {
   }
   // </editor-fold>
 
-  // <editor-fold desc='Delete related methods'>
+  // <editor-fold desc='Other methods'>
   public delete(dtoListCollection: DtoListCollection): void {
     const dialogParams = new ConfirmationDialogParams();
     dialogParams.okButtonLabel = 'Delete';
@@ -181,6 +181,21 @@ This will remove the collection and all related data from the database. Physical
           );
       }
     });
+  }
+
+  public scan(dtoListCollection: DtoListCollection): void {
+    const request: DtoUntypedDataRequest = {
+      verb: DataVerb.POST,
+      path: `/collection/${dtoListCollection.id}/scan`
+    };
+    this.ipcService
+      .untypedDataRequest<string>(request)
+      .then(
+        undefined,
+        error => {
+          alert(error.message);
+        }
+      );
   }
   // </editor-fold>
 

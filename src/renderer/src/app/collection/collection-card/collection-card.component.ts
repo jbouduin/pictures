@@ -46,6 +46,10 @@ export class CollectionCardComponent implements OnInit {
   public delete(): void {
     this.collectionController.delete(this.collection);
   }
+
+  public scan(): void {
+    this.collectionController.scan(this.collection);
+  }
   // </editor-fold>
 
 }
