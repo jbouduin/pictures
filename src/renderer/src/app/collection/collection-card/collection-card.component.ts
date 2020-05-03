@@ -1,7 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { DtoListCollection } from '@ipc';
 import { ConfigurationService, IpcService } from '@core';
-import { CollectionController } from '../collection.controller';
+// import { CollectionController } from '../collection.controller';
+import { CollectionListItem } from '../collection.list-item';
+import { NewController } from '../new.controller';
 
 @Component({
   selector: 'app-collection-card',
@@ -9,7 +11,7 @@ import { CollectionController } from '../collection.controller';
   styleUrls: ['./collection-card.component.scss']
 })
 export class CollectionCardComponent implements OnInit {
-  @Input() collection: DtoListCollection;
+  @Input() collection: CollectionListItem;
 
   // <editor-fold desc='Public properties'>
   public thumbnailStyle: Object;
@@ -19,7 +21,7 @@ export class CollectionCardComponent implements OnInit {
   // <editor-fold desc='Constructor & C°'>
   public constructor(
     private configurationService: ConfigurationService,
-    private collectionController: CollectionController) { }
+    private newController: NewController) { }
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methods'>
@@ -40,15 +42,15 @@ export class CollectionCardComponent implements OnInit {
 
   // <editor-fold desc='UI Trigger methods'>
   public edit(): void {
-    this.collectionController.edit(this.collection);
+    this.newController.edit(this.collection);
   }
 
   public delete(): void {
-    this.collectionController.delete(this.collection);
+    this.newController.delete(this.collection);
   }
 
   public scan(): void {
-    this.collectionController.scan(this.collection);
+    this.newController.scan(this.collection);
   }
   // </editor-fold>
 

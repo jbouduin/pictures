@@ -1,6 +1,6 @@
 <h1 mat-dialog-title>{{dialogTitle}}</h1>
 <div mat-dialog-content [formGroup]="collectionData">
-  <div *ngIf="isUpdate" fxLayout="row" fxLayoutAlign="space-between center">
+  <div *ngIf="!collection.isNew" fxLayout="row" fxLayoutAlign="space-between center">
     <mat-form-field >
       <mat-label>Id</mat-label>
       <input matInput [value]="id" [disabled]="true"/>
@@ -16,7 +16,7 @@
       <input matInput required
         placeholder="enter a name for your collection"
         formControlName="name"
-        [(ngModel)]="dtoCollection.name"/>
+        [(ngModel)]="collection.name"/>
       <mat-error>{{ getErrorMessage('name') }}</mat-error>
     </mat-form-field>
   </div>
@@ -26,12 +26,12 @@
       <input matInput required
         placeholder="enter the location of your collection"
         formControlName="path"
-        [(ngModel)]="dtoCollection.path"
-        [disabled]="isUpdate"/>
+        [(ngModel)]="collection.path"
+      />
       <mat-error>{{ getErrorMessage('path') }}</mat-error>
     </mat-form-field>
   </div>
-  <div *ngIf="isUpdate" fxLayout="row" fxLayoutAlign="space-between center">
+  <div *ngIf="!collection.isNew" fxLayout="row" fxLayoutAlign="space-between center">
     <mat-form-field >
       <mat-label>Created</mat-label>
       <input matInput [value]="created | date:'d.M.yyyy HH:mm:SS'" [disabled]="true"/>
@@ -45,7 +45,7 @@
 <div mat-dialog-actions>
   <button mat-button (click)="cancel()">Cancel</button>
   <button
-    *ngIf="isUpdate"
+    *ngIf="!collection.isNew"
     mat-button
     cdkFocusInitial
     [disabled]="collectionData.invalid"
@@ -53,7 +53,7 @@
       Save
   </button>
   <button
-    *ngIf="!isUpdate"
+    *ngIf="collection.isNew"
     mat-button
     [disabled]="collectionData.invalid"
     (click)="create()">

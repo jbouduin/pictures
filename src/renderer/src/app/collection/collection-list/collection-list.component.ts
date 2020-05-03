@@ -4,7 +4,9 @@ import { DtoListCollection } from '@ipc';
 import { FloatingButtonHost } from '@shared';
 
 import { CollectionDialogComponent } from '../collection-dialog/collection-dialog.component';
-import { CollectionController } from '../collection.controller';
+import { CollectionListItem } from '../collection.list-item';
+
+import { NewController } from '../new.controller';
 
 @Component({
   selector: 'app-collection-list',
@@ -14,25 +16,24 @@ import { CollectionController } from '../collection.controller';
 export class CollectionListComponent implements FloatingButtonHost, OnInit {
 
   // <editor-fold desc='Public properties'>
-  public get cards(): Array<DtoListCollection> {
-    return this.collectionController.cards;
+  public get cards(): Array<CollectionListItem> {
+    return this.newController.cards;
   }
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor(
-    private collectionController: CollectionController) { }
+  public constructor(private newController: NewController) { }
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methods'>
   public ngOnInit(): void {
-    this.collectionController.loadList();
+    this.newController.loadList();
   }
   // </editor-fold>
 
   // <editor-fold desc='FloatingButtonhost interface members'>
   public floatingButtonClick(): void {
-    this.collectionController.create();
+    this.newController.create();
   }
 
   public get floatingButtonIcon(): string {
