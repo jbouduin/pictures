@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
-
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -8,10 +8,12 @@ import { AfterViewInit, Component, OnInit } from '@angular/core';
 export class AppComponent implements OnInit {
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor() { }
+  public constructor(private router: Router) { }
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methods'>
-  public ngOnInit(): void { }
+  public ngOnInit(): void {
+    console.log(this.router.config);
+  }
   // </editor-fold>
 }

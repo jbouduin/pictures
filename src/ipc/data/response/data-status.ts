@@ -11,11 +11,3 @@ export enum DataStatus {
   Error = 500,
   RendererError = 900
 }
-
-export interface DtoDataResponse<T> {
-  status: DataStatus,
-  data?: T,
-  message?: string
-}
-
-export interface DtoUntypedDataResponse extends DtoDataResponse<any> { }

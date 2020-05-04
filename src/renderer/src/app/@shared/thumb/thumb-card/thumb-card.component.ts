@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { DtoListBase, DtoGetBase, DtoNewBase, DtoSetBase } from '@ipc';
 
 import { ConfigurationService } from '@core';
 import { BaseItem } from '../base-item';
@@ -12,7 +13,9 @@ import { ThumbController } from '../thumb.controller';
 })
 export class ThumbCardComponent implements OnInit {
   @Input() item: ListItem;
-  @Input() controller: ThumbController<ListItem, BaseItem, BaseItem, any, any, any>;
+  @Input() controller: ThumbController<
+    ListItem, BaseItem, BaseItem,
+    DtoListBase, DtoGetBase, DtoNewBase, DtoSetBase>;
 
   // <editor-fold desc='Public properties'>
   public thumbnailStyle: Object;
@@ -38,17 +41,4 @@ export class ThumbCardComponent implements OnInit {
   }
   // </editor-fold>
 
-  // <editor-fold desc='UI Trigger methods'>
-  // public edit(): void {
-  //   this.controller.edit(this.item);
-  // }
-  //
-  // public delete(): void {
-  //   this.controller.remove(this.item);
-  // }
-  //
-  // public scan(): void {
-  //   // this.controller.scan(this.item);
-  // }
-  // </editor-fold>
 }

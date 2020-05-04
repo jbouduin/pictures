@@ -2,8 +2,9 @@ import { Component, Injectable } from '@angular/core';
 import { ComponentType } from '@angular/cdk/portal';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
-import { DataVerb, DtoDataRequest, DtoUntypedDataRequest } from '@ipc';
 import { IpcService } from '@core';
+import { DataVerb, DtoDataRequest, DtoUntypedDataRequest } from '@ipc';
+import { DtoListBase, DtoGetBase, DtoNewBase, DtoSetBase } from '@ipc';
 
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { ConfirmationDialogParams } from '../confirmation-dialog/confirmation-dialog.params';
@@ -18,12 +19,12 @@ import { BaseItem } from './base-item';
 import { ThumbCardFooterParams } from './thumb-card-footer.params';
 
 // QUESTION as this one is abstract, maybe it doesn't have to be Injectable anymore?
-@Injectable({
-  providedIn: 'root'
-})
+// @Injectable({
+//   providedIn: 'root'
+// })
 export abstract class ThumbController<
   L extends ListItem, N extends BaseItem, E extends BaseItem,
-  DtoL, DtoN, DtoE> {
+  DtoL extends DtoListBase, DtoG extends DtoGetBase, DtoN extends DtoNewBase, DtoS extends DtoSetBase> {
 
   // <editor-fold desc='Private properties'>
   private listItems: Array<L>;
@@ -53,7 +54,7 @@ export abstract class ThumbController<
   constructor(
     protected dialog: MatDialog,
     protected ipcService: IpcService,
-    protected itemFactory: BaseItemFactory<L, N, E, DtoL, DtoN, DtoE>) {
+    protected itemFactory: BaseItemFactory<L, N, E, DtoL, DtoG, DtoN, DtoS>) {
     this.listItems = new Array<L>();
     this.dialogRef = undefined;
   }
@@ -78,13 +79,13 @@ export abstract class ThumbController<
     const request: DtoDataRequest<DtoN> = {
       verb: DataVerb.POST,
       path: this.root,
-      data: this.itemFactory.newItemToDto(newItem)
+      data: this.itemFactory.newItemToNewDto(newItem)
     };
     return this.ipcService
       .dataRequest<DtoN, DtoL>(request)
       .then(
         result => {
-          const listItem = this.itemFactory.listDtoToItem(result.data);
+          const listItem = this.itemFactory.listDtoToListItem(result.data);
           this.listItems.splice(0, 0, listItem);
           if (this.dialogRef) {
             this.dialogRef.close()
@@ -92,7 +93,7 @@ export abstract class ThumbController<
           return listItem;
         },
         error => {
-          const listItem = this.itemFactory.listDtoToItem(error.data);
+          const listItem = this.itemFactory.listDtoToListItem(error.data);
           alert(error.message);
           return listItem;
         }
@@ -107,12 +108,12 @@ export abstract class ThumbController<
       path: `${this.root}/${listItem.id}`,
     };
     this.ipcService
-      .untypedDataRequest<DtoE>(request)
+      .untypedDataRequest<DtoG>(request)
       .then(response => {
         const params: DynamicDialogParams<E> = {
           data: {
             component: this.editDialogComponent,
-            item: this.itemFactory.getDtoToItem(response.data)
+            item: this.itemFactory.getDtoToEditItem(response.data)
           },
           width: '600px'
         };
@@ -126,16 +127,16 @@ export abstract class ThumbController<
   }
 
   public commitEdit(editedItem: E): Promise<L> {
-    const request: DtoDataRequest<DtoE> = {
+    const request: DtoDataRequest<DtoS> = {
       verb: DataVerb.PUT,
       path: `${this.root}/${editedItem.id}`,
-      data: this.itemFactory.existingItemToDto(editedItem)
+      data: this.itemFactory.editItemToSetDto(editedItem)
     };
     return this.ipcService
-      .dataRequest<DtoE, DtoL>(request)
+      .dataRequest<DtoS, DtoL>(request)
       .then(
         response => {
-          const listItem = this.itemFactory.listDtoToItem(response.data);
+          const listItem = this.itemFactory.listDtoToListItem(response.data);
           const index = this.listItems.findIndex( item => item.id === listItem.id);
           this.listItems[index] = listItem;
           if (this.dialogRef) {
@@ -144,7 +145,7 @@ export abstract class ThumbController<
           return listItem;
         },
         error => {
-          const listItem = this.itemFactory.listDtoToItem(error.data);
+          const listItem = this.itemFactory.listDtoToListItem(error.data);
           alert(error.message);
           return listItem;
         }
@@ -168,7 +169,7 @@ export abstract class ThumbController<
 
     return this.ipcService
       .untypedDataRequest<Array<DtoL>>(request)
-      .then(response => this.listItems = response.data.map( listItem => this.itemFactory.listDtoToItem(listItem)));
+      .then(response => this.listItems = response.data.map( listItem => this.itemFactory.listDtoToListItem(listItem)));
   }
 
   public remove(listItem: L): void {

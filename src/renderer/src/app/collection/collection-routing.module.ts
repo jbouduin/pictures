@@ -7,7 +7,7 @@ import { Shell } from '../shell/shell.service';
 const routes: Routes = [
   Shell.childRoutes([
     { path: '', redirectTo: '/home', pathMatch: 'full' },
-    { path: 'home', component: CollectionListComponent, data: { title: 'Collections' } }
+    { path: 'home', component: CollectionListComponent }
   ])
 ];
 

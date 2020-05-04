@@ -31,7 +31,7 @@ export class PictureListComponent implements OnInit {
     {
       parent: this.inj,
       providers: [
-        { provide: PictureController, useValue: this.pictureController }
+        { provide: ThumbController, useValue: this.pictureController }
       ]
     });
   }

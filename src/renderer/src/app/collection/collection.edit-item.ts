@@ -1,4 +1,4 @@
-import { DtoCollection } from '@ipc';
+import { DtoGetCollection } from '@ipc';
 import { BaseItem } from '@shared';
 
 import { Injectable } from '@angular/core';
@@ -14,7 +14,7 @@ export class CollectionEditItem extends BaseItem {
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor(dtoCollection: DtoCollection) {
+  public constructor(dtoCollection: DtoGetCollection) {
     super(dtoCollection.id);
     this.name = dtoCollection.name;
     this.path = dtoCollection.path;

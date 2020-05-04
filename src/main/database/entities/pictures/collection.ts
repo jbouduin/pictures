@@ -7,9 +7,6 @@ import { Picture } from './picture';
 export class Collection extends BaseEntity {
 
   @Column('nvarchar', { length: 256, nullable: false })
-  public name: string;
-
-  @Column('nvarchar', { length: 256, nullable: false })
   public path: string;
 
   @OneToMany(type => Picture, picture => picture.collection)

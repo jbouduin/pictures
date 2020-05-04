@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ComponentType } from '@angular/cdk/portal';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
-import { DtoGetPicture, DtoListPicture } from '@ipc';
+import { DtoGetPicture, DtoListPicture, DtoNewPicture, DtoSetPicture } from '@ipc';
 
 import { IpcService } from '@core';
 import { DynamicDialogParams, FloatingButtonParams } from '@shared';
@@ -17,12 +17,10 @@ import { PictureItemFactory } from './picture.item-factory';
 import { PictureListItem } from './picture.list-item';
 import { PictureNewItem } from './picture.new-item';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class PictureController extends ThumbController<
   PictureListItem, PictureNewItem, PictureEditItem,
-  DtoListPicture, DtoGetPicture, DtoGetPicture> {
+  DtoListPicture, DtoGetPicture, DtoNewPicture, DtoSetPicture> {
 
   // <editor-fold desc='Implementation of protected abstract getters'>
   protected get deleteDialogText(): string {

@@ -2,11 +2,15 @@
 <mat-card class="thumb-card">
   <mat-card-content >
     <div fxLayout="column">
-      <div class="thumb-card-header" fxLayout="row" fxFlex="50px" fxLayoutAlign="center center">
-        {{item.name}}
-      </div>
-      <div [ngStyle]="thumbnailStyle">
-      </div>
+      <a [routerLink]="item.routerLink" class="thumb-card-header" >
+        <div fxLayout="column">
+          <div fxLayout="row" fxFlex="50px" fxLayoutAlign="center center">
+            {{item.name}}
+          </div>
+          <div [ngStyle]="thumbnailStyle">
+          </div>
+        </div>
+      </a>
       <div class="thumb-card-footer" fxLayout="row" fxLayoutAlign="space-between center">
         <div class="thumb-footer-text">
           <div fxLayout="row" fxLayoutAlign="start center">

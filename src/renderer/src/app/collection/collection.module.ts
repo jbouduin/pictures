@@ -35,4 +35,8 @@ import { CollectionController } from './collection.controller';
     CollectionController
   ],
 })
-export class CollectionModule { }
+export class CollectionModule {
+  constructor() {
+    console.log('CollectionModule constructor');
+  }
+}

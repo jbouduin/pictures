@@ -6,6 +6,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CoreModule } from '@core';
 import { SharedModule } from '@shared';
 import { CollectionModule } from './collection';
+import { PictureModule } from './picture';
 import { ShellModule } from './shell';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -23,6 +24,7 @@ import { AppComponent } from './app.component';
     SharedModule,
     ShellModule,
     CollectionModule,
+    PictureModule,
     AppRoutingModule // must be imported as the last module as it contains the fallback route
   ],
   providers: [],

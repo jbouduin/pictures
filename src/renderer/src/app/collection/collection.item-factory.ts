@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { BaseItemFactory } from '@shared';
-import { DtoCollection, DtoListCollection, DtoNewCollection } from '@ipc';
+import { DtoGetCollection, DtoListCollection, DtoNewCollection, DtoSetCollection } from '@ipc';
 
 import { CollectionEditItem } from './collection.edit-item';
 import { CollectionListItem } from './collection.list-item';
@@ -12,7 +12,7 @@ import { CollectionNewItem } from './collection.new-item';
 })
 export class CollectionItemFactory extends BaseItemFactory<
   CollectionListItem, CollectionNewItem, CollectionEditItem,
-  DtoListCollection, DtoNewCollection, DtoCollection> {
+  DtoListCollection, DtoGetCollection, DtoNewCollection, DtoSetCollection> {
 
   // <editor-fold desc='Constructor & C°'>
   public constructor() {
@@ -25,26 +25,19 @@ export class CollectionItemFactory extends BaseItemFactory<
     return new CollectionNewItem();
   }
 
-  public getDtoToItem(dto: DtoCollection): CollectionEditItem {
+  public getDtoToEditItem(dto: DtoGetCollection): CollectionEditItem {
     return new CollectionEditItem(dto);
   }
 
-  public existingItemToDto(item: CollectionEditItem): DtoCollection {
-    return {
-      id: item.id,
-      created: item.created,
-      modified: item.modified,
-      version: item.version,
-      name: item.name,
-      path: item.path
-    }
+  public editItemToSetDto(item: CollectionEditItem): DtoSetCollection {
+    return { name: item.name }
   }
 
-  public listDtoToItem(dto: DtoListCollection): CollectionListItem {
+  public listDtoToListItem(dto: DtoListCollection): CollectionListItem {
     return new CollectionListItem(dto);
   }
 
-  public newItemToDto(item: CollectionNewItem): DtoNewCollection {
+  public newItemToNewDto(item: CollectionNewItem): DtoNewCollection {
     const result: DtoNewCollection = {
       name: item.name,
       path: item.path

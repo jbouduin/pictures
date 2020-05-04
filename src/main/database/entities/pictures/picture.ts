@@ -9,9 +9,6 @@ export class Picture extends BaseEntity {
 
   // TODO unique index on filename + pathname
   @Column('nvarchar', { length: 256, nullable: false })
-  public fileName: string;
-
-  @Column('nvarchar', { length: 256, nullable: false })
   public path: string;
 
   @Index()
@@ -21,6 +18,6 @@ export class Picture extends BaseEntity {
     { nullable: false, onDelete: 'CASCADE'})
   public collection: Collection;
 
-  @OneToMany(type => Exif, exif => exif.picture)
-  public exifs: Promise<Array<Exif>>;
+  // @OneToMany(type => Exif, exif => exif.picture)
+  // public exifs: Promise<Array<Exif>>;
 }

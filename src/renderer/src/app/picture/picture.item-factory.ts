@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { BaseItemFactory } from '@shared';
-import { DtoGetPicture, DtoListPicture } from '@ipc';
+import { DtoGetPicture, DtoListPicture, DtoNewPicture, DtoSetPicture } from '@ipc';
 
 import { PictureEditItem } from './picture.edit-item';
 import { PictureListItem } from './picture.list-item';
@@ -12,7 +12,7 @@ import { PictureNewItem } from './picture.new-item';
 })
 export class PictureItemFactory extends BaseItemFactory<
   PictureListItem, PictureNewItem, PictureEditItem,
-  DtoListPicture, DtoGetPicture, DtoGetPicture> {
+  DtoListPicture, DtoGetPicture, DtoNewPicture, DtoSetPicture> {
 
   // <editor-fold desc='Constructor & C°'>
   public constructor() {
@@ -25,31 +25,19 @@ export class PictureItemFactory extends BaseItemFactory<
     return undefined;
   }
 
-  public getDtoToItem(dto: DtoGetPicture): PictureEditItem {
+  public getDtoToEditItem(dto: DtoGetPicture): PictureEditItem {
     return new PictureEditItem(dto);
   }
 
-  public existingItemToDto(item: PictureEditItem): DtoGetPicture {
+  public editItemToSetDto(item: PictureEditItem): DtoGetPicture {
     return undefined;
-    // {
-    //   id: item.id,
-    //   created: item.created,
-    //   modified: item.modified,
-    //   version: item.version,
-    //   name: item.name,
-    //   path: item.path
-    // }
   }
 
-  public listDtoToItem(dto: DtoListPicture): PictureListItem {
+  public listDtoToListItem(dto: DtoListPicture): PictureListItem {
     return new PictureListItem(dto);
   }
 
-  public newItemToDto(item: PictureNewItem): DtoGetPicture {
-    // const result: DtoNewCollection = {
-    //   name: item.name,
-    //   path: item.path
-    // };
+  public newItemToNewDto(item: PictureNewItem): DtoGetPicture {
     return undefined;
   }
   // </editor-fold>

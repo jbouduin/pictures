@@ -6,8 +6,7 @@ import { Shell } from '../shell/shell.service';
 
 const routes: Routes = [
   Shell.childRoutes([
-    { path: '', redirectTo: '/home', pathMatch: 'full' },
-    { path: 'collection/:id', component: PictureListComponent, data: { title: 'Pictures' } }
+    { path: 'pictures/collection/:id', component: PictureListComponent}
   ])
 ];
 
@@ -16,4 +15,8 @@ const routes: Routes = [
   exports: [RouterModule],
   providers: []
 })
-export class PictureRoutingModule {}
+export class PictureRoutingModule {
+  constructor() {
+    console.log('PictureRoutingModule constructor');
+  }
+}

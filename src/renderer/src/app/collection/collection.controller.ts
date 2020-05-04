@@ -3,12 +3,11 @@ import { ComponentType } from '@angular/cdk/portal';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 import { DataVerb, DtoUntypedDataRequest } from '@ipc';
+import { DtoGetCollection, DtoListCollection, DtoNewCollection, DtoSetCollection } from '@ipc';
 
 import { IpcService } from '@core';
 import { DynamicDialogParams, FloatingButtonParams } from '@shared';
 import { ThumbCardFooterParams, ThumbController } from '@shared';
-
-import { DtoCollection, DtoListCollection, DtoNewCollection } from '@ipc';
 
 // FIXME WARNING in Circular dependency detected:
 // src\renderer\src\app\collection\collection-dialog\collection-dialog.component.ts -> src\renderer\src\app\collection\new.controller.ts -
@@ -22,7 +21,7 @@ import { CollectionNewItem } from './collection.new-item';
 @Injectable()
 export class CollectionController extends ThumbController<
   CollectionListItem, CollectionNewItem, CollectionEditItem,
-  DtoListCollection, DtoNewCollection, DtoCollection> {
+  DtoListCollection, DtoGetCollection, DtoNewCollection, DtoSetCollection> {
 
   // <editor-fold desc='Implementation of protected abstract getters'>
   protected get deleteDialogText(): string {
