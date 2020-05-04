@@ -2,7 +2,7 @@ import { Component, Injector, OnInit } from '@angular/core';
 
 import { ThumbController, ThumbListComponent } from '@shared';
 
-import { NewController } from '../new.controller';
+import { CollectionController } from '../collection.controller';
 
 @Component({
   selector: 'app-collection-list',
@@ -22,7 +22,7 @@ export class CollectionListComponent implements OnInit {
   // <editor-fold desc='Constructor & C°'>
   public constructor(
     private readonly inj: Injector,
-    private newController: NewController) { }
+    private collectionController: CollectionController) { }
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methods'>
@@ -31,7 +31,7 @@ export class CollectionListComponent implements OnInit {
     {
       parent: this.inj,
       providers: [
-        { provide: ThumbController, useValue: this.newController }
+        { provide: ThumbController, useValue: this.collectionController }
       ]
     });
   }

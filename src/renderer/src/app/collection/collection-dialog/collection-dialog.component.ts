@@ -4,9 +4,9 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialo
 
 import { BaseItem } from '@shared';
 
+import { CollectionController } from '../collection.controller';
 import { CollectionEditItem } from '../collection.edit-item';
 import { CollectionNewItem } from '../collection.new-item';
-import { NewController } from '../new.controller';
 
 @Component({
   selector: 'app-collection-dialog',
@@ -60,7 +60,7 @@ export class CollectionDialogComponent implements OnInit {
   // <editor-fold desc='Constructor & C°'>
   public constructor(
     private formBuilder: FormBuilder,
-    private newController: NewController,
+    private collectionController: CollectionController,
     private baseItem: BaseItem) {
 
     this.collection = baseItem.isNew ?
@@ -84,16 +84,16 @@ export class CollectionDialogComponent implements OnInit {
 
   // <editor-fold desc='UI triggered methods'>
   public cancel(): void {
-    this.newController.cancelDialog();
+    this.collectionController.cancelDialog();
   }
 
   public save(): void {
-    this.newController
+    this.collectionController
       .commitEdit(this.collection as CollectionEditItem);
   }
 
   public create(): void {
-    this.newController
+    this.collectionController
       .commitCreate(this.collection as CollectionNewItem);
   }
 

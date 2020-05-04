@@ -6,10 +6,11 @@ import { MatDialogModule } from '@angular/material/dialog';
 
 import { SharedModule } from '@shared';
 import { MaterialModule } from '../material.module';
+
 import { CollectionDialogComponent } from './collection-dialog/collection-dialog.component';
 import { CollectionListComponent } from './collection-list/collection-list.component';
 import { CollectionRoutingModule } from './collection-routing.module';
-import { NewController } from './new.controller';
+import { CollectionController } from './collection.controller';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,7 @@ import { NewController } from './new.controller';
     CollectionDialogComponent
   ],
   providers: [
-    NewController
+    CollectionController
   ],
 })
 export class CollectionModule { }
