@@ -1,6 +1,1 @@
-<app-floating-button [host]="this"></app-floating-button>
-<div class="card-list" fxLayout="row wrap">
-  <ng-container *ngFor="let card of cards">
-    <app-collection-card [collection]=card></app-collection-card>
-  </ng-container>
-<div>
+<ng-container *ngComponentOutlet="listComponent; injector: injector"></ng-container>

@@ -5,25 +5,30 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { DataVerb, DtoUntypedDataRequest } from '@ipc';
 
 import { IpcService } from '@core';
-import { DynamicDialogParams } from '@shared';
-import { ThumbController } from '@shared';
+import { DynamicDialogParams, FloatingButtonParams } from '@shared';
+import { ThumbCardFooterParams, ThumbController } from '@shared';
 
 import { DtoCollection, DtoListCollection, DtoNewCollection } from '@ipc';
 
+// FIXME WARNING in Circular dependency detected:
+// src\renderer\src\app\collection\collection-dialog\collection-dialog.component.ts -> src\renderer\src\app\collection\new.controller.ts -
+// > src\renderer\src\app\collection\collection-dialog\collection-dialog.component.ts
 import { CollectionDialogComponent } from './collection-dialog/collection-dialog.component';
 import { CollectionEditItem } from './collection.edit-item';
 import { CollectionItemFactory } from './collection.item-factory';
 import { CollectionListItem } from './collection.list-item';
 import { CollectionNewItem } from './collection.new-item';
 
-@Injectable({
-  providedIn: 'root' // CollectionModule gives a circular reference error, maybe we can solve this if we do not providedIn but use providers in module
-})
+@Injectable()
 export class NewController extends ThumbController<
   CollectionListItem, CollectionNewItem, CollectionEditItem,
   DtoListCollection, DtoNewCollection, DtoCollection> {
 
-  // <editor-fold desc='Implementation of abstract getters'>
+  // <editor-fold desc='Implementation of protected abstract getters'>
+  protected get deleteDialogText(): string {
+    return `Click on 'Delete' to remove the collection. This will remove the collection and all related data from the database. Physical files on disk will remain untouched.`;
+  }
+
   protected get editDialogComponent(): ComponentType<any> {
     return CollectionDialogComponent;
   }
@@ -31,9 +36,28 @@ export class NewController extends ThumbController<
     return CollectionDialogComponent;
   }
   protected get root(): string { return '/collection'; }
-  protected get deleteDialogText(): string {
-    return `Click on 'Delete' to remove the collection. This will remove the collection and all related data from the database. Physical files on disk will remain untouched.`;
+  // </editor-fold>
+
+  // <editor-fold desc='Implementation of public abstract getters'>
+  public get cardFooterIcon(): string {
+    return "camera_alt";
   }
+
+  public get floatingButtonParams(): FloatingButtonParams {
+    return new FloatingButtonParams('Add new', 'add', 'primary', this.create.bind(this));
+  }
+  public get showFloatingButton(): boolean {
+    return true;
+  }
+
+  public get thumbCardFooterParams(): Array<ThumbCardFooterParams> {
+    return [
+      new ThumbCardFooterParams(undefined, 'icon-button hover green', 'refresh', this.scan.bind(this)),
+      new ThumbCardFooterParams(undefined, 'icon-button hover green', 'edit', this.edit.bind(this)),
+      new ThumbCardFooterParams(undefined, 'icon-button hover red', 'delete', this.remove.bind(this))
+    ]
+  }
+
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>

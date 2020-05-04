@@ -1,5 +1,6 @@
-<div class="floating-button-wrap">
-  <button mat-fab color="primary" aria-label="Add new" (click)="host.floatingButtonClick()">
-      <mat-icon>{{host.floatingButtonIcon}}</mat-icon>
+<div *ngIf="params" class="floating-button-wrap">
+  <!-- TODO check why color="params.color" is not working -->
+  <button mat-fab color="primary" aria-label="params.label" (click)="params.click()">
+      <mat-icon>{{params.icon}}</mat-icon>
   </button>
 </div>

@@ -1,10 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Injector, OnInit } from '@angular/core';
 
-import { DtoListCollection } from '@ipc';
-import { FloatingButtonHost } from '@shared';
-
-import { CollectionDialogComponent } from '../collection-dialog/collection-dialog.component';
-import { CollectionListItem } from '../collection.list-item';
+import { ThumbController, ThumbListComponent } from '@shared';
 
 import { NewController } from '../new.controller';
 
@@ -13,31 +9,31 @@ import { NewController } from '../new.controller';
   templateUrl: './collection-list.component.html',
   styleUrls: ['./collection-list.component.scss']
 })
-export class CollectionListComponent implements FloatingButtonHost, OnInit {
+export class CollectionListComponent implements OnInit {
+
+  // <editor-fold desc='Private properties'>
+  public injector: Injector;
+  // </editor-fold>
 
   // <editor-fold desc='Public properties'>
-  public get cards(): Array<CollectionListItem> {
-    return this.newController.cards;
-  }
+  public readonly listComponent = ThumbListComponent;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor(private newController: NewController) { }
+  public constructor(
+    private readonly inj: Injector,
+    private newController: NewController) { }
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methods'>
   public ngOnInit(): void {
-    this.newController.loadList();
-  }
-  // </editor-fold>
-
-  // <editor-fold desc='FloatingButtonhost interface members'>
-  public floatingButtonClick(): void {
-    this.newController.create();
-  }
-
-  public get floatingButtonIcon(): string {
-    return 'add';
+    this.injector = Injector.create(
+    {
+      parent: this.inj,
+      providers: [
+        { provide: ThumbController, useValue: this.newController }
+      ]
+    });
   }
   // </editor-fold>
 

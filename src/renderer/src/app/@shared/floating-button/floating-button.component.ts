@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MaterialModule } from '../../material.module';
 
-import { FloatingButtonHost } from './floating-button-host';
+import { FloatingButtonParams } from './floating-button.params';
 
 @Component({
   selector: 'app-floating-button',
@@ -9,11 +9,17 @@ import { FloatingButtonHost } from './floating-button-host';
   styleUrls: ['./floating-button.component.scss']
 })
 export class FloatingButtonComponent implements OnInit {
-  @Input() host: FloatingButtonHost;
+  // <editor-fold desc='@Input'>
+  @Input() params: FloatingButtonParams;
+  // </editor-fold>
 
+  // <editor-fold desc='Constructor & C°'>
   constructor() { }
+  // </editor-fold>
 
+  // <editor-fold desc='Angular interface methods'>
   ngOnInit(): void {
   }
+  // </editor-fold>
 
 }

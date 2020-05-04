@@ -1,1 +1,7 @@
-<p>thumb-list works!</p>
+<app-floating-button [params]="floatingButtonParams"></app-floating-button>
+<!-- TODO get css dynamically (from controller ?) -->
+<div class="card-list" fxLayout="row wrap">
+  <ng-container *ngFor="let listItem of listItems">
+    <app-thumb-card [item]=listItem [controller]="controller"></app-thumb-card>
+  </ng-container>
+<div>

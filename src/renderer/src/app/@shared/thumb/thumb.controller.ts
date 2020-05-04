@@ -7,6 +7,7 @@ import { IpcService } from '@core';
 
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { ConfirmationDialogParams } from '../confirmation-dialog/confirmation-dialog.params';
+import { FloatingButtonParams } from '../floating-button/floating-button.params';
 import { DynamicDialogComponent } from '../dynamic-dialog/dynamic-dialog.component';
 import { DynamicDialogParams } from '../dynamic-dialog/dynamic-dialog.params';
 
@@ -14,6 +15,7 @@ import { BaseItemFactory } from './base.item-factory';
 
 import { ListItem } from './list-item';
 import { BaseItem } from './base-item';
+import { ThumbCardFooterParams } from './thumb-card-footer.params';
 
 // QUESTION as this one is abstract, maybe it doesn't have to be Injectable anymore?
 @Injectable({
@@ -34,11 +36,17 @@ export abstract class ThumbController<
   }
   // </editor-fold>
 
-  // <editor-fold desc='Abstract getters'>
+  // <editor-fold desc='Abstract protected getters'>
   protected abstract get editDialogComponent(): ComponentType<any>;
   protected abstract get deleteDialogText(): string;
   protected abstract get newDialogComponent(): ComponentType<any>;
   protected abstract get root(): string;
+  // </editor-fold>
+
+  // <editor-fold desc='Abstract public getters'>
+  public abstract get thumbCardFooterParams(): Array<ThumbCardFooterParams>;
+  public abstract get floatingButtonParams(): FloatingButtonParams;
+  public abstract get cardFooterIcon(): string;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
@@ -163,7 +171,7 @@ export abstract class ThumbController<
       .then(response => this.listItems = response.data.map( listItem => this.itemFactory.listDtoToItem(listItem)));
   }
 
-  public delete(listItem: L): void {
+  public remove(listItem: L): void {
     const dialogParams = new ConfirmationDialogParams();
     dialogParams.okButtonLabel = 'Delete';
     dialogParams.title = `Delete '${listItem.name}'?`;

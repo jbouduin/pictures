@@ -1,1 +1,31 @@
-<p>thumb-card works!</p>
+<!-- TODO get css dynamically (from controller ?) -->
+<mat-card class="thumb-card">
+  <mat-card-content >
+    <div fxLayout="column">
+      <div class="thumb-card-header" fxLayout="row" fxFlex="50px" fxLayoutAlign="center center">
+        {{item.name}}
+      </div>
+      <div [ngStyle]="thumbnailStyle">
+      </div>
+      <div class="thumb-card-footer" fxLayout="row" fxLayoutAlign="space-between center">
+        <div class="thumb-footer-text">
+          <div fxLayout="row" fxLayoutAlign="start center">
+            {{item.footerText}}
+            <mat-icon>
+              {{controller.cardFooterIcon}}
+            </mat-icon>
+          </div>
+        </div>
+        <div class="thumb-actions">
+          <ng-container *ngFor="let params of controller.thumbCardFooterParams">
+            <button class="{{params.cssClass}}" (click)="params.click(item)">
+              <mat-icon>
+                {{params.icon}}
+              </mat-icon>
+            </button>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
