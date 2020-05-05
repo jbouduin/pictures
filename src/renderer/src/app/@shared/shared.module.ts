@@ -10,6 +10,7 @@ import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-
 import { ThumbCardComponent } from './thumb/thumb-card/thumb-card.component';
 import { ThumbListComponent } from './thumb/thumb-list/thumb-list.component';
 import { DynamicDialogComponent } from './dynamic-dialog/dynamic-dialog.component';
+import { PaginationComponent } from './pagination/pagination.component';
 
 
 @NgModule({
@@ -18,7 +19,8 @@ import { DynamicDialogComponent } from './dynamic-dialog/dynamic-dialog.componen
     ConfirmationDialogComponent,
     ThumbCardComponent,
     ThumbListComponent,
-    DynamicDialogComponent
+    DynamicDialogComponent,
+    PaginationComponent
   ],
   imports: [
     CommonModule,

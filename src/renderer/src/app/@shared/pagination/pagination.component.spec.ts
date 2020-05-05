@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PictureListComponent } from './picture-list.component';
+import { PaginationComponent } from './pagination.component';
 
-// describe('PictureListComponent', () => {
-//   let component: PictureListComponent;
-//   let fixture: ComponentFixture<PictureListComponent>;
+// describe('PaginationComponent', () => {
+//   let component: PaginationComponent;
+//   let fixture: ComponentFixture<PaginationComponent>;
 //
 //   beforeEach(async(() => {
 //     TestBed.configureTestingModule({
-//       declarations: [ PictureListComponent ]
+//       declarations: [ PaginationComponent ]
 //     })
 //     .compileComponents();
 //   }));
 //
 //   beforeEach(() => {
-//     fixture = TestBed.createComponent(PictureListComponent);
+//     fixture = TestBed.createComponent(PaginationComponent);
 //     component = fixture.componentInstance;
 //     fixture.detectChanges();
 //   });

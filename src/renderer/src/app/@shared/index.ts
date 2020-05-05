@@ -7,6 +7,10 @@ export * from './dynamic-dialog/dynamic-dialog.params';
 export * from './floating-button/floating-button.component';
 export * from './floating-button/floating-button.params';
 
+export * from './pagination/pagination.component';
+export * from './pagination/pagination.controller';
+export * from './pagination/pagination.params';
+
 export * from './thumb/thumb-card/thumb-card.component';
 export * from './thumb/thumb-list/thumb-list.component';
 export * from './thumb/base-item';

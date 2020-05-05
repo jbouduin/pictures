@@ -1,0 +1,33 @@
+<div class="pagination-wrapper" fxLayout="row wrap" fxLayoutAlign="center center">
+  <ng-container *ngFor="let button of controller.buttons">
+    <div [ngSwitch]="button.buttonType">
+      <button
+        *ngSwitchCase="buttonType.Previous"
+        class="pagination-button prev-next"
+        (click)="controller.click(button.pageNumber)">
+        <!-- <mat-icon>keyboard_arrow_left</mat-icon> -->
+        Previous
+      </button>
+      <button
+        *ngSwitchCase="buttonType.Next"
+        class="pagination-button prev-next"
+        (click)="controller.click(button.pageNumber)">
+        Next
+        <!-- <mat-icon>keyboard_arrow_right</mat-icon> -->
+      </button>
+      <button
+        *ngSwitchCase="buttonType.Page"
+        class="pagination-button page"
+        (click)="controller.click(button.pageNumber)">
+        {{button.pageNumber}}
+      </button>
+      <button
+        *ngSwitchCase="buttonType.Current"
+        class="pagination-button current"
+        (click)="controller.click(button.pageNumber)">
+        {{button.pageNumber}}
+      </button>
+      <span *ngSwitchCase="buttonType.Ellipsis" class="ellipsis-span">...</span>
+    </div>
+  </ng-container>
+</div>

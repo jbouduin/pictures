@@ -11,6 +11,8 @@ import { ConfirmationDialogParams } from '../confirmation-dialog/confirmation-di
 import { FloatingButtonParams } from '../floating-button/floating-button.params';
 import { DynamicDialogComponent } from '../dynamic-dialog/dynamic-dialog.component';
 import { DynamicDialogParams } from '../dynamic-dialog/dynamic-dialog.params';
+import { PaginationController } from '../pagination/pagination.controller';
+import { PaginationParams } from '../pagination/pagination.params';
 
 import { BaseItemFactory } from './base.item-factory';
 
@@ -35,6 +37,10 @@ export abstract class ThumbController<
   public get cards(): Array<L>{
     return this.listItems;
   }
+
+  public get pagination(): PaginationController {
+    return this.paginationController
+  }
   // </editor-fold>
 
   // <editor-fold desc='Abstract protected getters'>
@@ -54,6 +60,7 @@ export abstract class ThumbController<
   constructor(
     protected dialog: MatDialog,
     protected ipcService: IpcService,
+    protected paginationController: PaginationController,
     protected itemFactory: BaseItemFactory<L, N, E, DtoL, DtoG, DtoN, DtoS>) {
     this.listItems = new Array<L>();
     this.dialogRef = undefined;
@@ -167,6 +174,8 @@ export abstract class ThumbController<
       path: this.root
     };
 
+    // TODO:
+    this.paginationController.setPagination(new PaginationParams(1, 5, undefined));
     return this.ipcService
       .untypedDataRequest<Array<DtoL>>(request)
       .then(response => this.listItems = response.data.map( listItem => this.itemFactory.listDtoToListItem(listItem)));

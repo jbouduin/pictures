@@ -6,6 +6,7 @@ import { DataVerb, DtoUntypedDataRequest } from '@ipc';
 import { DtoGetCollection, DtoListCollection, DtoNewCollection, DtoSetCollection } from '@ipc';
 
 import { IpcService } from '@core';
+import { PaginationController } from '@shared';
 import { DynamicDialogParams, FloatingButtonParams } from '@shared';
 import { ThumbCardFooterParams, ThumbController } from '@shared';
 
@@ -63,8 +64,9 @@ export class CollectionController extends ThumbController<
   constructor(
     dialog: MatDialog,
     ipcService: IpcService,
+    paginationController: PaginationController,
     itemFactory: CollectionItemFactory) {
-    super(dialog, ipcService, itemFactory);
+    super(dialog, ipcService, paginationController, itemFactory);
   }
   // </editor-fold>
 

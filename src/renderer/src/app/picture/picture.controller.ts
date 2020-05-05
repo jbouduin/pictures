@@ -6,6 +6,7 @@ import { UrlSegment } from '@angular/router';
 import { DtoGetPicture, DtoListPicture, DtoNewPicture, DtoSetPicture } from '@ipc';
 
 import { IpcService } from '@core';
+import { PaginationController } from '@shared';
 import { DynamicDialogParams, FloatingButtonParams } from '@shared';
 import { ThumbCardFooterParams, ThumbController } from '@shared';
 
@@ -64,8 +65,9 @@ export class PictureController extends ThumbController<
   constructor(
     dialog: MatDialog,
     ipcService: IpcService,
+    paginationController: PaginationController,
     itemFactory: PictureItemFactory) {
-    super(dialog, ipcService, itemFactory);
+    super(dialog, ipcService, paginationController, itemFactory);
   }
   // </editor-fold>
 

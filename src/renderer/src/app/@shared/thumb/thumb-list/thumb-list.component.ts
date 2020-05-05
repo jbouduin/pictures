@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { DtoListBase, DtoGetBase, DtoNewBase, DtoSetBase } from '@ipc';
 
 import { FloatingButtonParams } from '../../floating-button/floating-button.params';
+import { PaginationController} from '../../pagination/pagination.controller';
 import { BaseItem } from '../base-item';
 import { ListItem } from '../list-item';
 import { ThumbController } from '../thumb.controller';
@@ -21,6 +22,10 @@ export class ThumbListComponent implements OnInit {
 
   public get floatingButtonParams(): FloatingButtonParams {
     return this.controller.floatingButtonParams;
+  }
+
+  public get paginationController(): PaginationController {
+    return this.controller.pagination;
   }
   // </editor-fold>
 
