@@ -16,7 +16,7 @@ export class CollectionListItem extends ListItem {
     this.thumb = `${dtoListCollection.path}/${dtoListCollection.thumb}`;
     this.path = dtoListCollection.path;
     this.footerText = dtoListCollection.pictures.toString();
-    this.routerLink = [ `/pictures/collection/${dtoListCollection.id}` ];
+    this.routerLink = [ `/picture/collection/${dtoListCollection.id}` ];
   }
   // </editor-fold>
 }

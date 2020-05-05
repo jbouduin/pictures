@@ -32,29 +32,29 @@ export class PictureService implements IPictureService {
   // <editor-fold desc='IPictureService interface methods'>
   public addPicture(collection: Collection, relativePath: string): Promise<Picture> {
     const splitted = relativePath.split('/');
-    const fileName = splitted.pop();
+    const name = splitted.pop();
     const path = splitted.join('/');
     const repository = this.databaseService.getPictureRepository();
     return repository
       .findOneOrFail({
           where: {
             path: path,
-            fileName: fileName,
+            name: name,
             collection: collection
           }
       })
       .then(
         picture => {
-          console.log(`picture '${path}/${fileName}' already in collection`);
+          console.log(`picture '${path}/${name}' already in '${collection.name}'`);
           return picture;
         },
         () => {
           const newPicture = repository.create({
-            fileName: fileName,
+            name: name,
             path: path,
             collection: collection
           });
-          console.log(`adding '${path}/${fileName}' to collection`);
+          console.log(`adding '${path}/${name}' to '${collection.name}'`);
           return repository.save(newPicture);
         }
       );

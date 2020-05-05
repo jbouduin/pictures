@@ -1,7 +1,9 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 
-import { DataStatus, DtoCollection, DtoListCollection, DtoDataResponse, DtoUntypedDataResponse, DtoScan, ScanStatus } from '@ipc';
+import { DataStatus, DtoDataResponse, DtoUntypedDataResponse } from '@ipc';
+import { DtoGetCollection, DtoListCollection, DtoNewCollection, DtoSetCollection } from '@ipc';
+import { DtoListPicture, DtoListPictureCollection } from '@ipc';
 
 import { Collection, Picture } from '../../database';
 import { IDatabaseService } from '../../database';
@@ -37,7 +39,7 @@ export class CollectionService implements ICollectionService {
     // GET
     router.get('/collection', this.getCollections.bind(this));
     router.get('/collection/:collection', this.getCollection.bind(this));
-    router.get('/collection/:collection/pictures', this.notImplemented);
+    router.get('/collection/:collection/pictures', this.getPictures.bind(this));
     // POST
     router.post('/collection', this.createCollection.bind(this));
     router.post('/collection/:collection/scan', this.scanCollection.bind(this));
@@ -82,7 +84,7 @@ export class CollectionService implements ICollectionService {
         return cntQry
           .select('collectionId')
           .addSelect("path as thumbPath")
-          .addSelect("fileName")
+          .addSelect("name as fileName")
           .addSelect("COUNT(*) AS count")
           .from('picture', null)
           .orderBy("path", "DESC")
@@ -106,7 +108,6 @@ export class CollectionService implements ICollectionService {
             name: collection.name,
             path: collection.path,
             pictures: collection.count || 0,
-            scanStatus: ScanStatus.NoScan,
             thumb: collection.thumbPath ?
               `${collection.thumbPath}/${collection.fileName}` :
               undefined
@@ -130,13 +131,13 @@ export class CollectionService implements ICollectionService {
     );
   }
 
-  private getCollection(request: RoutedRequest): Promise<DtoDataResponse<DtoCollection>> {
+  private getCollection(request: RoutedRequest): Promise<DtoDataResponse<DtoGetCollection>> {
     return this.databaseService
       .getCollectionRepository()
       .findOneOrFail(request.params.collection)
       .then(
         collection => {
-          const dtoCollection: DtoCollection = {
+          const dtoCollection: DtoGetCollection = {
             id: collection.id,
             created: collection.created,
             modified: collection.modified,
@@ -144,20 +145,73 @@ export class CollectionService implements ICollectionService {
             name: collection.name,
             path: collection.path
           }
-          const result: DtoDataResponse<DtoCollection> = {
+          const result: DtoDataResponse<DtoGetCollection> = {
             status: DataStatus.Ok,
             data: dtoCollection
           };
           return result;
         },
         error => {
-          const result: DtoDataResponse<DtoCollection> = {
+          const result: DtoDataResponse<DtoGetCollection> = {
             status: DataStatus.Conflict,
             message: `${error.name}: ${error.message}`
           };
           return result;
         }
       );
+  }
+
+  private getPictures(request: RoutedRequest): Promise<DtoDataResponse<Array<DtoListPicture>>> {
+    const pictureQry = this.databaseService
+      .getCollectionRepository()
+      .createQueryBuilder('collection')
+      .innerJoinAndSelect('collection.pictures', 'picture')
+      .where("collection.id = :collectionId", { collectionId: request.params.collection })
+    console.log(pictureQry.getQuery());
+
+    return pictureQry.getOne().then(
+      collection => {
+        if (!collection) {
+          const result: DtoDataResponse<Array<DtoListPicture>> = {
+            status: DataStatus.NotFound
+          };
+          return result;
+        }
+        else {
+          const dtoListPictureCollection: DtoListPictureCollection = {
+            id: collection.id,
+            name: collection.name,
+            path: collection.path
+          };
+
+          return collection.pictures.then(pictures => {
+            const dtoListPictures = pictures.map(picture => {
+              const dtoListPicture: DtoListPicture = {
+                id: picture.id,
+                name: picture.name,
+                path: picture.path,
+                collection: dtoListPictureCollection
+              };
+              return dtoListPicture;
+            });
+
+            const result: DtoDataResponse<Array<DtoListPicture>> = {
+              status: DataStatus.Ok,
+              data: dtoListPictures
+            };
+            return result;
+          });
+        }
+      },
+      error => {
+        console.log(error);
+        const result: DtoDataResponse<Array<DtoListPicture>> = {
+          status: DataStatus.Error,
+          message: `${error.name}: ${error.message}`
+        };
+        return result;
+      }
+    );
   }
 
   private notImplemented(request: RoutedRequest): Promise<DtoUntypedDataResponse> {
@@ -195,7 +249,6 @@ export class CollectionService implements ICollectionService {
           name: collection.name,
           path: collection.path,
           pictures: 0,
-          scanStatus: scanStatus.status,
           thumb: undefined,
         };
         const result: DtoDataResponse<DtoListCollection> = {
@@ -251,7 +304,6 @@ export class CollectionService implements ICollectionService {
                 name: savedCollection.name,
                 path: savedCollection.path,
                 pictures: 0,
-                scanStatus: ScanStatus.NoScan,
                 thumb: undefined
               };
               const result: DtoDataResponse<DtoListCollection> = {
@@ -281,11 +333,7 @@ export class CollectionService implements ICollectionService {
   // </editor-fold>
 
   // <editor-fold desc='Private helper methods'>
-  private scanDirectory(collection: Collection): DtoScan {
-    const result: DtoScan = {
-      status: ScanStatus.NoScan,
-      files: 0
-    };
+  private scanDirectory(collection: Collection): void {
     this.fileService
       .scanDirectory(collection.path, this.fileTypes)
       .then(
@@ -315,8 +363,6 @@ export class CollectionService implements ICollectionService {
           console.log(error);
         }
       );
-
-    return result;
   }
   // </editor-fold>
 }

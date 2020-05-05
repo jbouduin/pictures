@@ -1,5 +1,5 @@
 import { Component, Injector, OnInit } from '@angular/core';
-
+import { ActivatedRoute } from '@angular/router';
 import { ThumbController, ThumbListComponent } from '@shared';
 
 import { PictureController } from '../picture.controller';
@@ -22,11 +22,14 @@ export class PictureListComponent implements OnInit {
   // <editor-fold desc='Constructor & C°'>
   public constructor(
     private readonly inj: Injector,
+    private activatedRoute: ActivatedRoute,
     private pictureController: PictureController) { }
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methods'>
   public ngOnInit(): void {
+    this.activatedRoute.url
+      .subscribe(urlSegments => this.pictureController.setCurrentRoot(urlSegments));
     this.injector = Injector.create(
     {
       parent: this.inj,

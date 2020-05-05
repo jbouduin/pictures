@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ComponentType } from '@angular/cdk/portal';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { UrlSegment } from '@angular/router';
 
 import { DtoGetPicture, DtoListPicture, DtoNewPicture, DtoSetPicture } from '@ipc';
 
@@ -22,6 +23,10 @@ export class PictureController extends ThumbController<
   PictureListItem, PictureNewItem, PictureEditItem,
   DtoListPicture, DtoGetPicture, DtoNewPicture, DtoSetPicture> {
 
+  // <editor-fold desc='Private properties'>
+  private currentRoot: string;
+  // </editor-fold>
+
   // <editor-fold desc='Implementation of protected abstract getters'>
   protected get deleteDialogText(): string {
     return undefined;
@@ -35,7 +40,7 @@ export class PictureController extends ThumbController<
     return PictureDialogComponent;
   }
 
-  protected get root(): string { return '/collection'; }
+  protected get root(): string { return this.currentRoot; }
   // </editor-fold>
 
   // <editor-fold desc='Implementation of public abstract getters'>
@@ -61,6 +66,22 @@ export class PictureController extends ThumbController<
     ipcService: IpcService,
     itemFactory: PictureItemFactory) {
     super(dialog, ipcService, itemFactory);
+  }
+  // </editor-fold>
+
+  // <editor-fold desc='Public methods'>
+  public setCurrentRoot(urlSegments: Array<UrlSegment>): void {
+    const urlPaths = urlSegments.map(segment => segment.path);
+    switch(urlPaths[1]) {
+      case 'collection': {
+        this.currentRoot = `/collection/${urlPaths[2]}/pictures`;
+        break;
+      }
+      default: {
+        this.currentRoot = undefined;
+      }
+    }
+
   }
   // </editor-fold>
 }

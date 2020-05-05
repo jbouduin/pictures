@@ -2,7 +2,7 @@ import { Column, Entity, Index, ManyToOne, OneToMany } from 'typeorm';
 
 import { BaseEntity } from '../base-entity';
 import { Collection } from './collection';
-import { Exif } from './exif';
+
 
 @Entity()
 export class Picture extends BaseEntity {

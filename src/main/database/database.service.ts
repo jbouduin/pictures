@@ -11,7 +11,7 @@ import { IService } from '../di/service';
 
 import SERVICETYPES from '../di/service.types';
 
-import { Collection, Exif, Picture } from './entities';
+import { Collection, Picture } from './entities';
 
 export interface IDatabaseService extends IService<any> {
   getCollectionRepository(): Repository<Collection>;
@@ -31,7 +31,7 @@ export class DatabaseService implements IDatabaseService {
     console.log('in initialize DatabaseService');
     return this.connectByName(
           this.getConnectionNameForTargetType(TargetType.PICTURES),
-          [Collection, Exif, Picture]);
+          [Collection, Picture]);
   }
   // </editor-fold>
 
