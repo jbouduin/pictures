@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-
+import { RouterTestingModule } from '@angular/router/testing';
 import { PaginationButtonType } from './pagination-button-type';
 import { PaginationButton } from './pagination-button';
 import { PaginationController } from './pagination.controller';
@@ -86,7 +86,9 @@ describe('PaginationController', () => {
   let controller: PaginationController;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      imports: [ RouterTestingModule ]
+    });
     controller = TestBed.inject(PaginationController);
   });
   // </editor-fold>
@@ -123,6 +125,27 @@ describe('PaginationController', () => {
     expectLastButtonIsLastPageAndCurrent(controller.buttons, 2)
   });
   // </editor-fold>
+
+  // <editor-fold desc='3 pages tests'>
+  it('# page 1/3', () => {
+    const params = new PaginationParams(1, 3, undefined);
+    controller.setPagination(params);
+    expect(controller.buttons.length).toBe(4);
+    expectFirstButtonIsFirstPageAndCurrent(controller.buttons);
+    expectPageButton(controller.buttons[1], 2);
+    expectPageButton(controller.buttons[2], 3);
+    expectLastButtonIsNext(controller.buttons, 2);
+  });
+
+  it('# page 3/3', () => {
+    const params = new PaginationParams(3, 3, undefined);
+    controller.setPagination(params);
+    expect(controller.buttons.length).toBe(4);
+    expectFirstButtonIsPrevious(controller.buttons, 2);
+    expectPageButton(controller.buttons[1], 1);
+    expectPageButton(controller.buttons[2], 2);
+    expectLastButtonIsLastPageAndCurrent(controller.buttons, 3)
+  });
 
   // <editor-fold desc='6 pages: there should be a button for every page'>
   it('# page 1/6', () => {

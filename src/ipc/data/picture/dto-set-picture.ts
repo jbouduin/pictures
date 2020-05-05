@@ -1,3 +1,3 @@
-import { DtoSetBase } from '../dto-set-base';
+import { DtoSetBase } from '../request/dto-set-base';
 
 export interface DtoSetPicture extends DtoSetBase { }

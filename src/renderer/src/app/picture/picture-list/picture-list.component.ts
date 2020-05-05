@@ -28,8 +28,10 @@ export class PictureListComponent implements OnInit {
 
   // <editor-fold desc='Angular interface methods'>
   public ngOnInit(): void {
-    this.activatedRoute.url
-      .subscribe(urlSegments => this.pictureController.setCurrentRoot(urlSegments));
+    this.activatedRoute.paramMap.subscribe(paramMap => {
+      this.pictureController.processParamMap(paramMap);
+    });
+
     this.injector = Injector.create(
     {
       parent: this.inj,

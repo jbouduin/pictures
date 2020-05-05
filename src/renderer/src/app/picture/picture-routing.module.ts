@@ -6,7 +6,8 @@ import { Shell } from '../shell/shell.service';
 
 const routes: Routes = [
   Shell.childRoutes([
-    { path: 'picture/collection/:id', component: PictureListComponent}
+    { path: 'picture/:parent/:id', component: PictureListComponent},
+    { path: 'picture/:parent/:id/:page', component: PictureListComponent}
   ])
 ];
 

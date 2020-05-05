@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-
+import { Router } from '@angular/router';
 import { PaginationButtonType } from './pagination-button-type';
 import { PaginationButton } from './pagination-button';
 import { PaginationParams } from './pagination.params';
@@ -9,20 +9,25 @@ import { PaginationParams } from './pagination.params';
 })
 export class PaginationController {
 
-  private tempX = 5;
+  // <editor-fold desc='Private properties'>
+  private baseRoute: string;
+  // </editor-fold>
+
 
   // <editor-fold desc='Public properties'>
   public readonly buttons: Array<PaginationButton>;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor() {
-    this.buttons = new Array<PaginationButton>()
+  public constructor(private router: Router) {
+    this.buttons = new Array<PaginationButton>();
+    this.baseRoute = undefined;
   }
   // </editor-fold>
 
   // <editor-fold desc='Public methods'>
   public setPagination(params: PaginationParams): void {
+    this.baseRoute = params.baseRoute;
     this.buttons.length = 0;
     console.log(params);
     // if we are not on the first page, display a previous button
@@ -51,7 +56,7 @@ export class PaginationController {
       endPage = params.currentPage + 2;
     }
 
-    if (startPage < params.totalPages && endPage > startPage) {
+    if (startPage <= params.totalPages && endPage >= startPage) {
         // fill the 5 buttons in the middle
       for (let cnt = startPage; cnt <= endPage; cnt++) {
         // if the current page is greater then 4 display the ellipsis
@@ -86,7 +91,7 @@ export class PaginationController {
 
   // <editor-fold desc='UI Triggered methods'>
   public click(pageNumber: number): void {
-    alert(pageNumber);
+    this.router.navigate([this.baseRoute, pageNumber]);
   }
   // </editor-fold>
 }

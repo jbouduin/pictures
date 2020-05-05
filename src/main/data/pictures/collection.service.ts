@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 
-import { DataStatus, DtoDataResponse, DtoUntypedDataResponse } from '@ipc';
+import { DataStatus, DtoDataResponse, DtoListDataResponse, DtoUntypedDataResponse } from '@ipc';
 import { DtoGetCollection, DtoListCollection, DtoNewCollection, DtoSetCollection } from '@ipc';
 import { DtoListPicture, DtoListPictureCollection } from '@ipc';
 
@@ -73,7 +73,10 @@ export class CollectionService implements ICollectionService {
   // </editor-fold>
 
   // <editor-fold desc='GET routes callbacks'>
-  private getCollections(request: RoutedRequest): Promise<DtoDataResponse<Array<DtoListCollection>>> {
+  private getCollections(request: RoutedRequest): Promise<DtoListDataResponse<DtoListCollection>> {
+    const paginationTake = request.queryParams.pageSize || 20;
+    const paginationSkip = ((request.queryParams.page || 1) - 1) * paginationTake;
+
     const collectionQry = this.databaseService
       .getCollectionRepository()
       .createQueryBuilder('collection')
@@ -97,38 +100,48 @@ export class CollectionService implements ICollectionService {
       .addSelect('cnt.count')
       .addSelect('cnt.thumbPath')
       .addSelect('cnt.fileName')
+      .offset(paginationSkip)
+      .limit(paginationTake)
       .orderBy('collection.name');
     console.log(collectionQry.getQuery());
 
-    return collectionQry.getRawMany().then(
-      collections => {
-        const dtoCollections: Array<DtoListCollection> = collections.map(collection => {
-          const result: DtoListCollection = {
-            id: collection.id,
-            name: collection.name,
-            path: collection.path,
-            pictures: collection.count || 0,
-            thumb: collection.thumbPath ?
-              `${collection.thumbPath}/${collection.fileName}` :
-              undefined
-          };
-          return result;
-        });
-        const result: DtoDataResponse<Array<DtoListCollection>> = {
-          status: DataStatus.Ok,
-          data: dtoCollections,
-        };
-        return result;
-      },
-      error => {
-        console.log(error);
-        const result: DtoDataResponse<Array<DtoListCollection>> = {
-          status: DataStatus.Error,
-          message: `${error.name}: ${error.message}`
-        };
-        return result;
-      }
-    );
+    return this.databaseService
+      .getCollectionRepository()
+      .count()
+      .then(count => {
+        return collectionQry.getRawMany().then(
+          collections => {
+            const dtoCollections: Array<DtoListCollection> = collections.map(collection => {
+              const result: DtoListCollection = {
+                id: collection.id,
+                name: collection.name,
+                path: collection.path,
+                pictures: collection.count || 0,
+                thumb: collection.thumbPath ?
+                  `${collection.thumbPath}/${collection.fileName}` :
+                  undefined
+              };
+              return result;
+            });
+            const result: DtoListDataResponse<DtoListCollection> = {
+              status: DataStatus.Ok,
+              data: {
+                listData: dtoCollections,
+                count: count
+              }
+            };
+            return result;
+          },
+          error => {
+            console.log(error);
+            const result: DtoListDataResponse<DtoListCollection> = {
+              status: DataStatus.Error,
+              message: `${error.name}: ${error.message}`
+            };
+            return result;
+          }
+        )
+      });
   }
 
   private getCollection(request: RoutedRequest): Promise<DtoDataResponse<DtoGetCollection>> {
@@ -161,57 +174,55 @@ export class CollectionService implements ICollectionService {
       );
   }
 
-  private getPictures(request: RoutedRequest): Promise<DtoDataResponse<Array<DtoListPicture>>> {
-    const pictureQry = this.databaseService
-      .getCollectionRepository()
-      .createQueryBuilder('collection')
-      .innerJoinAndSelect('collection.pictures', 'picture')
-      .where("collection.id = :collectionId", { collectionId: request.params.collection })
-    console.log(pictureQry.getQuery());
+  private getPictures(request: RoutedRequest): Promise<DtoListDataResponse<DtoListPicture>> {
+    const paginationTake = request.queryParams.pageSize || 20;
+    const paginationSkip = ((request.queryParams.page || 1) - 1) * paginationTake;
 
-    return pictureQry.getOne().then(
-      collection => {
-        if (!collection) {
-          const result: DtoDataResponse<Array<DtoListPicture>> = {
-            status: DataStatus.NotFound
-          };
-          return result;
-        }
-        else {
+    return this.databaseService
+      .getCollectionRepository()
+      .findOneOrFail(request.params.collection)
+      .then(
+        collection => {
           const dtoListPictureCollection: DtoListPictureCollection = {
             id: collection.id,
             name: collection.name,
             path: collection.path
           };
+          return this.databaseService.getPictureRepository()
+            .findAndCount({
+              where: { collection: collection},
+              skip: paginationSkip,
+              take: paginationTake
+            })
+            .then( qryResult => {
+              const dtoListPictures = qryResult[0].map(picture => {
+                const dtoListPicture: DtoListPicture = {
+                  id: picture.id,
+                  name: picture.name,
+                  path: picture.path,
+                  collection: dtoListPictureCollection
+                };
+                return dtoListPicture;
+              });
 
-          return collection.pictures.then(pictures => {
-            const dtoListPictures = pictures.map(picture => {
-              const dtoListPicture: DtoListPicture = {
-                id: picture.id,
-                name: picture.name,
-                path: picture.path,
-                collection: dtoListPictureCollection
+              const result: DtoListDataResponse<DtoListPicture> = {
+                status: DataStatus.Ok,
+                data: {
+                  listData: dtoListPictures,
+                  count: qryResult[1]
+                }
               };
-              return dtoListPicture;
-            });
-
-            const result: DtoDataResponse<Array<DtoListPicture>> = {
-              status: DataStatus.Ok,
-              data: dtoListPictures
-            };
-            return result;
-          });
+              return result;
+            })
+        },
+        error => {
+          console.log('found no collection');
+          const result: DtoListDataResponse<DtoListPicture> = {
+            status: DataStatus.NotFound
+          };
+          return result;
         }
-      },
-      error => {
-        console.log(error);
-        const result: DtoDataResponse<Array<DtoListPicture>> = {
-          status: DataStatus.Error,
-          message: `${error.name}: ${error.message}`
-        };
-        return result;
-      }
-    );
+      );
   }
 
   private notImplemented(request: RoutedRequest): Promise<DtoUntypedDataResponse> {

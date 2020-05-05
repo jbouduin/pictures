@@ -1,4 +1,4 @@
-import { DtoGetBase } from '../dto-get-base';
+import { DtoGetBase } from '../response/dto-get-base';
 import { DtoGetPictureCollection } from './dto-get-picture-collection';
 
 export interface DtoGetPicture extends DtoGetBase {

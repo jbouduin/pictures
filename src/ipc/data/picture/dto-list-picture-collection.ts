@@ -1,4 +1,4 @@
-import { DtoListBase } from '../dto-list-base';
+import { DtoListBase } from '../response/dto-list-base';
 
 export interface DtoListPictureCollection extends DtoListBase {
   path: string

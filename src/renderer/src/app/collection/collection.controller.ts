@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ComponentType } from '@angular/cdk/portal';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { ParamMap } from '@angular/router';
 
 import { DataVerb, DtoUntypedDataRequest } from '@ipc';
 import { DtoGetCollection, DtoListCollection, DtoNewCollection, DtoSetCollection } from '@ipc';
@@ -35,6 +36,11 @@ export class CollectionController extends ThumbController<
   protected get newDialogComponent(): ComponentType<any> {
     return CollectionDialogComponent;
   }
+
+  protected get paginationRoot(): string {
+    return '/home';
+  }
+
   protected get root(): string { return '/collection'; }
   // </editor-fold>
 
@@ -67,6 +73,19 @@ export class CollectionController extends ThumbController<
     paginationController: PaginationController,
     itemFactory: CollectionItemFactory) {
     super(dialog, ipcService, paginationController, itemFactory);
+  }
+  // </editor-fold>
+
+  // <editor-fold desc='Implementation of abstract Public methods'>
+  public processParamMap(paramMap: ParamMap): void {
+    if (paramMap.has('page')) {
+      try {
+        this.page = Number(paramMap.get('page'));
+      } catch {
+        this.page = undefined;
+      }
+    }
+    this.loadList();
   }
   // </editor-fold>
 

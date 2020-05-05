@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ComponentType } from '@angular/cdk/portal';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { UrlSegment } from '@angular/router';
+import { ParamMap } from '@angular/router';
 
 import { DtoGetPicture, DtoListPicture, DtoNewPicture, DtoSetPicture } from '@ipc';
 
@@ -26,6 +26,7 @@ export class PictureController extends ThumbController<
 
   // <editor-fold desc='Private properties'>
   private currentRoot: string;
+  private currentPaginationRoot: string;
   // </editor-fold>
 
   // <editor-fold desc='Implementation of protected abstract getters'>
@@ -41,7 +42,13 @@ export class PictureController extends ThumbController<
     return PictureDialogComponent;
   }
 
-  protected get root(): string { return this.currentRoot; }
+  protected get paginationRoot(): string {
+    return this.currentPaginationRoot;
+  }
+
+  protected get root(): string {
+    return this.currentRoot;
+  }
   // </editor-fold>
 
   // <editor-fold desc='Implementation of public abstract getters'>
@@ -71,12 +78,12 @@ export class PictureController extends ThumbController<
   }
   // </editor-fold>
 
-  // <editor-fold desc='Public methods'>
-  public setCurrentRoot(urlSegments: Array<UrlSegment>): void {
-    const urlPaths = urlSegments.map(segment => segment.path);
-    switch(urlPaths[1]) {
+  // <editor-fold desc='Implementation of abstract Public methods'>
+  public processParamMap(paramMap: ParamMap): void {
+    switch(paramMap.get('parent')) {
       case 'collection': {
-        this.currentRoot = `/collection/${urlPaths[2]}/pictures`;
+        this.currentRoot = `/collection/${paramMap.get('id')}/pictures`;
+        this.currentPaginationRoot = `/picture/collection/${paramMap.get('id')}`;
         break;
       }
       default: {
@@ -84,6 +91,14 @@ export class PictureController extends ThumbController<
       }
     }
 
+    if (paramMap.has('page')) {
+      try {
+        this.page = Number(paramMap.get('page'));
+      } catch {
+        this.page = undefined;
+      }
+    }
+    this.loadList();
   }
   // </editor-fold>
 }

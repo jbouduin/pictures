@@ -1,4 +1,5 @@
 import { Component, Injector, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 import { ThumbController, ThumbListComponent } from '@shared';
 
@@ -22,11 +23,15 @@ export class CollectionListComponent implements OnInit {
   // <editor-fold desc='Constructor & C°'>
   public constructor(
     private readonly inj: Injector,
+    private activatedRoute: ActivatedRoute,
     private collectionController: CollectionController) { }
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methods'>
   public ngOnInit(): void {
+    this.activatedRoute.paramMap.subscribe(paramMap => {
+      this.collectionController.processParamMap(paramMap);
+    });
     this.injector = Injector.create(
     {
       parent: this.inj,

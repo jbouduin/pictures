@@ -1,10 +1,11 @@
-import { Component, Injectable } from '@angular/core';
+import { Component } from '@angular/core';
 import { ComponentType } from '@angular/cdk/portal';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { ParamMap } from '@angular/router';
 
 import { IpcService } from '@core';
 import { DataVerb, DtoDataRequest, DtoUntypedDataRequest } from '@ipc';
-import { DtoListBase, DtoGetBase, DtoNewBase, DtoSetBase } from '@ipc';
+import { DtoListData, DtoListBase, DtoGetBase, DtoNewBase, DtoSetBase } from '@ipc';
 
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { ConfirmationDialogParams } from '../confirmation-dialog/confirmation-dialog.params';
@@ -20,26 +21,36 @@ import { ListItem } from './list-item';
 import { BaseItem } from './base-item';
 import { ThumbCardFooterParams } from './thumb-card-footer.params';
 
-// QUESTION as this one is abstract, maybe it doesn't have to be Injectable anymore?
-// @Injectable({
-//   providedIn: 'root'
-// })
 export abstract class ThumbController<
   L extends ListItem, N extends BaseItem, E extends BaseItem,
   DtoL extends DtoListBase, DtoG extends DtoGetBase, DtoN extends DtoNewBase, DtoS extends DtoSetBase> {
 
+  // <editor-fold desc='Private readonly properties'>
+  // TODO make this configurable
+  private readonly pageSize = 20;
+  // </editor-fold>
+
   // <editor-fold desc='Private properties'>
   private listItems: Array<L>;
   private dialogRef: MatDialogRef<any>;
+  private currentPage: number;
   // </editor-fold>
 
-  // <editor-fold desc='Public get methods'>
+  // <editor-fold desc='Public get/set methods'>
   public get cards(): Array<L>{
     return this.listItems;
   }
 
   public get pagination(): PaginationController {
     return this.paginationController
+  }
+
+  public get page(): number {
+    return this.currentPage || 1;
+  }
+
+  public set page(value: number) {
+    this.currentPage = value;
   }
   // </editor-fold>
 
@@ -48,6 +59,7 @@ export abstract class ThumbController<
   protected abstract get deleteDialogText(): string;
   protected abstract get newDialogComponent(): ComponentType<any>;
   protected abstract get root(): string;
+  protected abstract get paginationRoot(): string;
   // </editor-fold>
 
   // <editor-fold desc='Abstract public getters'>
@@ -64,9 +76,13 @@ export abstract class ThumbController<
     protected itemFactory: BaseItemFactory<L, N, E, DtoL, DtoG, DtoN, DtoS>) {
     this.listItems = new Array<L>();
     this.dialogRef = undefined;
+    this.currentPage = undefined;
   }
   // </editor-fold>
 
+  // <editor-fold desc='Abstract public methods'>
+  public abstract processParamMap(paramMap: ParamMap): void;
+  // </editor-fold>
   // <editor-fold desc='Public Create related methods'>
   public create(): void {
     this.dialogRef = this.dialog.open(
@@ -171,14 +187,19 @@ export abstract class ThumbController<
   public loadList(): Promise<Array<L>> {
     const request: DtoUntypedDataRequest = {
       verb: DataVerb.GET,
-      path: this.root
+      path: `${this.root}?page=${this.page}&pageSize=${this.pageSize}`
     };
 
-    // TODO:
-    this.paginationController.setPagination(new PaginationParams(1, 5, undefined));
     return this.ipcService
-      .untypedDataRequest<Array<DtoL>>(request)
-      .then(response => this.listItems = response.data.map( listItem => this.itemFactory.listDtoToListItem(listItem)));
+      .untypedDataRequest<DtoListData<DtoL>>(request)
+      .then(response => {
+        this.listItems = response.data.listData.map( listDto => this.itemFactory.listDtoToListItem(listDto));
+        const totalPages =
+          Math.floor(response.data.count / this.pageSize) +
+          ((response.data.count % this.pageSize) > 0 ? 1 : 0);
+        this.paginationController.setPagination(new PaginationParams(this.page, totalPages, this.paginationRoot));
+        return this.listItems;
+      });
   }
 
   public remove(listItem: L): void {

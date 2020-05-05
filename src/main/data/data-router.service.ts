@@ -6,7 +6,7 @@ import * as Collections from 'typescript-collections';
 import * as util from 'util';
 import 'reflect-metadata';
 
-import { DataStatus, DataVerb, DtoDataRequest, DtoDataResponse } from '@ipc';
+import { DataStatus, DataVerb, DtoDataRequest, DtoDataResponse, DtoUntypedDataResponse } from '@ipc';
 
 import { IService } from '../di/service';
 
@@ -106,9 +106,8 @@ export class DataRouterService implements IDataRouterService {
     }
     if (!routeDictionary) {
       console.log('not allowed');
-      const response: DtoDataResponse<string> = {
-        status: DataStatus.NotAllowed,
-        data: undefined
+      const response: DtoUntypedDataResponse = {
+        status: DataStatus.NotAllowed
       };
       result = Promise.resolve(response);
     }
@@ -125,15 +124,17 @@ export class DataRouterService implements IDataRouterService {
     routeDictionary: Collections.Dictionary<string, RouteCallback>): Promise<DtoDataResponse<any>> {
     let result: Promise<DtoDataResponse<any>>;
 
+    const splittedPath = request.path.split('?');
+
     const matchedKey = routeDictionary.keys().find(key => {
       const matcher = match(key);
-      const matchResult = matcher(request.path);
+      const matchResult = matcher(splittedPath[0]);
       return matchResult !== false;
     });
     if (matchedKey)
     {
       const matcher2 = match(matchedKey);
-      const matchResult2: any = matcher2(request.path);
+      const matchResult2: any = matcher2(splittedPath[0]);
 
       if (_.isObject(matchResult2)) {
         console.log(`Route found: ${matchedKey}`);
@@ -142,6 +143,16 @@ export class DataRouterService implements IDataRouterService {
         routedRequest.path = matchResult2.path;
         routedRequest.params = matchResult2.params;
         routedRequest.data = request.data;
+        routedRequest.queryParams = { };
+        if (splittedPath.length > 1) {
+          const queryParts = splittedPath[1].split('&');
+          queryParts.forEach(part => {
+            const kvp = part.split('=');
+            if (kvp.length > 1) {
+              routedRequest.queryParams[kvp[0]] = kvp[1];
+            }
+          });
+        }
         const route = routeDictionary.getValue(matchedKey);
         if (route) {
           console.log(routedRequest);
