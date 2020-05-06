@@ -78,7 +78,7 @@ ipcMain.on('request-systeminfo', () => {
 
 ipcMain.on('request-configuration', () => {
   const configuration: DtoConfiguration = container.get<IConfigurationService>(SERVICETYPES.ConfigurationService).configuration;
-  // console.log(JSON.stringify(configuration));
+  // console.log(JSON.stringify(configuration, null, 2));
   if (win) {
     win.webContents.send('configuration', JSON.stringify(configuration));
   }
@@ -89,6 +89,7 @@ ipcMain.on('data', async (event, arg) => {
   // console.log(`Request received ${dtoRequest}`);
   const result = await container.get<IDataRouterService>(SERVICETYPES.DataRouterService)
     .routeRequest(dtoRequest);
+  // console.log(JSON.stringify(result, null, 2));
   event.reply('data', JSON.stringify(result));
 })
 
@@ -98,7 +99,7 @@ ipcMain.on('data-sync', (event, arg) => {
   const result = container.get<IDataRouterService>(SERVICETYPES.DataRouterService)
     .routeRequest(dtoRequest)
     .then(result => {
-      // console.log(`Response ${result}`);
+      // console.log(JSON.stringify(result, null, 2));
       event.returnValue = JSON.stringify(result);
     });
 })

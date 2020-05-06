@@ -5,7 +5,7 @@ export abstract class ListItem extends BaseItem {
   // <editor-fold desc='Public properties'>
   public footerText: string;
   public routerLink: Array<string>
-  public thumb: string;
+  public thumbPath: string;
 
   // </editor-fold>
 

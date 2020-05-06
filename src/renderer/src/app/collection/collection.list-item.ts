@@ -13,7 +13,7 @@ export class CollectionListItem extends ListItem {
   public constructor(dtoListCollection: DtoListCollection) {
     super(dtoListCollection.id);
     this.name = dtoListCollection.name;
-    this.thumb = `${dtoListCollection.path}/${dtoListCollection.thumb}`;
+    this.thumbPath = dtoListCollection.thumbPath;
     this.path = dtoListCollection.path;
     this.footerText = dtoListCollection.pictures.toString();
     this.routerLink = [ `/picture/collection/${dtoListCollection.id}` ];

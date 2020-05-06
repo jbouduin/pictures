@@ -27,8 +27,9 @@ export class ThumbCardComponent implements OnInit {
 
   // <editor-fold desc='Angular interface methods'>
   public ngOnInit(): void {
-    const imageSrc = (this.item.thumb ?
-      `file:${this.item.thumb}` :
+    // TODO move this to main
+    const imageSrc = (this.item.thumbPath ?
+      `file:${this.item.thumbPath}` :
       `file:${this.configurationService.configuration.appPath}/dist/renderer/assets/thumb.png`).replace(/\\/g, '/')
     this.thumbnailStyle = {
       'background-image': `url(${encodeURI(imageSrc)})`,

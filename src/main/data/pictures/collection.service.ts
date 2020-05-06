@@ -9,6 +9,7 @@ import { Collection, Picture } from '../../database';
 import { IDatabaseService } from '../../database';
 import { IFileService } from '../../system';
 
+import { IConfigurationService } from '../configuration';
 import { IDataRouterService } from '../data-router.service';
 import { IDataService } from '../data-service';
 import { RoutedRequest } from '../routed-request';
@@ -27,6 +28,7 @@ export class CollectionService implements ICollectionService {
 
   // <editor-fold desc='Constructor & C°'>
   public constructor(
+    @inject(SERVICETYPES.ConfigurationService) private configurationService: IConfigurationService,
     @inject(SERVICETYPES.DatabaseService) private databaseService: IDatabaseService,
     @inject(SERVICETYPES.PictureService) private pictureService: IPictureService,
     @inject(SERVICETYPES.FileService) private fileService: IFileService) { }
@@ -86,25 +88,27 @@ export class CollectionService implements ICollectionService {
       .leftJoin( (cntQry) => {
         return cntQry
           .select('collectionId')
+          .addSelect("id as thumbId")
           .addSelect("path as thumbPath")
-          .addSelect("name as fileName")
+          .addSelect("name as thumbName")
           .addSelect("COUNT(*) AS count")
           .from('picture', null)
           .orderBy("path", "DESC")
-          .addOrderBy("fileName", "DESC")
+          .addOrderBy("thumbName", "DESC")
           .groupBy("picture.collectionId")
         },
         'cnt',
         'cnt.collectionId = collection.Id',
       )
       .addSelect('cnt.count')
+      .addSelect('cnt.thumbId')
       .addSelect('cnt.thumbPath')
-      .addSelect('cnt.fileName')
+      .addSelect('cnt.thumbName')
       .offset(paginationSkip)
       .limit(paginationTake)
       .orderBy('collection.name');
     console.log(collectionQry.getQuery());
-
+    console.log('passing');
     return this.databaseService
       .getCollectionRepository()
       .count()
@@ -112,15 +116,23 @@ export class CollectionService implements ICollectionService {
         return collectionQry.getRawMany().then(
           collections => {
             const dtoCollections: Array<DtoListCollection> = collections.map(collection => {
+              let thumbnailPath: string = undefined;
+              if (collection.thumbName) {
+                const collectionThumbnailPath = `${this.configurationService.environment.thumbBaseDirectory}/${collection.id}`;
+                const thumbnailExtension = collection.thumbName.split('.').pop();
+                thumbnailPath = `${collectionThumbnailPath}/${collection.thumbId}.${thumbnailExtension}`;
+                if (!this.fileService.fileOrDirectoryExistsSync(thumbnailPath)) {
+                  thumbnailPath = `${collection.path}/${collection.thumbPath}/${collection.thumbName}`;
+                }
+              }
               const result: DtoListCollection = {
                 id: collection.id,
                 name: collection.name,
                 path: collection.path,
                 pictures: collection.count || 0,
-                thumb: collection.thumbPath ?
-                  `${collection.thumbPath}/${collection.fileName}` :
-                  undefined
+                thumbPath: thumbnailPath
               };
+              console.log(result);
               return result;
             });
             const result: DtoListDataResponse<DtoListCollection> = {
@@ -195,11 +207,18 @@ export class CollectionService implements ICollectionService {
               take: paginationTake
             })
             .then( qryResult => {
+              const collectionThumbnailPath = `${this.configurationService.environment.thumbBaseDirectory}/${collection.id}`;
               const dtoListPictures = qryResult[0].map(picture => {
+                const thumbnailExtension = picture.name.split('.').pop();
+                let thumbnailPath = `${collectionThumbnailPath}/${picture.id}.${thumbnailExtension}`;
+                if (!this.fileService.fileOrDirectoryExistsSync(thumbnailPath)) {
+                  thumbnailPath = `${collection.path}/${picture.path}/${picture.name}`;
+                }
                 const dtoListPicture: DtoListPicture = {
                   id: picture.id,
                   name: picture.name,
                   path: picture.path,
+                  thumbPath: thumbnailPath,
                   collection: dtoListPictureCollection
                 };
                 return dtoListPicture;
@@ -260,7 +279,7 @@ export class CollectionService implements ICollectionService {
           name: collection.name,
           path: collection.path,
           pictures: 0,
-          thumb: undefined,
+          thumbPath: undefined,
         };
         const result: DtoDataResponse<DtoListCollection> = {
           status: DataStatus.Ok,
@@ -315,7 +334,7 @@ export class CollectionService implements ICollectionService {
                 name: savedCollection.name,
                 path: savedCollection.path,
                 pictures: 0,
-                thumb: undefined
+                thumbPath: undefined
               };
               const result: DtoDataResponse<DtoListCollection> = {
                 status: DataStatus.Ok,

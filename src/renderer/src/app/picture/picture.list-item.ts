@@ -11,7 +11,7 @@ export class PictureListItem extends ListItem {
   public constructor(dtoListPicture: DtoListPicture) {
     super(dtoListPicture.id);
     this.name = dtoListPicture.name;
-    this.thumb = `${dtoListPicture.collection.path}/${dtoListPicture.path}/${dtoListPicture.name}`;
+    this.thumbPath = dtoListPicture.thumbPath;
     this.footerText = '0';
   }
   // </editor-fold>
