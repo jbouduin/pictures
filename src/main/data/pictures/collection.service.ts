@@ -239,7 +239,7 @@ export class CollectionService implements ICollectionService {
     const repository = this.databaseService
       .getCollectionRepository();
 
-    if (!this.fileService.directoryExists(request.data.path)) {
+    if (!this.fileService.fileOrDirectoryExistsSync(request.data.path)) {
       const result: DtoDataResponse<DtoListCollection> = {
         status: DataStatus.Error,
         message: `The directory '${request.data.path}' could not be found`
@@ -254,7 +254,7 @@ export class CollectionService implements ICollectionService {
 
     return repository.save(newCollection).then(
       collection => {
-        const scanStatus = this.scanDirectory(collection);
+        this.scanDirectory(collection);
         const listItem: DtoListCollection = {
           id: collection.id,
           name: collection.name,
@@ -356,7 +356,7 @@ export class CollectionService implements ICollectionService {
           let promises = new Array<Promise<Picture>>();
           files.forEach( (file, index) => {
             // save each file in a separate transaction
-            promises.push(this.pictureService.addPicture(collection, file));
+            promises.push(this.pictureService.upsertPicture(collection, file));
             if (((index + 1) % 10 === 0) || (index === total - 1)) {
               Promise
                 .all(promises)

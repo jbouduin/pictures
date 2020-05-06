@@ -4,6 +4,7 @@ const SERVICETYPES = {
   DataRouterService: Symbol('DataRouterService'),
   DatabaseService: Symbol('DatabaseService'),
   FileService: Symbol('FileService'),
+  ImageService: Symbol('ImageService'),
   PictureService: Symbol('PictureService')
 };
 

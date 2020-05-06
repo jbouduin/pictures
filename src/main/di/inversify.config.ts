@@ -6,6 +6,7 @@ import { IDataRouterService, DataRouterService } from '../data';
 import { IPictureService, PictureService } from '../data';
 import { IDatabaseService, DatabaseService } from '../database';
 import { IFileService, FileService } from '../system';
+import { IImageService, ImageService } from '../system';
 
 import SERVICETYPES from './service.types';
 
@@ -17,6 +18,7 @@ container.bind<IConfigurationService>(SERVICETYPES.ConfigurationService).to(Conf
 container.bind<IDataRouterService>(SERVICETYPES.DataRouterService).to(DataRouterService).inSingletonScope();
 container.bind<IDatabaseService>(SERVICETYPES.DatabaseService).to(DatabaseService).inSingletonScope();
 container.bind<IFileService>(SERVICETYPES.FileService).to(FileService);
+container.bind<IImageService>(SERVICETYPES.ImageService).to(ImageService);
 container.bind<IPictureService>(SERVICETYPES.PictureService).to(PictureService);
 // </editor-fold>
 
