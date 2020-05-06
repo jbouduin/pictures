@@ -3,6 +3,7 @@ import * as path from 'path';
 import { DtoConfiguration, DtoSystemInfo } from '@ipc';
 import { DtoDataRequest } from '@ipc';
 import * as os from 'os';
+import { fork, spawn } from 'child_process';
 
 import container from './di/inversify.config';
 import { IConfigurationService } from './data';
@@ -103,3 +104,17 @@ ipcMain.on('data-sync', (event, arg) => {
       event.returnValue = JSON.stringify(result);
     });
 })
+
+const p = fork(path.join(app.getAppPath(), 'dist/fork', 'child.js'), ['hello'], {
+    stdio: ['pipe', 'pipe', 'pipe', 'ipc'],
+  });
+  p.stdout.on('data', (d) => {
+    console.log('data', '[stdout-main-fork] ' + d.toString());
+  });
+  p.stderr.on('data', (d) => {
+    console.log('data', '[stderr-main-fork] ' + d.toString());
+  });
+  p.send('hello');
+  p.on('message', (m) => {
+    console.log('data', '[ipc-main-fork] ' + m);
+  });

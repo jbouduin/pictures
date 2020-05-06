@@ -9,6 +9,8 @@
     "build:prod:renderer": "ng build --prod",
     "build:dev:main": "webpack --config ./src/main/webpack.ts --mode development",
     "build:prod:main": "webpack --config ./src/main/webpack.ts --mode production",
+    "build:dev:fork": "webpack --config ./src/fork/webpack.ts --mode development",
+    "build:prod:fork": "webpack --config ./src/fork/webpack.ts --mode production",
     "build:dev:preload": "webpack --config ./src/preload/webpack.ts --mode development",
     "build:prod:preload": "webpack --config ./src/preload/webpack.ts --mode production",
     "build:dev:all": "npm run build:dev:renderer && npm run build:dev:main && npm run build:dev:preload",

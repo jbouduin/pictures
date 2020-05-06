@@ -108,7 +108,7 @@ export class CollectionService implements ICollectionService {
       .limit(paginationTake)
       .orderBy('collection.name');
     console.log(collectionQry.getQuery());
-    console.log('passing');
+
     return this.databaseService
       .getCollectionRepository()
       .count()
@@ -132,7 +132,6 @@ export class CollectionService implements ICollectionService {
                 pictures: collection.count || 0,
                 thumbPath: thumbnailPath
               };
-              console.log(result);
               return result;
             });
             const result: DtoListDataResponse<DtoListCollection> = {
