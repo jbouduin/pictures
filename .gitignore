@@ -49,3 +49,4 @@ configuration/environments/development/*.json
 
 # project specific
 *.sqlite
+*.sqlite-journal
