@@ -17,7 +17,5 @@ const routes: Routes = [
   providers: []
 })
 export class PictureRoutingModule {
-  constructor() {
-    console.log('PictureRoutingModule constructor');
-  }
+  constructor() { }
 }

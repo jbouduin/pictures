@@ -66,7 +66,6 @@ export class CollectionDialogComponent implements OnInit {
     this.collection = baseItem.isNew ?
       (baseItem as any) as CollectionNewItem :
       (baseItem as any) as CollectionEditItem;
-    console.log('CollectionDialogComponent constructor');
     this.dialogTitle = baseItem.isNew ?
       'New collection' :
       'Edit collection';

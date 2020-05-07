@@ -36,6 +36,5 @@ import { PictureDialogComponent } from './picture-dialog/picture-dialog.componen
   ],
 })
 export class PictureModule {
-  constructor() {
-    console.log('PictureModule constructor');
-  }}
+  constructor() { }
+}

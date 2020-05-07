@@ -2,13 +2,15 @@ import { Injectable } from '@angular/core';
 import { DtoConfiguration, DtoSystemInfo } from '@ipc';
 import { DataStatus, DtoDataRequest, DtoDataResponse, DtoUntypedDataRequest } from '@ipc';
 
+import { LogService } from '@core';
+
 @Injectable({
   providedIn: 'root'
 })
 export class IpcService {
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor() { }
+  public constructor(private logService: LogService) { }
   // </editor-fold>
 
   // <editor-fold desc='Public methods'>
@@ -34,7 +36,7 @@ export class IpcService {
   public dataRequestSync<T,U>(request: DtoDataRequest<T>): DtoDataResponse<U> {
     const json = JSON.stringify(request);
     const result = window.api.electronIpcSendSync('data-sync', json);
-    console.log(result);
+    this.logService.debug(result);
     let response: DtoDataResponse<U>;
     try {
       response = JSON.parse(result);
@@ -54,7 +56,7 @@ export class IpcService {
   public dataRequest<T,U>(request: DtoDataRequest<T>): Promise<DtoDataResponse<U>> {
     return new Promise((resolve, reject) => {
       window.api.electronIpcOnce('data', (event, arg) => {
-        console.log(arg);
+        this.logService.debug(arg);
         try {
           const result: DtoDataResponse<U> = JSON.parse(arg);
           if (result.status < DataStatus.BadRequest) {

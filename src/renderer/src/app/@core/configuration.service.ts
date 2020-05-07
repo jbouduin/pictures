@@ -9,13 +9,14 @@ import { IpcService } from './ipc/ipc.service';
 export class ConfigurationService {
 
   private _configuration: DtoConfiguration;
-
+  private
   public get configuration(): DtoConfiguration {
     return this._configuration || this.getConfiguration();
   }
 
   // <editor-fold desc='Constructor & C°'>
-  constructor(private ipcService: IpcService) { }
+  constructor(
+    private ipcService: IpcService) { }
   // </editor-fold>
 
   private getConfiguration(): DtoConfiguration {

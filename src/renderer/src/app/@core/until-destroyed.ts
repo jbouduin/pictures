@@ -24,7 +24,7 @@ const untilDestroyedSymbol = Symbol('untilDestroyed');
  *   ngOnInit() {
  *     interval(1000)
  *       .pipe(untilDestroyed(this))
- *       .subscribe(val => console.log(val));
+ *       .subscribe(val => consolelog(val));
  *   }
  *
  *   // This method must be present, even if empty.

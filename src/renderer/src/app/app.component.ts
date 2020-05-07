@@ -12,8 +12,6 @@ export class AppComponent implements OnInit {
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methods'>
-  public ngOnInit(): void {
-    console.log(this.router.config);
-  }
+  public ngOnInit(): void { }
   // </editor-fold>
 }

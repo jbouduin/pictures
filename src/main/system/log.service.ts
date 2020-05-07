@@ -50,7 +50,8 @@ export class LogService implements ILogService {
     if (!this.configuration) {
       return;
     }
-    if (this.configuration.current.logLevel | logLevel) {
+
+    if (logLevel <= this.configuration.current.mainLogLevel) {
       switch (logLevel) {
         case LogLevel.Info: {
           console.info('[INFO]', object, ...args);

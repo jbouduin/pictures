@@ -9,14 +9,18 @@ export class CfgEnvironment implements DtoEnvironment {
   public database: CfgDatabase;
   // TODO move this to real configuration files
   public thumbBaseDirectory: string;
-  public logLevel: LogLevel;
+  public mainLogLevel: LogLevel;
+  public rendererLogLevel: LogLevel;
+  public queueLogLevel: LogLevel;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
   public constructor() {
     this.database = new CfgDatabase();
     this.thumbBaseDirectory = 'C:/temp/pictures/thumbs';
-    this.logLevel = LogLevel.Info;
+    this.mainLogLevel = LogLevel.Info;
+    this.rendererLogLevel = LogLevel.Error;
+    this.queueLogLevel = LogLevel.Error;
   }
   // </editor-fold>
 }

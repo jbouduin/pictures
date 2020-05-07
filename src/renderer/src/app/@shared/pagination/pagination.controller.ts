@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+
+import { LogService } from '@core';
+
 import { PaginationButtonType } from './pagination-button-type';
 import { PaginationButton } from './pagination-button';
 import { PaginationParams } from './pagination.params';
@@ -19,7 +22,9 @@ export class PaginationController {
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor(private router: Router) {
+  public constructor(
+    private router: Router,
+    private logService: LogService) {
     this.buttons = new Array<PaginationButton>();
     this.baseRoute = undefined;
   }
@@ -29,7 +34,7 @@ export class PaginationController {
   public setPagination(params: PaginationParams): void {
     this.baseRoute = params.baseRoute;
     this.buttons.length = 0;
-    console.log(params);
+    this.logService.debug(params);
     // if we are not on the first page, display a previous button
     if (params.currentPage > 1) {
       this.buttons.push(new PaginationButton(PaginationButtonType.Previous, params.currentPage - 1));
