@@ -7,7 +7,7 @@ import { DtoListPicture, DtoListPictureCollection } from '@ipc';
 
 import { Collection, Picture } from '../../database';
 import { IDatabaseService } from '../../database';
-import { IFileService } from '../../system';
+import { IFileService, ILogService } from '../../system';
 
 import { IConfigurationService } from '../configuration';
 import { IDataRouterService } from '../data-router.service';
@@ -28,6 +28,7 @@ export class CollectionService implements ICollectionService {
 
   // <editor-fold desc='Constructor & C°'>
   public constructor(
+    @inject(SERVICETYPES.LogService) private logService: ILogService,
     @inject(SERVICETYPES.ConfigurationService) private configurationService: IConfigurationService,
     @inject(SERVICETYPES.DatabaseService) private databaseService: IDatabaseService,
     @inject(SERVICETYPES.PictureService) private pictureService: IPictureService,
@@ -68,7 +69,7 @@ export class CollectionService implements ICollectionService {
                 return result;
               },
               error => {
-                console.log(error);
+                this.logService.error(error);
                 const result: DtoUntypedDataResponse = {
                   status: DataStatus.Error,
                   message: `${error.name}: ${error.message}`
@@ -78,7 +79,7 @@ export class CollectionService implements ICollectionService {
             )
         },
         error => {
-          console.log(error);
+          this.logService.error(error);
           const result: DtoUntypedDataResponse = {
             status: DataStatus.NotFound,
             message: `${error.name}: ${error.message}`
@@ -122,7 +123,7 @@ export class CollectionService implements ICollectionService {
       .offset(paginationSkip)
       .limit(paginationTake)
       .orderBy('collection.name');
-    console.log(collectionQry.getQuery());
+    this.logService.debug(collectionQry.getQuery());
 
     return this.databaseService
       .getCollectionRepository()
@@ -159,7 +160,7 @@ export class CollectionService implements ICollectionService {
             return result;
           },
           error => {
-            console.log(error);
+            this.logService.error(error);
             const result: DtoListDataResponse<DtoListCollection> = {
               status: DataStatus.Error,
               message: `${error.name}: ${error.message}`
@@ -249,7 +250,7 @@ export class CollectionService implements ICollectionService {
             })
         },
         error => {
-          console.log('found no collection');
+          this.logService.error('found no collection');
           const result: DtoListDataResponse<DtoListPicture> = {
             status: DataStatus.NotFound
           };
@@ -384,7 +385,7 @@ export class CollectionService implements ICollectionService {
         files => {
           const total = files.length;
           let done = 0;
-          console.log(`found ${total} files`);
+          this.logService.info(`found ${total} files`);
           // TODO send a status to the renderer with the number of files found
           let promises = new Array<Promise<Picture>>();
           files.forEach( (file, index) => {
@@ -396,7 +397,7 @@ export class CollectionService implements ICollectionService {
                 .then( pictures => {
                   done += pictures.length;
                   // TODO send current status to renderer
-                  console.log(`processed ${done}/${total}pictures`);
+                  this.logService.info(`processed ${done}/${total}pictures`);
                   // TODO if (done === total) send finished to renderer
                 });
               promises = new Array<Promise<Picture>>();
@@ -404,7 +405,7 @@ export class CollectionService implements ICollectionService {
           });
         },
         error => {
-          console.log(error);
+          this.logService.error(error);
         }
       );
   }

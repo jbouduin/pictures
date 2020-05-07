@@ -5,7 +5,9 @@ import { IConfigurationService } from '../data/configuration';
 import { Collection, Picture } from '../database';
 
 import { IFileService } from './file.service';
+import { ILogService } from './log.service';
 import { IQueueService } from './queue.service';
+
 import SERVICETYPES from '../di/service.types';
 
 export interface IImageService {
@@ -17,6 +19,7 @@ export class ImageService implements IImageService {
 
   // <editor-fold desc='Constructor & C°'>
   public constructor(
+    @inject(SERVICETYPES.LogService) private logService: ILogService,
     @inject(SERVICETYPES.ConfigurationService) private configurationService: IConfigurationService,
     @inject(SERVICETYPES.FileService) private fileService: IFileService,
     @inject(SERVICETYPES.QueueService) private queueService: IQueueService) {
@@ -32,7 +35,7 @@ export class ImageService implements IImageService {
     const pictureExtension = picturePath.split('/').pop().split('.').pop();
     const thumbnailPath = `${collectionThumbnailPath}/${picture.id}.${pictureExtension}`;
     if (this.fileService.fileOrDirectoryExistsSync(thumbnailPath)) {
-      console.log(`thumb alread exists for ${picturePath}`);
+      this.logService.verbose(`thumb alread exists for ${picturePath}`);
     } else {
       const request: DtoTaskRequest<DtoTaskCreateThumb> = {
         taskType: TaskType.CreateThumb,

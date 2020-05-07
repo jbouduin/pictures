@@ -9,12 +9,12 @@ import container from './di/inversify.config';
 import { IConfigurationService } from './data';
 import { IDataRouterService } from './data';
 import { IDatabaseService } from './database';
-import { IQueueService } from './system';
+import { ILogService, IQueueService } from './system';
 
 import SERVICETYPES from './di/service.types';
 
 let win: BrowserWindow;
-
+let logService: ILogService;
 
 app.on('ready', createWindow);
 
@@ -26,17 +26,15 @@ app.on('activate', () => {
 
 
 function createWindow() {
-  container.get<IQueueService>(SERVICETYPES.QueueService).initialize(
-    path.join(app.getAppPath(), 'dist/queue', 'queue.js')
-  );
+
   container.get<IConfigurationService>(SERVICETYPES.ConfigurationService)
     .initialize(app.getAppPath())
     .then( configuration => {
+      logService = container.get<ILogService>(SERVICETYPES.LogService);
       container.get<IDataRouterService>(SERVICETYPES.DataRouterService).initialize();
       container.get<IDatabaseService>(SERVICETYPES.DatabaseService)
         .initialize()
         .then( connection => {
-          // console.log(configuration);
           win = new BrowserWindow({
             width: 800,
             height: 600,
@@ -59,6 +57,9 @@ function createWindow() {
           win.on('closed', () => {
             win = null;
           });
+          container.get<IQueueService>(SERVICETYPES.QueueService).initialize(
+            path.join(app.getAppPath(), 'dist/queue', 'queue.js')
+          );
       });
   });
 }
@@ -84,28 +85,28 @@ ipcMain.on('request-systeminfo', () => {
 
 ipcMain.on('request-configuration', () => {
   const configuration: DtoConfiguration = container.get<IConfigurationService>(SERVICETYPES.ConfigurationService).configuration;
-  // console.log(JSON.stringify(configuration, null, 2));
   if (win) {
     win.webContents.send('configuration', JSON.stringify(configuration));
   }
 });
 
 ipcMain.on('data', async (event, arg) => {
+  logService.debug(arg);
   const dtoRequest: DtoDataRequest<any> = JSON.parse(arg);
-  // console.log(`Request received ${dtoRequest}`);
+
   const result = await container.get<IDataRouterService>(SERVICETYPES.DataRouterService)
     .routeRequest(dtoRequest);
-  // console.log(JSON.stringify(result, null, 2));
+  logService.debug(JSON.stringify(result, null, 2))
   event.reply('data', JSON.stringify(result));
 })
 
 ipcMain.on('data-sync', (event, arg) => {
+  logService.debug(arg)
   const dtoRequest: DtoDataRequest<any> = JSON.parse(arg);
-  // console.log(`Request received ${dtoRequest}`);
   const result = container.get<IDataRouterService>(SERVICETYPES.DataRouterService)
     .routeRequest(dtoRequest)
     .then(result => {
-      // console.log(JSON.stringify(result, null, 2));
+      logService.debug(JSON.stringify(result, null, 2))
       event.returnValue = JSON.stringify(result);
     });
 })

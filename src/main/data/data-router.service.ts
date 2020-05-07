@@ -8,6 +8,7 @@ import 'reflect-metadata';
 
 import { DataStatus, DataVerb, DtoDataRequest, DtoDataResponse, DtoUntypedDataResponse } from '@ipc';
 
+import { ILogService } from '../system';
 import { IConfigurationService } from './configuration';
 import { ICollectionService } from './pictures/collection.service';
 import { RoutedRequest } from './routed-request';
@@ -38,6 +39,7 @@ export class DataRouterService implements IDataRouterService {
 
   // <editor-fold desc='Constructor & C°'>
   public constructor(
+    @inject(SERVICETYPES.LogService) private logService: ILogService,
     @inject(SERVICETYPES.ConfigurationService) private configurationService: IConfigurationService,
     @inject(SERVICETYPES.CollectionService) private collectionService: ICollectionService) {
     this.deleteRoutes = new Collections.Dictionary<string, RouteCallback>();
@@ -49,17 +51,17 @@ export class DataRouterService implements IDataRouterService {
 
   // <editor-fold desc='IService interface methods'>
   public initialize(): void {
-    console.log('in initialize DataRouterService');
+    this.logService.verbose('in initialize DataRouterService');
     this.configurationService.setRoutes(this);
     this.collectionService.setRoutes(this);
-    console.log('registered DELETE routes:');
-    this.deleteRoutes.keys().forEach(route => console.log(route));
-    console.log('registered GET routes:');
-    this.getRoutes.keys().forEach(route => console.log(route));
-    console.log('registered POST routes:');
-    this.postRoutes.keys().forEach(route => console.log(route));
-    console.log('registered PUT routes:');
-    this.putRoutes.keys().forEach(route => console.log(route));
+    this.logService.verbose('registered DELETE routes:');
+    this.deleteRoutes.keys().forEach(route => this.logService.verbose(route));
+    this.logService.verbose('registered GET routes:');
+    this.getRoutes.keys().forEach(route => this.logService.verbose(route));
+    this.logService.verbose('registered POST routes:');
+    this.postRoutes.keys().forEach(route => this.logService.verbose(route));
+    this.logService.verbose('registered PUT routes:');
+    this.putRoutes.keys().forEach(route => this.logService.verbose(route));
   }
   // </editor-fold>
 
@@ -82,7 +84,7 @@ export class DataRouterService implements IDataRouterService {
 
   public routeRequest(request: DtoDataRequest<any>): Promise<DtoDataResponse<any>> {
     let result: Promise<DtoDataResponse<any>>;
-    console.log(`routing ${DataVerb[request.verb]} ${request.path}`);
+    this.logService.verbose(`routing ${DataVerb[request.verb]} ${request.path}`);
     let routeDictionary: Collections.Dictionary<string, RouteCallback>;
     switch(request.verb) {
       case (DataVerb.DELETE): {
@@ -103,7 +105,7 @@ export class DataRouterService implements IDataRouterService {
       }
     }
     if (!routeDictionary) {
-      console.log('not allowed');
+      this.logService.verbose('not allowed');
       const response: DtoUntypedDataResponse = {
         status: DataStatus.NotAllowed
       };
@@ -135,7 +137,7 @@ export class DataRouterService implements IDataRouterService {
       const matchResult2: any = matcher2(splittedPath[0]);
 
       if (_.isObject(matchResult2)) {
-        console.log(`Route found: ${matchedKey}`);
+        this.logService.verbose(`Route found: ${matchedKey}`);
         const routedRequest = new RoutedRequest();
         routedRequest.route = matchedKey
         routedRequest.path = matchResult2.path;
@@ -153,11 +155,11 @@ export class DataRouterService implements IDataRouterService {
         }
         const route = routeDictionary.getValue(matchedKey);
         if (route) {
-          console.log(routedRequest);
+          this.logService.debug(routedRequest);
           result = route(routedRequest);
         }
       } else {
-        console.log('strange error!');
+        this.logService.error('strange error!');
         const response: DtoDataResponse<string> = {
           status: DataStatus.Error,
           data: 'Error in router'
@@ -165,7 +167,7 @@ export class DataRouterService implements IDataRouterService {
         result = Promise.resolve(response);
       }
     } else {
-      console.log('Route not found');
+      this.logService.error('Route not found');
       const response: DtoDataResponse<string> = {
         status: DataStatus.NotFound,
         data: ''

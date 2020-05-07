@@ -4,6 +4,10 @@ import glob from 'glob-promise';
 import 'reflect-metadata';
 import { promisify } from 'util'
 
+import { ILogService } from './log.service';
+
+import SERVICETYPES from '../di/service.types';
+
 export interface IFileService {
   createDirSync(directory: string): void;
   emptyDir(directory: string): Promise<boolean>;
@@ -23,7 +27,8 @@ export class FileService implements IFileService {
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor() { }
+  public constructor(
+    @inject(SERVICETYPES.LogService) private logService: ILogService) { }
   // </editor-fold>
 
   // <editor-fold desc='IFileService interface methods'>
@@ -39,13 +44,13 @@ export class FileService implements IFileService {
           .then(
             () => { return true; },
             error => {
-              console.error(error);
+              this.logService.error(error);
               return false;
             }
           );
       },
       error => {
-        console.error(error);
+        this.logService.error(error);
         return false;
       }
     );
@@ -59,14 +64,14 @@ export class FileService implements IFileService {
             .then(
               () => { return true; },
               error => {
-                console.error(error);
+                this.logService.error(error);
                 return false;
               }
             ) :
             false;
       },
       error => {
-        console.error(error);
+        this.logService.error(error);
         return false;
       }
     );

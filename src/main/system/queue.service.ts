@@ -4,6 +4,11 @@ import { inject, injectable } from 'inversify';
 import { DtoTaskRequest } from '@ipc';
 import { IConfigurationService } from '../data/configuration';
 
+import { IFileService } from './file.service';
+import { ILogService } from './log.service';
+
+import SERVICETYPES from '../di/service.types';
+
 export interface IQueueService {
   initialize(queuePath: string): void;
   push(task: DtoTaskRequest<any>);
@@ -17,24 +22,34 @@ export class QueueService implements IQueueService {
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor() {
+  public constructor(
+    @inject(SERVICETYPES.LogService) private logService: ILogService) {
     this.childProcess = undefined;
   }
   // </editor-fold>
 
   // <editor-fold desc='Public methods'>
   public initialize(queuePath: string): void {
-    this.childProcess = fork(queuePath, ['hello'], {
-        stdio: ['pipe', 'pipe', 'pipe', 'ipc'],
-      });
-    this.childProcess.stdout.on('data', (d) => {
-        console.log('[Q-stdout] ' + d.toString());
-      });
-    this.childProcess.stderr.on('data', (d) => {
-        console.log('[Q-stderr] ' + d.toString());
-      });
-    this.childProcess.on('message', (m) => {
-        console.log('[Q-ipc] ' + m);
+
+    this.childProcess = fork(
+      queuePath,
+      ['hello'],
+      { stdio: ['pipe', 'pipe', 'pipe', 'ipc'] }
+    );
+
+    this.childProcess.stdout.on(
+      'data',
+      data => { this.logService.info('[Q-stdout] ' + data.toString()); }
+    );
+
+    this.childProcess.stderr.on(
+      'data',
+      data => { this.logService.error('[Q-stderr] ' + data.toString()); }
+    );
+
+    this.childProcess.on(
+      'message',
+      message => { this.logService.info('[Q-ipc] ' + message);
       });
 
   }

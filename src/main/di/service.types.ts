@@ -5,6 +5,7 @@ const SERVICETYPES = {
   DatabaseService: Symbol('DatabaseService'),
   FileService: Symbol('FileService'),
   ImageService: Symbol('ImageService'),
+  LogService: Symbol('LogService'),
   PictureService: Symbol('PictureService'),
   QueueService: Symbol('QueueService')
 };

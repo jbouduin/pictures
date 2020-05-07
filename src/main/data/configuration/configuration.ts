@@ -36,9 +36,9 @@ export class Configuration {
     this.appPath = appPath;
     if (process.env.NODE_ENV) {
       this.environment = process.env.NODE_ENV.trim().toLowerCase();
-      console.info(`Using ${process.env.NODE_ENV} environment`);
+      // console(`Using ${process.env.NODE_ENV} environment`);
     } else {
-      console.info('NODE_ENV not set. Presuming development environment.');
+      // console('NODE_ENV not set. Presuming development environment.');
       this.environment = 'development';
     }
 

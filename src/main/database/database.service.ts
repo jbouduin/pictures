@@ -7,10 +7,11 @@ import 'reflect-metadata';
 import { ConnectionType, TargetType } from '@ipc';
 import { DtoConfiguration, DtoConnection } from '@ipc';
 import { IConfigurationService } from '../data';
-
-import SERVICETYPES from '../di/service.types';
+import { ILogService } from '../system';
 
 import { Collection, Picture } from './entities';
+
+import SERVICETYPES from '../di/service.types';
 
 export interface IDatabaseService {
   getCollectionRepository(): Repository<Collection>;
@@ -23,6 +24,7 @@ export class DatabaseService implements IDatabaseService {
 
   // <editor-fold desc='Constructor & C°'>
   public constructor(
+    @inject(SERVICETYPES.LogService) private logService: ILogService,
     @inject(SERVICETYPES.ConfigurationService) private configurationService: IConfigurationService) { }
   // </editor-fold>
 
@@ -40,7 +42,7 @@ export class DatabaseService implements IDatabaseService {
   }
 
   public initialize(): Promise<TypeOrmConnection> {
-    console.log('in initialize DatabaseService');
+    this.logService.debug('in initialize DatabaseService');
     return this.connectByName(
           this.getConnectionNameForTargetType(TargetType.PICTURES),
           [Collection, Picture]);

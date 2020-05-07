@@ -5,7 +5,7 @@ import { DataStatus, DtoDataResponse } from '@ipc';
 
 import { Collection, Picture } from '../../database';
 import { IDatabaseService } from '../../database';
-import { IImageService } from '../../system';
+import { IImageService, ILogService } from '../../system';
 
 import { IConfigurationService } from '../configuration';
 import { IDataRouterService } from '../data-router.service';
@@ -26,6 +26,7 @@ export class PictureService implements IPictureService {
 
   // <editor-fold desc='Constructor & C°'>
   public constructor(
+    @inject(SERVICETYPES.LogService) private logService: ILogService,
     @inject(SERVICETYPES.ConfigurationService) private configurationService: IConfigurationService,
     @inject(SERVICETYPES.DatabaseService) private databaseService: IDatabaseService,
     @inject(SERVICETYPES.ImageService) private imageService: IImageService) { }
@@ -51,7 +52,7 @@ export class PictureService implements IPictureService {
       })
       .then(
         picture => {
-          console.log(`picture '${path}/${name}' already in '${collection.name}'`);
+          this.logService.verbose(`picture '${path}/${name}' already in '${collection.name}'`);
           return picture;
         },
         () => {
@@ -60,7 +61,7 @@ export class PictureService implements IPictureService {
             path: path,
             collection: collection
           });
-          console.log(`adding '${path}/${name}' to '${collection.name}'`);
+          this.logService.error(`adding '${path}/${name}' to '${collection.name}'`);
           return repository.save(newPicture);
         }
       ).then( picture => { return this.imageService.checkThumbnail(collection, picture); });
