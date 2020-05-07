@@ -1,3 +1,5 @@
+require('devtron').install()
+
 # angular-electron-boilerplate
 
 This template provides a starting point of a modern and secure Electron app.
@@ -9,8 +11,8 @@ This template provides a starting point of a modern and secure Electron app.
 
 Use [Angular](https://angular.io/) for the Electron renderer process. Using a modern frontend framework helps you organize your codebase once your Electron app grows in complexity. Use the [Angular CLI](https://cli.angular.io/) to generate components, routes, services and pipes. To give a modern look-and-feel [Angular Material](https://material.angular.io/) is used. This can easily be removed if it is not needed.
 
-Use [TypeScript](https://www.typescriptlang.org/) for strongly-typed JavaScript.
 
+Use [TypeScript](https://www.typescriptlang.org/) for strongly-typed JavaScript.
 Use [webpack](https://webpack.js.org/) to pack *main* and *preload* to produce small fast build output. Everything is packed, so no need to include the */node_modules* folder, in order to remove unnessesary files and to produce small and fast builds.
 
 Use most secure Electron security settings: contextIsolation and disabled nodeIntegration and disabled enableRemoteModule. preload uses the contextBridge.

@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 
-import { DataStatus, DtoDataResponse } from '@ipc';
+import { DataStatus, DtoDataResponse, LogSource } from '@ipc';
 
 import { Collection, Picture } from '../../database';
 import { IDatabaseService } from '../../database';
@@ -52,7 +52,7 @@ export class PictureService implements IPictureService {
       })
       .then(
         picture => {
-          this.logService.verbose(`picture '${path}/${name}' already in '${collection.name}'`);
+          this.logService.verbose(LogSource.Main, `picture '${path}/${name}' already in '${collection.name}'`);
           return picture;
         },
         () => {
@@ -61,14 +61,10 @@ export class PictureService implements IPictureService {
             path: path,
             collection: collection
           });
-          this.logService.error(`adding '${path}/${name}' to '${collection.name}'`);
+          this.logService.error(LogSource.Main, `adding '${path}/${name}' to '${collection.name}'`);
           return repository.save(newPicture);
         }
       ).then( picture => { return this.imageService.checkThumbnail(collection, picture); });
   }
-  // </editor-fold>
-
-  // <editor-fold desc='Private methods'>
-
   // </editor-fold>
 }

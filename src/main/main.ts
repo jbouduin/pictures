@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain, Menu } from 'electron';
 import * as path from 'path';
 import { DtoConfiguration, DtoSystemInfo } from '@ipc';
-import { DtoDataRequest } from '@ipc';
+import { DtoDataRequest, LogSource } from '@ipc';
 import * as os from 'os';
 import { fork, spawn } from 'child_process';
 
@@ -39,6 +39,7 @@ function createWindow() {
             width: 800,
             height: 600,
             webPreferences: {
+              devTools: true,
               // Disabled Node integration
               nodeIntegration: false,
               // protect against prototype pollution
@@ -53,7 +54,7 @@ function createWindow() {
         //   Menu.setApplicationMenu(null);
 
           win.loadFile(path.join(app.getAppPath(), 'dist/renderer', 'index.html'));
-
+          logService.injectWindow(win);
           win.on('closed', () => {
             win = null;
           });
@@ -91,22 +92,22 @@ ipcMain.on('request-configuration', () => {
 });
 
 ipcMain.on('data', async (event, arg) => {
-  logService.debug(arg);
+  logService.debug(LogSource.Main, arg);
   const dtoRequest: DtoDataRequest<any> = JSON.parse(arg);
 
   const result = await container.get<IDataRouterService>(SERVICETYPES.DataRouterService)
     .routeRequest(dtoRequest);
-  logService.debug(JSON.stringify(result, null, 2))
+  logService.debug(LogSource.Main, JSON.stringify(result, null, 2))
   event.reply('data', JSON.stringify(result));
 })
 
 ipcMain.on('data-sync', (event, arg) => {
-  logService.debug(arg)
+  logService.debug(LogSource.Main, arg)
   const dtoRequest: DtoDataRequest<any> = JSON.parse(arg);
   const result = container.get<IDataRouterService>(SERVICETYPES.DataRouterService)
     .routeRequest(dtoRequest)
     .then(result => {
-      logService.debug(JSON.stringify(result, null, 2))
+      logService.debug(LogSource.Main, JSON.stringify(result, null, 2))
       event.returnValue = JSON.stringify(result);
     });
 })

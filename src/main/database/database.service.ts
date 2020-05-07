@@ -4,7 +4,7 @@ import { Connection as TypeOrmConnection } from 'typeorm';
 import { Repository } from 'typeorm';
 import 'reflect-metadata';
 
-import { ConnectionType, TargetType } from '@ipc';
+import { ConnectionType, LogSource, TargetType } from '@ipc';
 import { DtoConfiguration, DtoConnection } from '@ipc';
 import { IConfigurationService } from '../data';
 import { ILogService } from '../system';
@@ -42,7 +42,7 @@ export class DatabaseService implements IDatabaseService {
   }
 
   public initialize(): Promise<TypeOrmConnection> {
-    this.logService.debug('in initialize DatabaseService');
+    this.logService.debug(LogSource.Main, 'in initialize DatabaseService');
     return this.connectByName(
           this.getConnectionNameForTargetType(TargetType.PICTURES),
           [Collection, Picture]);

@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@angular/core';
 
-import { DtoConfiguration, LogLevel } from '@ipc';
+import { DtoConfiguration, DtoLogMessage, LogLevel, LogSource } from '@ipc';
 import { ConfigurationService } from './configuration.service';
 
 @Injectable({
@@ -13,50 +13,65 @@ export class LogService {
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
-  constructor() { }
+  public constructor() { }
   // </editor-fold>
 
   // <editor-fold desc='public methods'>
-  injectConfiguraton(configuration: DtoConfiguration): void {
+  public injectConfiguraton(configuration: DtoConfiguration): void {
     this.configuration = configuration;
+    window.api.electronIpcRemoveAllListeners('log');
+    window.api.electronIpcOn('log', (event, arg) => {
+      try {
+        const message: DtoLogMessage = JSON.parse(arg);
+        this.log(message.logSource, message.logLevel, message.object, message.args);
+      } catch (error) {
+        this.log(
+          LogSource.Renderer,
+          LogLevel.Error,
+          'Error processing message received:',
+          arg);
+      }
+    });
   }
 
-  info(object: any, ...args: Array<any>): void {
-    this.log(LogLevel.Info, object, ...args);
+  public info(object: any, ...args: Array<any>): void {
+    this.log(LogSource.Renderer, LogLevel.Info, object, ...args);
   }
 
-  error(object: any, ...args: Array<any>): void {
-    this.log(LogLevel.Error, object, ...args);
+  public error(object: any, ...args: Array<any>): void {
+    this.log(LogSource.Renderer, LogLevel.Error, object, ...args);
   }
 
-  verbose(object: any, ...args: Array<any>): void {
-    this.log(LogLevel.Verbose, object, ...args);
+  public verbose(object: any, ...args: Array<any>): void {
+    this.log(LogSource.Renderer, LogLevel.Verbose, object, ...args);
   }
 
-  debug(object: any, ...args: Array<any>): void {
-    this.log(LogLevel.Debug, object, ...args);
+  public debug(object: any, ...args: Array<any>): void {
+    this.log(LogSource.Renderer, LogLevel.Debug, object, ...args);
   }
 
-  log(logLevel: LogLevel, object: any, ...args: Array<any>): void {
+  public log(logSource: LogSource, logLevel: LogLevel, object: any, ...args: Array<any>): void {
     if (!this.configuration) {
       return;
     }
-    if (logLevel <= this.configuration.current.rendererLogLevel) {
+    if ((logSource === LogSource.Renderer && logLevel <= this.configuration.current.rendererLogLevel) ||
+      (logSource === LogSource.Main && logLevel <= this.configuration.current.mainLogLevel)||
+      (logSource === LogSource.Queue && logLevel <= this.configuration.current.queueLogLevel)) {
       switch (logLevel) {
         case LogLevel.Info: {
-          console.info(object, ...args);
+          console.info(`[${LogSource[logSource]}]`, object, ...args);
           break;
         }
         case LogLevel.Error: {
-          console.error(object, ...args);
+          console.error(`[${LogSource[logSource]}]`, object, ...args);
           break;
         }
         case LogLevel.Verbose: {
-          console.log(object, ...args);
+          console.log(`[${LogSource[logSource]}]`, object, ...args);
           break;
         }
         case LogLevel.Debug: {
-          console.debug(object, ...args);
+          console.debug(`[${LogSource[logSource]}]`, object, ...args);
           break;
         }
       }

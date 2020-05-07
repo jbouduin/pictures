@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { DataVerb, DtoDataRequest, DtoConfiguration } from '@ipc';
 import { IpcService } from './ipc/ipc.service';
+import { LogService } from './log.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +17,7 @@ export class ConfigurationService {
 
   // <editor-fold desc='Constructor & C°'>
   constructor(
+    private logService: LogService,
     private ipcService: IpcService) { }
   // </editor-fold>
 
@@ -26,6 +28,7 @@ export class ConfigurationService {
     };
     this._configuration = this.ipcService
       .dataRequestSync<string, DtoConfiguration>(request).data;
+    this.logService.injectConfiguraton(this._configuration);
     return this._configuration;
   }
 }

@@ -1,7 +1,7 @@
 import { ChildProcess, fork, spawn } from 'child_process';
 import { inject, injectable } from 'inversify';
 
-import { DtoTaskRequest } from '@ipc';
+import { DtoTaskRequest, LogSource } from '@ipc';
 import { IConfigurationService } from '../data/configuration';
 
 import { IFileService } from './file.service';
@@ -39,17 +39,17 @@ export class QueueService implements IQueueService {
 
     this.childProcess.stdout.on(
       'data',
-      data => { this.logService.info('[Q-stdout] ' + data.toString()); }
+      data => { this.logService.info(LogSource.Queue, data.toString()); }
     );
 
     this.childProcess.stderr.on(
       'data',
-      data => { this.logService.error('[Q-stderr] ' + data.toString()); }
+      data => { this.logService.error(LogSource.Queue, data.toString()); }
     );
 
     this.childProcess.on(
       'message',
-      message => { this.logService.info('[Q-ipc] ' + message);
+      message => { this.logService.info(LogSource.Queue, message);
       });
 
   }

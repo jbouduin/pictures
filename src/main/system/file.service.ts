@@ -4,6 +4,8 @@ import glob from 'glob-promise';
 import 'reflect-metadata';
 import { promisify } from 'util'
 
+import { LogSource } from '@ipc';
+
 import { ILogService } from './log.service';
 
 import SERVICETYPES from '../di/service.types';
@@ -44,13 +46,13 @@ export class FileService implements IFileService {
           .then(
             () => { return true; },
             error => {
-              this.logService.error(error);
+              this.logService.error(LogSource.Main, error);
               return false;
             }
           );
       },
       error => {
-        this.logService.error(error);
+        this.logService.error(LogSource.Main, error);
         return false;
       }
     );
@@ -64,14 +66,14 @@ export class FileService implements IFileService {
             .then(
               () => { return true; },
               error => {
-                this.logService.error(error);
+                this.logService.error(LogSource.Main, error);
                 return false;
               }
             ) :
             false;
       },
       error => {
-        this.logService.error(error);
+        this.logService.error(LogSource.Main, error);
         return false;
       }
     );

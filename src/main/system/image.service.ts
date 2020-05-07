@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 
-import { DtoTaskRequest, DtoTaskCreateThumb, TaskType } from '@ipc';
+import { DtoTaskRequest, DtoTaskCreateThumb, LogSource, TaskType } from '@ipc';
 import { IConfigurationService } from '../data/configuration';
 import { Collection, Picture } from '../database';
 
@@ -35,7 +35,7 @@ export class ImageService implements IImageService {
     const pictureExtension = picturePath.split('/').pop().split('.').pop();
     const thumbnailPath = `${collectionThumbnailPath}/${picture.id}.${pictureExtension}`;
     if (this.fileService.fileOrDirectoryExistsSync(thumbnailPath)) {
-      this.logService.verbose(`thumb alread exists for ${picturePath}`);
+      this.logService.verbose(LogSource.Main, `thumb alread exists for ${picturePath}`);
     } else {
       const request: DtoTaskRequest<DtoTaskCreateThumb> = {
         taskType: TaskType.CreateThumb,
