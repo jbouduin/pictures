@@ -9,6 +9,7 @@ import container from './di/inversify.config';
 import { IConfigurationService } from './data';
 import { IDataRouterService } from './data';
 import { IDatabaseService } from './database';
+import { IQueueService } from './system';
 
 import SERVICETYPES from './di/service.types';
 
@@ -23,7 +24,11 @@ app.on('activate', () => {
   }
 });
 
+
 function createWindow() {
+  container.get<IQueueService>(SERVICETYPES.QueueService).initialize(
+    path.join(app.getAppPath(), 'dist/queue', 'queue.js')
+  );
   container.get<IConfigurationService>(SERVICETYPES.ConfigurationService)
     .initialize()
     .then( configuration => {
@@ -104,17 +109,3 @@ ipcMain.on('data-sync', (event, arg) => {
       event.returnValue = JSON.stringify(result);
     });
 })
-
-const p = fork(path.join(app.getAppPath(), 'dist/fork', 'child.js'), ['hello'], {
-    stdio: ['pipe', 'pipe', 'pipe', 'ipc'],
-  });
-  p.stdout.on('data', (d) => {
-    console.log('data', '[stdout-main-fork] ' + d.toString());
-  });
-  p.stderr.on('data', (d) => {
-    console.log('data', '[stderr-main-fork] ' + d.toString());
-  });
-  p.send('hello');
-  p.on('message', (m) => {
-    console.log('data', '[ipc-main-fork] ' + m);
-  });

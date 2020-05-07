@@ -5,7 +5,8 @@ const SERVICETYPES = {
   DatabaseService: Symbol('DatabaseService'),
   FileService: Symbol('FileService'),
   ImageService: Symbol('ImageService'),
-  PictureService: Symbol('PictureService')
+  PictureService: Symbol('PictureService'),
+  QueueService: Symbol('QueueService')
 };
 
 export default SERVICETYPES;

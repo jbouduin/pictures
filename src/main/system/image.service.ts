@@ -1,11 +1,11 @@
 import { inject, injectable } from 'inversify';
-import Jimp from 'jimp/es';
 
+import { DtoTaskRequest, DtoTaskCreateThumb, TaskType } from '@ipc';
 import { IConfigurationService } from '../data/configuration';
 import { Collection, Picture } from '../database';
 
 import { IFileService } from './file.service';
-
+import { IQueueService } from './queue.service';
 import SERVICETYPES from '../di/service.types';
 
 export interface IImageService {
@@ -18,7 +18,8 @@ export class ImageService implements IImageService {
   // <editor-fold desc='Constructor & C°'>
   public constructor(
     @inject(SERVICETYPES.ConfigurationService) private configurationService: IConfigurationService,
-    @inject(SERVICETYPES.FileService) private fileService: IFileService) {
+    @inject(SERVICETYPES.FileService) private fileService: IFileService,
+    @inject(SERVICETYPES.QueueService) private queueService: IQueueService) {
     fileService.ensureExistsSync(configurationService.environment.thumbBaseDirectory);
   }
   // </editor-fold>
@@ -33,21 +34,14 @@ export class ImageService implements IImageService {
     if (this.fileService.fileOrDirectoryExistsSync(thumbnailPath)) {
       console.log(`thumb alread exists for ${picturePath}`);
     } else {
-      console.log(`creating thumb for ${picturePath}`);
-      Jimp.read(picturePath)
-        .then( image => {
-
-          if (!this.fileService.fileOrDirectoryExistsSync(thumbnailPath)) {
-          image.scaleToFit(240, 240) // resize
-            .quality(80) // set JPEG quality
-            .greyscale() // set greyscale
-            .write(thumbnailPath);
-          }
-        })
-        .catch(err => {
-          console.error(`Error creating thumbnail for ${picturePath}:`);
-          console.error(`${err.name}: ${err.message}`);
-        });
+      const request: DtoTaskRequest<DtoTaskCreateThumb> = {
+        taskType: TaskType.CreateThumb,
+        data: {
+          source: picturePath,
+          target: thumbnailPath
+        }
+      };
+      this.queueService.push(request);
     }
     return Promise.resolve(picture);
   }

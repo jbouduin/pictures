@@ -1,15 +1,16 @@
 import * as path from 'path';
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
 module.exports = env => {
   if (!env) { env = 'development'; }
   return {
     entry: {
-      main: './src/fork/child.ts'
+      main: './src/queue/queue.ts'
     },
     target: 'electron-main',
     output: {
-      path: path.resolve(__dirname, '../../dist/fork'),
-      filename: 'child.js'
+      path: path.resolve(__dirname, '../../dist/queue'),
+      filename: 'queue.js'
     },
     externals: [ ],
     devtool: 'source-map',
@@ -24,6 +25,9 @@ module.exports = env => {
     },
     resolve: {
       extensions: ['.js', '.ts', '.tsx', '.jsx', '.json'],
+      plugins: [
+        new TsconfigPathsPlugin({ configFile: './src/main/tsconfig.json' })
+      ],
       alias: { }
     },
     node: {

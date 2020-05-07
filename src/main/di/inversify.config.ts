@@ -7,6 +7,7 @@ import { IPictureService, PictureService } from '../data';
 import { IDatabaseService, DatabaseService } from '../database';
 import { IFileService, FileService } from '../system';
 import { IImageService, ImageService } from '../system';
+import { IQueueService, QueueService } from '../system';
 
 import SERVICETYPES from './service.types';
 
@@ -20,6 +21,7 @@ container.bind<IDatabaseService>(SERVICETYPES.DatabaseService).to(DatabaseServic
 container.bind<IFileService>(SERVICETYPES.FileService).to(FileService);
 container.bind<IImageService>(SERVICETYPES.ImageService).to(ImageService);
 container.bind<IPictureService>(SERVICETYPES.PictureService).to(PictureService);
+container.bind<IQueueService>(SERVICETYPES.QueueService).to(QueueService).inSingletonScope();
 // </editor-fold>
 
 export default container;
