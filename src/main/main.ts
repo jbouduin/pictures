@@ -30,7 +30,7 @@ function createWindow() {
     path.join(app.getAppPath(), 'dist/queue', 'queue.js')
   );
   container.get<IConfigurationService>(SERVICETYPES.ConfigurationService)
-    .initialize()
+    .initialize(app.getAppPath())
     .then( configuration => {
       container.get<IDataRouterService>(SERVICETYPES.DataRouterService).initialize();
       container.get<IDatabaseService>(SERVICETYPES.DatabaseService)

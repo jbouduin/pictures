@@ -12,28 +12,28 @@ import { CfgDatabase } from './database/cfg-database';
 export class Configuration {
 
   // <editor-fold desc='Static methods'>
-  public static async loadConfiguration(): Promise<Configuration> {
-    const result = new Configuration();
-    const configDirectory = path.join(result.appPath, 'configuration');
+  public static async loadConfiguration(appPath: string): Promise<Configuration> {
+    const configDirectory = path.join(appPath, 'configuration');
     if (!fs.existsSync(configDirectory)) {
       throw new Error('Configuration directory is missing. Can not start the server');
     }
+    const result = new Configuration(appPath);
     return result.loadConfigFiles();
   }
   // </editor-fold>
 
 
   // <editor-fold desc='DtoConfiguration members'>
-  // </editor-fold>
   public application: CfgApplication;
   public appPath: string;
   public environment: string;
   public current: CfgEnvironment;
   public launchedAt: Date;
+  // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
-  private constructor() {
-    this.appPath = process.cwd();
+  private constructor(appPath: string) {
+    this.appPath = appPath;
     if (process.env.NODE_ENV) {
       this.environment = process.env.NODE_ENV.trim().toLowerCase();
       console.info(`Using ${process.env.NODE_ENV} environment`);

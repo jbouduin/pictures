@@ -8,20 +8,19 @@ import 'reflect-metadata';
 
 import { DataStatus, DataVerb, DtoDataRequest, DtoDataResponse, DtoUntypedDataResponse } from '@ipc';
 
-import { IService } from '../di/service';
-
 import { IConfigurationService } from './configuration';
 import { ICollectionService } from './pictures/collection.service';
 import { RoutedRequest } from './routed-request';
 
 import SERVICETYPES from '../di/service.types';
 
-export interface IDataRouterService extends IService<boolean> {
+export interface IDataRouterService {
   delete(path: string, callback: (request: RoutedRequest) => Promise<DtoDataResponse<any>>);
   get(path: string, callback: (request: RoutedRequest) => Promise<DtoDataResponse<any>>);
   // PATCH is not used
   post(path: string, callback: (request: RoutedRequest) => Promise<DtoDataResponse<any>>);
   put(path: string, callback: (request: RoutedRequest) => Promise<DtoDataResponse<any>>);
+  initialize(): void;
   routeRequest(request: DtoDataRequest<any>): Promise<DtoDataResponse<any>>;
 }
 
@@ -49,7 +48,7 @@ export class DataRouterService implements IDataRouterService {
   // </editor-fold>
 
   // <editor-fold desc='IService interface methods'>
-  public initialize(): Promise<boolean> {
+  public initialize(): void {
     console.log('in initialize DataRouterService');
     this.configurationService.setRoutes(this);
     this.collectionService.setRoutes(this);
@@ -61,7 +60,6 @@ export class DataRouterService implements IDataRouterService {
     this.postRoutes.keys().forEach(route => console.log(route));
     console.log('registered PUT routes:');
     this.putRoutes.keys().forEach(route => console.log(route));
-    return Promise.resolve(true);
   }
   // </editor-fold>
 

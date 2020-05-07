@@ -4,15 +4,15 @@ import 'reflect-metadata';
 
 import { DataStatus, DtoConfiguration, DtoEnvironment, DtoDataResponse } from '@ipc';
 
-import { IService } from '../../di';
 import { IDataRouterService } from '../data-router.service';
 import { IDataService } from '../data-service';
 import { RoutedRequest } from '../routed-request';
 import { Configuration } from './configuration';
 
-export interface IConfigurationService extends IDataService, IService<Configuration> {
+export interface IConfigurationService extends IDataService {
   configuration: DtoConfiguration;
   environment: DtoEnvironment;
+  initialize(appPath: string): Promise<Configuration>
 }
 
 @injectable()
@@ -30,14 +30,14 @@ export class ConfigurationService implements IConfigurationService {
   public get environment(): DtoEnvironment {
     return this._configuration.current;
   }
-  // </editor-fold>
 
-  // <editor-fold desc='IService Interface methods'>
-  public initialize(): Promise<Configuration> {
+  public initialize(appPath: string): Promise<Configuration> {
     console.log('in initialize ConfigurationService');
-    return Configuration.loadConfiguration().then( configuration => this._configuration = configuration);
+    return Configuration.loadConfiguration(appPath).then( configuration => this._configuration = configuration);
   }
   // </editor-fold>
+
+
 
   // <editor-fold desc='IDataService Interface methods'>
   public setRoutes(router: IDataRouterService): void {
