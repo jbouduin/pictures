@@ -52,25 +52,40 @@ export class CollectionService implements ICollectionService {
 
   // <editor-fold desc='DELETE route callback'>
   private deleteCollection(request: RoutedRequest): Promise<DtoUntypedDataResponse> {
-    return this.databaseService
-      .getCollectionRepository()
-      .delete(request.params.collection)
+    const repository = this.databaseService.getCollectionRepository();
+
+    return repository
+      .findOneOrFail(request.params.collection)
       .then(
-        () => {
-          const result: DtoUntypedDataResponse = {
-            status: DataStatus.Ok
-          };
-          return result;
+        collection => {
+          return repository.delete(request.params.collection)
+            .then(
+              () => {
+                this.fileService.emptyAndDeleteDir(`${this.configurationService.environment.thumbBaseDirectory}/${collection.id}`);
+                const result: DtoUntypedDataResponse = {
+                  status: DataStatus.Ok
+                };
+                return result;
+              },
+              error => {
+                console.log(error);
+                const result: DtoUntypedDataResponse = {
+                  status: DataStatus.Error,
+                  message: `${error.name}: ${error.message}`
+                };
+                return result;
+              }
+            )
         },
-        (error) => {
+        error => {
           console.log(error);
           const result: DtoUntypedDataResponse = {
-            status: DataStatus.Error,
+            status: DataStatus.NotFound,
             message: `${error.name}: ${error.message}`
           };
           return result;
         }
-      )
+      );
   }
   // </editor-fold>
 
