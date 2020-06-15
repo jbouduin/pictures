@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { DtoConfiguration, DtoSystemInfo } from '@ipc';
-import { DataStatus, DtoDataRequest, DtoDataResponse, DtoUntypedDataRequest } from '@ipc';
+import { DtoSystemInfo } from '@ipc';
+import { DataStatus, DtoDataResponse } from '@ipc';
 
-import { LogService } from '@core';
+import { LogService } from '../log.service';
+import { IpcDataRequest } from './ipc-data-request';
 
 @Injectable({
   providedIn: 'root'
@@ -19,8 +20,8 @@ export class IpcService {
   }
 
   public getSystemInfoAsync(): Promise<DtoSystemInfo> {
-    return new Promise((resolve, reject) => {
-      window.api.electronIpcOnce('systeminfo', (event, arg) => {
+    return new Promise((resolve, _reject) => {
+      window.api.electronIpcOnce('systeminfo', (_event, arg) => {
         const systemInfo: DtoSystemInfo = JSON.parse(arg);
         resolve(systemInfo);
       });
@@ -29,11 +30,11 @@ export class IpcService {
   }
 
   // be carefull when using sync, as errors coming from main are not handled
-  public untypedDataRequestSync<T>(request: DtoUntypedDataRequest): DtoDataResponse<T> {
-    return this.dataRequestSync<any, T>(request);
-  }
+  // public untypedDataRequestSync<T>(request: DtoUntypedDataRequest): DtoDataResponse<T> {
+  //   return this.dataRequestSync<any, T>(request);
+  // }
 
-  public dataRequestSync<T,U>(request: DtoDataRequest<T>): DtoDataResponse<U> {
+  public dataRequestSync<U>(request: IpcDataRequest): DtoDataResponse<U> {
     const json = JSON.stringify(request);
     const result = window.api.electronIpcSendSync('data-sync', json);
     this.logService.debug(result);
@@ -49,13 +50,13 @@ export class IpcService {
     return response;
   }
 
-  public untypedDataRequest<T>(request: DtoUntypedDataRequest): Promise<DtoDataResponse<T>> {
-    return this.dataRequest<any, T>(request);
-  }
+  // public untypedDataRequest<T>(request: DtoUntypedDataRequest): Promise<DtoDataResponse<T>> {
+  //   return this.dataRequest<any, T>(request);
+  // }
 
-  public dataRequest<T,U>(request: DtoDataRequest<T>): Promise<DtoDataResponse<U>> {
+  public dataRequest<U>(request: IpcDataRequest): Promise<DtoDataResponse<U>> {
     return new Promise((resolve, reject) => {
-      window.api.electronIpcOnce('data', (event, arg) => {
+      window.api.electronIpcOnce(`data-${request.id}`, (_event, arg) => {
         this.logService.debug(arg);
         try {
           const result: DtoDataResponse<U> = JSON.parse(arg);

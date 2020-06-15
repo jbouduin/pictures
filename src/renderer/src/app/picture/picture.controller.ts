@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { ComponentType } from '@angular/cdk/portal';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { ParamMap } from '@angular/router';
 
 import { DtoGetPicture, DtoListPicture, DtoNewPicture, DtoSetPicture } from '@ipc';
 
-import { IpcService } from '@core';
+import { IpcService, DataRequestFactory } from '@core';
 import { PaginationController } from '@shared';
-import { DynamicDialogParams, FloatingButtonParams } from '@shared';
+import { FloatingButtonParams } from '@shared';
 import { ThumbCardFooterParams, ThumbController } from '@shared';
 
 // FIXME WARNING in Circular dependency detected:
@@ -72,9 +72,10 @@ export class PictureController extends ThumbController<
   constructor(
     dialog: MatDialog,
     ipcService: IpcService,
+    dataRequestFactory: DataRequestFactory,
     paginationController: PaginationController,
     itemFactory: PictureItemFactory) {
-    super(dialog, ipcService, paginationController, itemFactory);
+    super(dialog, ipcService, dataRequestFactory, paginationController, itemFactory);
   }
   // </editor-fold>
 

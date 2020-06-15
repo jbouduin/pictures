@@ -3,7 +3,6 @@ import * as path from 'path';
 import { DtoConfiguration, DtoSystemInfo } from '@ipc';
 import { DtoDataRequest, LogSource } from '@ipc';
 import * as os from 'os';
-import { fork, spawn } from 'child_process';
 
 import container from './di/inversify.config';
 import { IConfigurationService } from './data';
@@ -29,12 +28,12 @@ function createWindow() {
 
   container.get<IConfigurationService>(SERVICETYPES.ConfigurationService)
     .initialize(app.getAppPath())
-    .then( configuration => {
+    .then( _configuration => {
       logService = container.get<ILogService>(SERVICETYPES.LogService);
       container.get<IDataRouterService>(SERVICETYPES.DataRouterService).initialize();
       container.get<IDatabaseService>(SERVICETYPES.DatabaseService)
         .initialize()
-        .then( connection => {
+        .then( _connection => {
           win = new BrowserWindow({
             width: 800,
             height: 600,
@@ -98,13 +97,13 @@ ipcMain.on('data', async (event, arg) => {
   const result = await container.get<IDataRouterService>(SERVICETYPES.DataRouterService)
     .routeRequest(dtoRequest);
   logService.debug(LogSource.Main, JSON.stringify(result, null, 2))
-  event.reply('data', JSON.stringify(result));
+  event.reply(`data-${dtoRequest.id}`, JSON.stringify(result));
 })
 
 ipcMain.on('data-sync', (event, arg) => {
   logService.debug(LogSource.Main, arg)
   const dtoRequest: DtoDataRequest<any> = JSON.parse(arg);
-  const result = container.get<IDataRouterService>(SERVICETYPES.DataRouterService)
+  container.get<IDataRouterService>(SERVICETYPES.DataRouterService)
     .routeRequest(dtoRequest)
     .then(result => {
       logService.debug(LogSource.Main, JSON.stringify(result, null, 2))

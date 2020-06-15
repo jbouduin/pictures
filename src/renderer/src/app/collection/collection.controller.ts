@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { ComponentType } from '@angular/cdk/portal';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { ParamMap } from '@angular/router';
 
-import { DataVerb, DtoUntypedDataRequest } from '@ipc';
+import { DataVerb } from '@ipc';
 import { DtoGetCollection, DtoListCollection, DtoNewCollection, DtoSetCollection } from '@ipc';
 
-import { IpcService } from '@core';
+import { IpcService, DataRequestFactory, IpcDataRequest } from '@core';
 import { PaginationController } from '@shared';
-import { DynamicDialogParams, FloatingButtonParams } from '@shared';
+import { FloatingButtonParams } from '@shared';
 import { ThumbCardFooterParams, ThumbController } from '@shared';
 
 // FIXME WARNING in Circular dependency detected:
@@ -70,9 +70,10 @@ export class CollectionController extends ThumbController<
   constructor(
     dialog: MatDialog,
     ipcService: IpcService,
+    dataRequestFactory: DataRequestFactory,
     paginationController: PaginationController,
     itemFactory: CollectionItemFactory) {
-    super(dialog, ipcService, paginationController, itemFactory);
+    super(dialog, ipcService, dataRequestFactory, paginationController, itemFactory);
   }
   // </editor-fold>
 
@@ -91,12 +92,11 @@ export class CollectionController extends ThumbController<
 
   // <editor-fold desc='Specific methods'>
   public scan(dtoListCollection: CollectionListItem): void {
-    const request: DtoUntypedDataRequest = {
-      verb: DataVerb.POST,
-      path: `/collection/${dtoListCollection.id}/scan`
-    };
+    const request: IpcDataRequest = this.dataRequestFactory.createUntypedDataRequest(
+      DataVerb.POST,
+      `/collection/${dtoListCollection.id}/scan`);
     this.ipcService
-      .untypedDataRequest<string>(request)
+      .dataRequest<string>(request)
       .then(
         undefined,
         error => {

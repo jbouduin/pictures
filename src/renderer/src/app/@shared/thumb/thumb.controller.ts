@@ -1,10 +1,9 @@
-import { Component } from '@angular/core';
 import { ComponentType } from '@angular/cdk/portal';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ParamMap } from '@angular/router';
 
-import { IpcService } from '@core';
-import { DataVerb, DtoDataRequest, DtoUntypedDataRequest } from '@ipc';
+import { IpcService, IpcDataRequest, DataRequestFactory } from '@core';
+import { DataVerb } from '@ipc';
 import { DtoListData, DtoListBase, DtoGetBase, DtoNewBase, DtoSetBase } from '@ipc';
 
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
@@ -72,6 +71,7 @@ export abstract class ThumbController<
   constructor(
     protected dialog: MatDialog,
     protected ipcService: IpcService,
+    protected dataRequestFactory: DataRequestFactory,
     protected paginationController: PaginationController,
     protected itemFactory: BaseItemFactory<L, N, E, DtoL, DtoG, DtoN, DtoS>) {
     this.listItems = new Array<L>();
@@ -83,6 +83,7 @@ export abstract class ThumbController<
   // <editor-fold desc='Abstract public methods'>
   public abstract processParamMap(paramMap: ParamMap): void;
   // </editor-fold>
+  //
   // <editor-fold desc='Public Create related methods'>
   public create(): void {
     this.dialogRef = this.dialog.open(
@@ -98,40 +99,37 @@ export abstract class ThumbController<
     this.dialogRef.afterClosed().subscribe( () => this.dialogRef = undefined);
   }
 
-  public commitCreate(newItem: N): Promise<L> {
-    const request: DtoDataRequest<DtoN> = {
-      verb: DataVerb.POST,
-      path: this.root,
-      data: this.itemFactory.newItemToNewDto(newItem)
-    };
-    return this.ipcService
-      .dataRequest<DtoN, DtoL>(request)
-      .then(
-        result => {
-          const listItem = this.itemFactory.listDtoToListItem(result.data);
-          this.listItems.splice(0, 0, listItem);
-          if (this.dialogRef) {
-            this.dialogRef.close()
-          };
-          return listItem;
-        },
-        error => {
-          const listItem = this.itemFactory.listDtoToListItem(error.data);
-          alert(error.message);
-          return listItem;
-        }
-      );
+  public async commitCreate(newItem: N): Promise<L> {
+    const request: IpcDataRequest = this.dataRequestFactory.createDataRequest(
+      DataVerb.POST,
+      this.root,
+      this.itemFactory.newItemToNewDto(newItem));
+    try {
+      const result = await this.ipcService
+        .dataRequest<DtoL>(request);
+      const listItem = this.itemFactory.listDtoToListItem(result.data);
+      this.listItems.splice(0, 0, listItem);
+      if (this.dialogRef) {
+        this.dialogRef.close();
+      }
+      ;
+      return listItem;
+    }
+    catch (error) {
+      const listItem_1 = this.itemFactory.listDtoToListItem(error.data);
+      alert(error.message);
+      return listItem_1;
+    }
   }
   // </editor-fold>
 
   // <editor-fold desc='Public Edit related methods'>
   public edit(listItem: L): void {
-    const request: DtoUntypedDataRequest = {
-      verb: DataVerb.GET,
-      path: `${this.root}/${listItem.id}`,
-    };
+    const request: IpcDataRequest = this.dataRequestFactory.createUntypedDataRequest(
+      DataVerb.GET,
+      `${this.root}/${listItem.id}`);
     this.ipcService
-      .untypedDataRequest<DtoG>(request)
+      .dataRequest<DtoG>(request)
       .then(response => {
         const params: DynamicDialogParams<E> = {
           data: {
@@ -149,30 +147,28 @@ export abstract class ThumbController<
     );
   }
 
-  public commitEdit(editedItem: E): Promise<L> {
-    const request: DtoDataRequest<DtoS> = {
-      verb: DataVerb.PUT,
-      path: `${this.root}/${editedItem.id}`,
-      data: this.itemFactory.editItemToSetDto(editedItem)
-    };
-    return this.ipcService
-      .dataRequest<DtoS, DtoL>(request)
-      .then(
-        response => {
-          const listItem = this.itemFactory.listDtoToListItem(response.data);
-          const index = this.listItems.findIndex( item => item.id === listItem.id);
-          this.listItems[index] = listItem;
-          if (this.dialogRef) {
-            this.dialogRef.close()
-          };
-          return listItem;
-        },
-        error => {
-          const listItem = this.itemFactory.listDtoToListItem(error.data);
-          alert(error.message);
-          return listItem;
-        }
-      );
+  public async commitEdit(editedItem: E): Promise<L> {
+    const request: IpcDataRequest = this.dataRequestFactory.createDataRequest(
+      DataVerb.PUT,
+      `${this.root}/${editedItem.id}`,
+      this.itemFactory.editItemToSetDto(editedItem));
+    try {
+      const response = await this.ipcService
+        .dataRequest<DtoL>(request);
+      const listItem = this.itemFactory.listDtoToListItem(response.data);
+      const index = this.listItems.findIndex(item => item.id === listItem.id);
+      this.listItems[index] = listItem;
+      if (this.dialogRef) {
+        this.dialogRef.close();
+      }
+      ;
+      return listItem;
+    }
+    catch (error) {
+      const listItem_1 = this.itemFactory.listDtoToListItem(error.data);
+      alert(error.message);
+      return listItem_1;
+    }
   }
   // </editor-fold>
 
@@ -184,22 +180,18 @@ export abstract class ThumbController<
     }
   }
 
-  public loadList(): Promise<Array<L>> {
-    const request: DtoUntypedDataRequest = {
-      verb: DataVerb.GET,
-      path: `${this.root}?page=${this.page}&pageSize=${this.pageSize}`
-    };
+  public async loadList(): Promise<Array<L>> {
+    const request: IpcDataRequest = this.dataRequestFactory.createUntypedDataRequest(
+      DataVerb.GET,
+      `${this.root}?page=${this.page}&pageSize=${this.pageSize}`);
 
-    return this.ipcService
-      .untypedDataRequest<DtoListData<DtoL>>(request)
-      .then(response => {
-        this.listItems = response.data.listData.map( listDto => this.itemFactory.listDtoToListItem(listDto));
-        const totalPages =
-          Math.floor(response.data.count / this.pageSize) +
-          ((response.data.count % this.pageSize) > 0 ? 1 : 0);
-        this.paginationController.setPagination(new PaginationParams(this.page, totalPages, this.paginationRoot));
-        return this.listItems;
-      });
+    const response = await this.ipcService
+      .dataRequest<DtoListData<DtoL>>(request);
+    this.listItems = response.data.listData.map(listDto => this.itemFactory.listDtoToListItem(listDto));
+    const totalPages = Math.floor(response.data.count / this.pageSize) +
+      ((response.data.count % this.pageSize) > 0 ? 1 : 0);
+    this.paginationController.setPagination(new PaginationParams(this.page, totalPages, this.paginationRoot));
+    return this.listItems;
   }
 
   public remove(listItem: L): void {
@@ -217,14 +209,13 @@ export abstract class ThumbController<
     );
     confirmDialog.afterClosed().subscribe(dialogResult => {
       if (dialogResult) {
-        const request: DtoUntypedDataRequest = {
-          verb: DataVerb.DELETE,
-          path: `${this.root}/${listItem.id}`
-        };
+        const request: IpcDataRequest = this.dataRequestFactory.createUntypedDataRequest(
+          DataVerb.DELETE,
+          `${this.root}/${listItem.id}`);
         this.ipcService
-          .untypedDataRequest<string>(request)
+          .dataRequest<string>(request)
           .then(
-            response => {
+            _response => {
               const index = this.listItems.findIndex( item => item.id === listItem.id);
               this.listItems.splice(index, 1);
             },

@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 
-import { DataVerb, DtoDataRequest, DtoConfiguration } from '@ipc';
+import { DataVerb, DtoConfiguration } from '@ipc';
 import { IpcService } from './ipc/ipc.service';
+import { DataRequestFactory } from './ipc/data-request-factory';
 import { LogService } from './log.service';
+import { IpcDataRequest } from './ipc/ipc-data-request';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +12,7 @@ import { LogService } from './log.service';
 export class ConfigurationService {
 
   private _configuration: DtoConfiguration;
-  private
+
   public get configuration(): DtoConfiguration {
     return this._configuration || this.getConfiguration();
   }
@@ -18,16 +20,15 @@ export class ConfigurationService {
   // <editor-fold desc='Constructor & C°'>
   constructor(
     private logService: LogService,
+    private dataRequestFactory: DataRequestFactory,
     private ipcService: IpcService) { }
   // </editor-fold>
 
   private getConfiguration(): DtoConfiguration {
-    const request: DtoDataRequest<string> = {
-      verb: DataVerb.GET,
-      path: '/configuration'
-    };
+    const request: IpcDataRequest = this.dataRequestFactory.createUntypedDataRequest(DataVerb.GET,'/configuration');
+
     this._configuration = this.ipcService
-      .dataRequestSync<string, DtoConfiguration>(request).data;
+      .dataRequestSync<DtoConfiguration>(request).data;
     this.logService.injectConfiguraton(this._configuration);
     return this._configuration;
   }
