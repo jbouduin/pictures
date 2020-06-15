@@ -38,45 +38,40 @@ export class FileService implements IFileService {
     fs.mkdirSync(directory, { recursive: true });
   }
 
-  public emptyDir(directory: string): Promise<boolean> {
-    return this.dir(directory).then(
-      files => {
-        const unlinkPromises = files.map(filename => this.rm(`${directory}/${filename}`));
-        return Promise.all(unlinkPromises)
-          .then(
-            () => { return true; },
-            error => {
-              this.logService.error(LogSource.Main, error);
-              return false;
-            }
-          );
-      },
-      error => {
+  public async emptyDir(directory: string): Promise<boolean> {
+    try {
+      const files = await this.dir(directory);
+      const unlinkPromises = files.map(filename => this.rm(`${directory}/${filename}`));
+      try {
+        await Promise.all(unlinkPromises);
+        return true;
+      }
+      catch (error) {
         this.logService.error(LogSource.Main, error);
         return false;
       }
-    );
+    }
+    catch (error_1) {
+      this.logService.error(LogSource.Main, error_1);
+      return false;
+    }
   }
 
-  public emptyAndDeleteDir(directory: string): Promise<boolean> {
-    return this.emptyDir(directory).then(
-      isEmtpy => {
-        return isEmtpy ?
-          this.rmdir(directory)
-            .then(
-              () => { return true; },
-              error => {
-                this.logService.error(LogSource.Main, error);
-                return false;
-              }
-            ) :
-            false;
-      },
-      error => {
-        this.logService.error(LogSource.Main, error);
-        return false;
-      }
-    );
+  public async emptyAndDeleteDir(directory: string): Promise<boolean> {
+    try {
+      const isEmtpy = await this.emptyDir(directory);
+      return isEmtpy ?
+        this.rmdir(directory)
+          .then(() => { return true; }, error => {
+            this.logService.error(LogSource.Main, error);
+            return false;
+          }) :
+        false;
+    }
+    catch (error_1) {
+      this.logService.error(LogSource.Main, error_1);
+      return false;
+    }
   }
 
   public ensureExistsSync(path: string): void {

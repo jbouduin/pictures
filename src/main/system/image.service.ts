@@ -7,6 +7,8 @@ import { Collection, Picture } from '../database';
 import { IFileService } from './file.service';
 import { ILogService } from './log.service';
 import { IQueueService } from './queue.service';
+import im from  'imagemagick';
+import * as fs from 'fs';
 
 import SERVICETYPES from '../di/service.types';
 
@@ -44,9 +46,44 @@ export class ImageService implements IImageService {
           target: thumbnailPath
         }
       };
+      // this.createThumbIm(request.data);
       this.queueService.push(request);
     }
     return Promise.resolve(picture);
   }
+
+  private num = 0;
   // </editor-fold>
+  public createThumbIm(params: DtoTaskCreateThumb): void {
+    try {
+      console.error(++this.num, params.source);
+      const data = fs.readFileSync(params.source, 'binary');
+      console.error(this.num, 'passed read');
+      im.resize(
+        {
+           srcData: data,
+           width: 240,
+           height: 240
+        },
+        (error: Error, result: any) => {
+           console.log(this.num, 'resized');
+          if (error) {
+            console.error(`Error resizing ${params.source}:`);
+            console.error(`${error.name}: ${error.message}`, error);
+          } else {
+            // console.log(result);
+            fs.writeFileSync(params.target, result, 'binary');
+          }
+        }
+      );
+    }  catch (err) {
+        console.error(`Error creating thumbnail for ${params.source}:`);
+        console.error(`${err.name}: ${err.message}`);
+    }
+    // im.resize(
+    //   {
+    //     srcPath: '""' + params.source.replace(/\//g, '\\') + '""',
+    //     dstPath: '""' + params.target.replace(/\//g, '\\') + '""', width: 240 },
+
+  }
 }

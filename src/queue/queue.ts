@@ -11,13 +11,12 @@ process.on('message', (m) => {
 class QueueService {
   // <editor-fold desc='Private properties'>
   private queue: Array<DtoTaskRequest<any>>;
-  private timerId: any;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
   public constructor() {
     this.queue = new Array<DtoTaskRequest<any>>();
-    this.timerId = setTimeout(this.next.bind(this), 5000);
+    setTimeout(this.next.bind(this), 5000);
   }
   // </editor-fold>
 
@@ -31,7 +30,7 @@ class QueueService {
     }
   }
 
-  public next(): void {
+  public async next(): Promise<any> {
     if (this.queue.length > 0) {
       const next = this.queue.shift();
       switch (next.taskType) {
@@ -40,17 +39,17 @@ class QueueService {
           break;
         }
         case TaskType.CreateThumb: {
-          ThumbCreator.createThumb(next.data);
+          await new ThumbCreator().createThumbIm(next.data);
           break;
         }
         default: {
           console.error(`Unknown tasktype: ${next.taskType}`);
         }
       }
-      this.timerId = setTimeout(this.next.bind(this), 100);
+      setTimeout(this.next.bind(this), 100);
     } else {
       console.log('queue is empty');
-      this.timerId = setTimeout(this.next.bind(this), 5000);
+      setTimeout(this.next.bind(this), 5000);
     }
   }
   // </editor-fold>

@@ -1,17 +1,14 @@
-import { ChildProcess, fork, spawn } from 'child_process';
+import { ChildProcess, fork } from 'child_process';
 import { inject, injectable } from 'inversify';
 
 import { DtoTaskRequest, LogSource } from '@ipc';
-import { IConfigurationService } from '../data/configuration';
-
-import { IFileService } from './file.service';
 import { ILogService } from './log.service';
 
 import SERVICETYPES from '../di/service.types';
 
 export interface IQueueService {
   initialize(queuePath: string): void;
-  push(task: DtoTaskRequest<any>);
+  push(task: DtoTaskRequest<any>): void;
 }
 
 @injectable()
