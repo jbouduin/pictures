@@ -1,4 +1,5 @@
 export enum TaskType {
   Ping,
-  CreateThumb
+  CreateThumb,
+  ReadMetaData
 }

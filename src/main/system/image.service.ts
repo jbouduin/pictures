@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 
-import { DtoTaskRequest, DtoTaskCreateThumb, LogSource, TaskType } from '@ipc';
+import { DtoTaskRequest, DtoTaskCreateThumb, LogSource, TaskType, DtoTaskReadMetaData } from '@ipc';
 import { IConfigurationService } from '../data/configuration';
 import { Collection, Picture } from '../database';
 
@@ -49,6 +49,15 @@ export class ImageService implements IImageService {
       // this.createThumbIm(request.data);
       this.queueService.push(request);
     }
+    // const metaDataRequest: DtoTaskRequest<DtoTaskReadMetaData> = {
+    //   taskType: TaskType.ReadMetaData,
+    //   data: {
+    //     source: picturePath,
+    //     pictureId: picture.id
+    //   }
+    // };
+    // this.queueService.push(metaDataRequest);
+
     return Promise.resolve(picture);
   }
 

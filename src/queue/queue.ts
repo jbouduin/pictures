@@ -42,6 +42,10 @@ class QueueService {
           await new ThumbCreator().createThumbIm(next.data);
           break;
         }
+        case TaskType.ReadMetaData: {
+          await new ThumbCreator().readMetaData(next.data);
+          break;
+        }
         default: {
           console.error(`Unknown tasktype: ${next.taskType}`);
         }
