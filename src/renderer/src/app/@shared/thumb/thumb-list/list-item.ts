@@ -1,4 +1,4 @@
-import { BaseItem } from './base-item';
+import { BaseItem } from '../base-item';
 
 export abstract class ListItem extends BaseItem {
 
@@ -6,7 +6,6 @@ export abstract class ListItem extends BaseItem {
   public footerText: string;
   public routerLink: Array<string>
   public thumbPath: string;
-
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>

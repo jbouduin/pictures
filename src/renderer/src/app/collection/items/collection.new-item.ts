@@ -1,7 +1,5 @@
 import { BaseItem } from '@shared';
-import { Injectable } from '@angular/core';
 
-// @Injectable()
 export class CollectionNewItem extends BaseItem {
 
   // <editor-fold desc='Public properties'>

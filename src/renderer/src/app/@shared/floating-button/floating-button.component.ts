@@ -1,5 +1,4 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { MaterialModule } from '../../material.module';
 
 import { FloatingButtonParams } from './floating-button.params';
 
@@ -18,8 +17,7 @@ export class FloatingButtonComponent implements OnInit {
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methods'>
-  ngOnInit(): void {
-  }
+  ngOnInit(): void { }
   // </editor-fold>
 
 }

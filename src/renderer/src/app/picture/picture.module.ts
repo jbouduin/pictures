@@ -8,9 +8,11 @@ import { SharedModule } from '@shared';
 import { MaterialModule } from '../material.module';
 
 import { PictureRoutingModule } from './picture-routing.module';
-import { PictureController } from './picture.controller';
 import { PictureListComponent } from './picture-list/picture-list.component';
 import { PictureDialogComponent } from './picture-dialog/picture-dialog.component';
+import { PictureCardController } from './controllers/picture.card-controller';
+import { PictureListController } from './controllers/picture.list-controller';
+import { PictureTreeController } from './controllers/picture.tree-controller';
 
 @NgModule({
   declarations: [
@@ -28,11 +30,12 @@ import { PictureDialogComponent } from './picture-dialog/picture-dialog.componen
     PictureRoutingModule
   ],
   entryComponents: [
-    // QUESTION is this required?
     PictureDialogComponent
   ],
   providers: [
-    PictureController
+    PictureCardController,
+    PictureListController,
+    PictureTreeController
   ],
 })
 export class PictureModule {

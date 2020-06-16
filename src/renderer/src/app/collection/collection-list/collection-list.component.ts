@@ -1,8 +1,8 @@
 import { Component, Injector, OnInit } from '@angular/core';
-
-import { ThumbController, ThumbListComponent } from '@shared';
-
-import { CollectionController } from '../collection.controller';
+import { ThumbListComponent, BaseListController, BaseCardController, BaseTreeController } from '@shared';
+import { CollectionListController } from '../controllers/collection.list-controller';
+import { CollectionCardController } from '../controllers/collection.card-controller';
+import { CollectionTreeController } from '../controllers/collection.tree-controller';
 
 @Component({
   selector: 'app-collection-list',
@@ -22,7 +22,9 @@ export class CollectionListComponent implements OnInit {
   // <editor-fold desc='Constructor & C°'>
   public constructor(
     private readonly inj: Injector,
-    private collectionController: CollectionController) { }
+    private listController: CollectionListController,
+    private cardController: CollectionCardController,
+    private treeController: CollectionTreeController) { }
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methods'>
@@ -31,7 +33,9 @@ export class CollectionListComponent implements OnInit {
     {
       parent: this.inj,
       providers: [
-        { provide: ThumbController, useValue: this.collectionController }
+        { provide: BaseListController, useValue: this.listController },
+        { provide: BaseCardController, useValue: this.cardController},
+        { provide: BaseTreeController, useValue: this.treeController}
       ]
     });
   }

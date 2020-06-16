@@ -1,5 +1,3 @@
-import { ListItem } from './list-item';
-
 export class ThumbCardFooterParams {
 
   // <editor-fold desc='Constructor & C°'>
@@ -7,7 +5,7 @@ export class ThumbCardFooterParams {
     public label: string,
     public cssClass: string,
     public icon: string,
-    public click: (listItem: ListItem) => void) { }
+    public click: (id: number) => void) { }
   // </editor-fold>
 
 }

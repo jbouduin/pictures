@@ -10,7 +10,9 @@ import { MaterialModule } from '../material.module';
 import { CollectionDialogComponent } from './collection-dialog/collection-dialog.component';
 import { CollectionListComponent } from './collection-list/collection-list.component';
 import { CollectionRoutingModule } from './collection-routing.module';
-import { CollectionController } from './collection.controller';
+import { CollectionListController } from './controllers/collection.list-controller';
+import { CollectionCardController } from './controllers/collection.card-controller';
+import { CollectionTreeController } from './controllers/collection.tree-controller';
 
 @NgModule({
   declarations: [
@@ -28,11 +30,12 @@ import { CollectionController } from './collection.controller';
     CollectionRoutingModule
   ],
   entryComponents: [
-    // QUESTION is this required?
     CollectionDialogComponent
   ],
   providers: [
-    CollectionController
+    CollectionListController,
+    CollectionCardController,
+    CollectionTreeController
   ],
 })
 export class CollectionModule {

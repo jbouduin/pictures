@@ -1,7 +1,7 @@
 import { Component, OnInit, OnChanges, Input, Output, EventEmitter, SimpleChanges } from '@angular/core';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
-import { TreeItem } from '../tree-item';
+import { BaseTreeItem } from './base.tree-item';
 
 @Component({
   selector: 'app-thumb-tree',
@@ -10,23 +10,30 @@ import { TreeItem } from '../tree-item';
 })
 export class ThumbTreeComponent implements OnInit, OnChanges {
 
-  @Input() public treeItems: Array<TreeItem>;
-  @Output() public itemSelected: EventEmitter<TreeItem>;
+  // <editor-fold desc='@Input/@Output properties'>
+  @Input() public treeItems: Array<BaseTreeItem>;
+  @Output() public itemSelected: EventEmitter<BaseTreeItem>;
+  // </editor-fold>
 
-  public treeControl: NestedTreeControl<TreeItem>;
-  public dataSource: MatTreeNestedDataSource<TreeItem>;
-  public selectedNode: TreeItem | undefined;
+  // <editor-fold desc='Public properties'>
+  public treeControl: NestedTreeControl<BaseTreeItem>;
+  public dataSource: MatTreeNestedDataSource<BaseTreeItem>;
+  public selectedNode: BaseTreeItem | undefined;
+  // </editor-fold>
 
-  constructor() {
-    this.treeControl = new NestedTreeControl<TreeItem>(node => node.children);
-    this.dataSource = new MatTreeNestedDataSource<TreeItem>();
-    this.itemSelected = new EventEmitter<TreeItem>();
+  // <editor-fold desc='Constructor & C°'>
+  public constructor() {
+    this.treeControl = new NestedTreeControl<BaseTreeItem>(node => node.children);
+    this.dataSource = new MatTreeNestedDataSource<BaseTreeItem>();
+    this.itemSelected = new EventEmitter<BaseTreeItem>();
     this.selectedNode = undefined;
   }
+  // </editor-fold>
 
-  ngOnInit(): void { }
+  // <editor-fold desc='Angular interface methods'>
+  public ngOnInit(): void { }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  public ngOnChanges(changes: SimpleChanges): void {
     for (const propName in changes) {
       if (changes.hasOwnProperty(propName)) {
         switch (propName) {
@@ -38,12 +45,14 @@ export class ThumbTreeComponent implements OnInit, OnChanges {
       }
     }
   }
+  // </editor-fold>
 
-  public hasChild(_: number, node: TreeItem): boolean {
+  // <editor-fold desc='UI Triggered methods'>
+  public hasChild(_: number, node: BaseTreeItem): boolean {
     return !!node.children && node.children.length > 0;
   }
 
-  public clickNode(item: TreeItem) {
+  public clickNode(item: BaseTreeItem) {
     if (this.selectedNode !== item) {
       this.selectedNode = item;
     } else {
@@ -51,4 +60,5 @@ export class ThumbTreeComponent implements OnInit, OnChanges {
     }
     this.itemSelected.emit(this.selectedNode);
   }
+  // </editor-fold>
 }

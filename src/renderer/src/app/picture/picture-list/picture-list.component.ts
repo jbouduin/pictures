@@ -1,7 +1,9 @@
 import { Component, Injector, OnInit } from '@angular/core';
-import { ThumbController, ThumbListComponent } from '@shared';
+import { ThumbListComponent, BaseListController, BaseCardController, BaseTreeController } from '@shared';
 
-import { PictureController } from '../picture.controller';
+import { PictureListController } from '../controllers/picture.list-controller';
+import { PictureCardController } from '../controllers/picture.card-controller';
+import { PictureTreeController } from '../controllers/picture.tree-controller';
 
 @Component({
   selector: 'app-picture-list',
@@ -21,7 +23,9 @@ export class PictureListComponent implements OnInit {
   // <editor-fold desc='Constructor & C°'>
   public constructor(
     private readonly inj: Injector,
-    private pictureController: PictureController) { }
+    private listController: PictureListController,
+    private cardController: PictureCardController,
+    private treeController: PictureTreeController) { }
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methods'>
@@ -30,7 +34,9 @@ export class PictureListComponent implements OnInit {
     {
       parent: this.inj,
       providers: [
-        { provide: ThumbController, useValue: this.pictureController }
+        { provide: BaseListController, useValue: this.listController },
+        { provide: BaseCardController, useValue: this.cardController},
+        { provide: BaseTreeController, useValue: this.treeController}
       ]
     });
   }

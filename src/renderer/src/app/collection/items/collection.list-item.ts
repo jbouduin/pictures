@@ -1,6 +1,6 @@
 import { DtoListCollection } from '@ipc';
-import { ListItem } from '@shared';
 import { Injectable } from '@angular/core';
+import { ListItem } from '@shared';
 
 @Injectable()
 export class CollectionListItem extends ListItem {

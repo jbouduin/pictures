@@ -1,13 +1,12 @@
 import { TestBed } from '@angular/core/testing';
+import { CollectionTreeController } from './collection.tree-controller';
 
-import { PictureController } from './picture.controller';
-
-// describe('PictureController', () => {
-//   let service: PictureController;
+// describe('CollectionController', () => {
+//   let service: CollectionTreeController;
 //
 //   beforeEach(() => {
 //     TestBed.configureTestingModule({});
-//     service = TestBed.inject(PictureController);
+//     service = TestBed.inject(CollectionTreeController);
 //   });
 //
 //   it('should be created', () => {

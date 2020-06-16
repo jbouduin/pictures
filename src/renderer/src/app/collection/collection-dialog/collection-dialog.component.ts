@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 
 import { BaseItem } from '@shared';
+import { CollectionNewItem } from '../items/collection.new-item';
+import { CollectionEditItem } from '../items/collection.edit-item';
+import { CollectionCardController } from '../controllers/collection.card-controller';
+import { CollectionListController } from '../controllers/collection.list-controller';
 
-import { CollectionController } from '../collection.controller';
-import { CollectionEditItem } from '../collection.edit-item';
-import { CollectionNewItem } from '../collection.new-item';
 
 @Component({
   selector: 'app-collection-dialog',
@@ -60,7 +60,8 @@ export class CollectionDialogComponent implements OnInit {
   // <editor-fold desc='Constructor & C°'>
   public constructor(
     private formBuilder: FormBuilder,
-    private collectionController: CollectionController,
+    private cardController: CollectionCardController,
+    private listController: CollectionListController,
     private baseItem: BaseItem) {
 
     this.collection = baseItem.isNew ?
@@ -83,16 +84,20 @@ export class CollectionDialogComponent implements OnInit {
 
   // <editor-fold desc='UI triggered methods'>
   public cancel(): void {
-    this.collectionController.cancelDialog();
+    if (this.baseItem.isNew) {
+      this.listController.cancelDialog();
+    } else {
+      this.cardController.cancelDialog();
+    }
   }
 
   public save(): void {
-    this.collectionController
+    this.cardController
       .commitEdit(this.collection as CollectionEditItem);
   }
 
   public create(): void {
-    this.collectionController
+    this.listController
       .commitCreate(this.collection as CollectionNewItem);
   }
 

@@ -3,27 +3,23 @@ import { ComponentType } from '@angular/cdk/portal';
 import { MatDialog } from '@angular/material/dialog';
 import { ParamMap } from '@angular/router';
 
-import { DtoGetPicture, DtoListPicture, DtoNewPicture, DtoSetPicture } from '@ipc';
+import { DtoListPicture, DtoNewPicture } from '@ipc';
 
 import { IpcService, DataRequestFactory } from '@core';
-import { PaginationController } from '@shared';
+import { PaginationController, BaseListController } from '@shared';
 import { FloatingButtonParams } from '@shared';
-import { ThumbCardFooterParams, ThumbController } from '@shared';
+import { PictureNewItem } from '../items/picture.new-item';
+import { PictureListItem } from '../items/picture.list-item';
+import { PictureListItemFactory } from '../factories/picture.list-item-factory';
+import { PictureDialogComponent } from '../picture-dialog/picture-dialog.component';
 
 // FIXME WARNING in Circular dependency detected:
 // src\renderer\src\app\collection\collection-dialog\collection-dialog.component.ts -> src\renderer\src\app\collection\new.controller.ts -
 // > src\renderer\src\app\collection\collection-dialog\collection-dialog.component.ts
-import { PictureDialogComponent } from './picture-dialog/picture-dialog.component';
-import { PictureEditItem } from './picture.edit-item';
-import { PictureItemFactory } from './picture.item-factory';
-import { PictureListItem } from './picture.list-item';
-import { PictureNewItem } from './picture.new-item';
-import { PictureTreeItem } from './picture-tree-item';
 
 @Injectable()
-export class PictureController extends ThumbController<
-  PictureListItem, PictureTreeItem, PictureNewItem, PictureEditItem,
-  DtoListPicture, DtoGetPicture, DtoNewPicture, DtoSetPicture> {
+export class PictureListController extends BaseListController<
+  PictureListItem, PictureNewItem, DtoListPicture, DtoNewPicture> {
 
   // <editor-fold desc='Private properties'>
   private currentRoot: string;
@@ -31,14 +27,6 @@ export class PictureController extends ThumbController<
   // </editor-fold>
 
   // <editor-fold desc='Implementation of protected abstract getters'>
-  protected get deleteDialogText(): string {
-    return undefined;
-  }
-
-  protected get editDialogComponent(): ComponentType<any> {
-    return PictureDialogComponent;
-  }
-
   protected get newDialogComponent(): ComponentType<any> {
     return PictureDialogComponent;
   }
@@ -53,20 +41,9 @@ export class PictureController extends ThumbController<
   // </editor-fold>
 
   // <editor-fold desc='Implementation of public abstract getters'>
-  public get cardFooterIcon(): string {
-    return "local_offer";
-  }
-
   public get floatingButtonParams(): FloatingButtonParams {
     return undefined;
   }
-
-  public get thumbCardFooterParams(): Array<ThumbCardFooterParams> {
-    return [
-      new ThumbCardFooterParams(undefined, 'icon-button hover green', 'edit', this.edit.bind(this))
-    ];
-  }
-
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
@@ -75,7 +52,7 @@ export class PictureController extends ThumbController<
     ipcService: IpcService,
     dataRequestFactory: DataRequestFactory,
     paginationController: PaginationController,
-    itemFactory: PictureItemFactory) {
+    itemFactory: PictureListItemFactory) {
     super(dialog, ipcService, dataRequestFactory, paginationController, itemFactory);
   }
   // </editor-fold>
@@ -100,17 +77,6 @@ export class PictureController extends ThumbController<
         this.page = undefined;
       }
     }
-    // this.loadList();
   }
-
-  public getTreeItems(list: Array<PictureListItem>): Array<PictureTreeItem> | undefined {
-    const result = new Array<PictureTreeItem>();
-    const workList = list.map(item => item.path).sort();
-    const root = new PictureTreeItem('root');
-    result.push(root);
-    workList.forEach((item: string) => root.children.push(new PictureTreeItem(item)));
-
-    return result;
-  };
   // </editor-fold>
 }

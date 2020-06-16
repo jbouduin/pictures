@@ -1,11 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { DtoListBase, DtoGetBase, DtoNewBase, DtoSetBase } from '@ipc';
-
+import { DtoGetBase, DtoSetBase } from '@ipc';
 import { ConfigurationService } from '@core';
 import { BaseItem } from '../base-item';
-import { ListItem } from '../list-item';
-import { ThumbController } from '../thumb.controller';
-import { TreeItem } from '../tree-item';
+import { ListItem } from '../thumb-list/list-item';
+import { BaseCardController } from './base.card-controller';
 
 @Component({
   selector: 'app-thumb-card',
@@ -14,9 +12,7 @@ import { TreeItem } from '../tree-item';
 })
 export class ThumbCardComponent implements OnInit {
   @Input() item: ListItem;
-  @Input() controller: ThumbController<
-    ListItem, TreeItem, BaseItem, BaseItem,
-    DtoListBase, DtoGetBase, DtoNewBase, DtoSetBase>;
+  @Input() controller: BaseCardController<BaseItem,  DtoGetBase, DtoSetBase>;
 
   // <editor-fold desc='Public properties'>
   public thumbnailStyle: Object;
