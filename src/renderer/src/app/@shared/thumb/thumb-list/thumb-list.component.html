@@ -1,15 +1,23 @@
 <app-floating-button [params]="floatingButtonParams"></app-floating-button>
-<div class="card-list-wrapper" fxLayout="column">
-  <div>
-    <app-pagination [controller]="paginationController"></app-pagination>
-  </div>
-  <!-- TODO get css dynamically (from controller ?) -->
-  <div class="card-list" fxLayout="row wrap">
-    <ng-container *ngFor="let listItem of listItems">
-      <app-thumb-card [item]=listItem [controller]="controller"></app-thumb-card>
-    </ng-container>
-  </div>
-  <div>
-    <app-pagination [controller]="paginationController"></app-pagination>
-  </div>
-</div>
+
+<rsz-layout class="row example-container" [directions]="['none']" [rFlex]="true">
+  <rsz-layout *ngIf="treeItems" class="cell one" [directions]="rszDirection" [rFlex]="true">
+    <app-thumb-tree [treeItems]="treeItems" (itemSelected)="treeItemSelected($event)"></app-thumb-tree>
+  </rsz-layout>
+  <rsz-layout class="cell two" [directions]="['none']" [rFlex]="false">
+    <div class="card-list-wrapper" fxLayout="column">
+      <div>
+        <app-pagination [controller]="paginationController"></app-pagination>
+      </div>
+      <!-- TODO get css dynamically (from controller ?) -->
+      <div class="card-list" fxLayout="row wrap">
+        <ng-container *ngFor="let listItem of listItems">
+          <app-thumb-card [item]=listItem [controller]="controller"></app-thumb-card>
+        </ng-container>
+      </div>
+      <div>
+        <app-pagination [controller]="paginationController"></app-pagination>
+      </div>
+    </div>
+  </rsz-layout>
+</rsz-layout>

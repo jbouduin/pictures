@@ -4,7 +4,7 @@ import { ListItem } from '@shared';
 export class PictureListItem extends ListItem {
 
   // <editor-fold desc='Public properties'>
-
+  public path: string;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
@@ -13,6 +13,7 @@ export class PictureListItem extends ListItem {
     this.name = dtoListPicture.name;
     this.thumbPath = dtoListPicture.thumbPath;
     this.footerText = '0';
+    this.path = dtoListPicture.path;
   }
   // </editor-fold>
 }

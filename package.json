@@ -32,6 +32,7 @@
   },
   "private": true,
   "dependencies": {
+    "@3dgenomes/ngx-resizable": "^1.8.1",
     "@angular/flex-layout": "^9.0.0-beta.31",
     "glob-promise": "^3.4.0",
     "imagemagick": "^0.1.3",

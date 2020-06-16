@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { RouterModule } from '@angular/router';
-
+import { NgxResizableModule } from '@3dgenomes/ngx-resizable';
 import { MaterialModule } from '../material.module';
 
 import { FloatingButtonComponent } from './floating-button/floating-button.component';
@@ -11,6 +11,7 @@ import { ThumbCardComponent } from './thumb/thumb-card/thumb-card.component';
 import { ThumbListComponent } from './thumb/thumb-list/thumb-list.component';
 import { DynamicDialogComponent } from './dynamic-dialog/dynamic-dialog.component';
 import { PaginationComponent } from './pagination/pagination.component';
+import { ThumbTreeComponent } from './thumb/thumb-tree/thumb-tree.component';
 
 
 @NgModule({
@@ -20,13 +21,15 @@ import { PaginationComponent } from './pagination/pagination.component';
     ThumbCardComponent,
     ThumbListComponent,
     DynamicDialogComponent,
-    PaginationComponent
+    PaginationComponent,
+    ThumbTreeComponent
   ],
   imports: [
     CommonModule,
     RouterModule,
     FlexLayoutModule,
-    MaterialModule
+    MaterialModule,
+    NgxResizableModule
   ],
   exports: [
     FloatingButtonComponent,

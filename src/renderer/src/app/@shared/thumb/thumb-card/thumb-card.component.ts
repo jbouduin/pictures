@@ -5,6 +5,7 @@ import { ConfigurationService } from '@core';
 import { BaseItem } from '../base-item';
 import { ListItem } from '../list-item';
 import { ThumbController } from '../thumb.controller';
+import { TreeItem } from '../tree-item';
 
 @Component({
   selector: 'app-thumb-card',
@@ -14,7 +15,7 @@ import { ThumbController } from '../thumb.controller';
 export class ThumbCardComponent implements OnInit {
   @Input() item: ListItem;
   @Input() controller: ThumbController<
-    ListItem, BaseItem, BaseItem,
+    ListItem, TreeItem, BaseItem, BaseItem,
     DtoListBase, DtoGetBase, DtoNewBase, DtoSetBase>;
 
   // <editor-fold desc='Public properties'>

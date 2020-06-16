@@ -22,7 +22,7 @@ import { CollectionNewItem } from './collection.new-item';
 
 @Injectable()
 export class CollectionController extends ThumbController<
-  CollectionListItem, CollectionNewItem, CollectionEditItem,
+  CollectionListItem, any, CollectionNewItem, CollectionEditItem,
   DtoListCollection, DtoGetCollection, DtoNewCollection, DtoSetCollection> {
 
   // <editor-fold desc='Implementation of protected abstract getters'>
@@ -33,11 +33,12 @@ export class CollectionController extends ThumbController<
   protected get editDialogComponent(): ComponentType<any> {
     return CollectionDialogComponent;
   }
+
   protected get newDialogComponent(): ComponentType<any> {
     return CollectionDialogComponent;
   }
 
-  protected get paginationRoot(): string {
+  protected get paginationRoute(): string {
     return '/home';
   }
 
@@ -51,9 +52,6 @@ export class CollectionController extends ThumbController<
 
   public get floatingButtonParams(): FloatingButtonParams {
     return new FloatingButtonParams('Add new', 'add', 'primary', this.create.bind(this));
-  }
-  public get showFloatingButton(): boolean {
-    return true;
   }
 
   public get thumbCardFooterParams(): Array<ThumbCardFooterParams> {
@@ -86,8 +84,12 @@ export class CollectionController extends ThumbController<
         this.page = undefined;
       }
     }
-    this.loadList();
+    // this.loadList();
   }
+
+  public getTreeItems(_list: Array<CollectionListItem>): Array<any> | undefined {
+    return undefined;
+  };
   // </editor-fold>
 
   // <editor-fold desc='Specific methods'>

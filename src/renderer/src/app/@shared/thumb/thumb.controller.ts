@@ -19,9 +19,10 @@ import { BaseItemFactory } from './base.item-factory';
 import { ListItem } from './list-item';
 import { BaseItem } from './base-item';
 import { ThumbCardFooterParams } from './thumb-card-footer.params';
+import { TreeItem } from './tree-item';
 
 export abstract class ThumbController<
-  L extends ListItem, N extends BaseItem, E extends BaseItem,
+  L extends ListItem, T extends TreeItem, N extends BaseItem, E extends BaseItem,
   DtoL extends DtoListBase, DtoG extends DtoGetBase, DtoN extends DtoNewBase, DtoS extends DtoSetBase> {
 
   // <editor-fold desc='Private readonly properties'>
@@ -31,6 +32,8 @@ export abstract class ThumbController<
 
   // <editor-fold desc='Private properties'>
   private listItems: Array<L>;
+  private treeItems: Array<T> | undefined;
+  private currentTreeItem: T | undefined;
   private dialogRef: MatDialogRef<any>;
   private currentPage: number;
   // </editor-fold>
@@ -48,6 +51,10 @@ export abstract class ThumbController<
     return this.currentPage || 1;
   }
 
+  public get treeNodes(): Array<T> | undefined {
+    return this.treeItems;
+  }
+
   public set page(value: number) {
     this.currentPage = value;
   }
@@ -58,7 +65,7 @@ export abstract class ThumbController<
   protected abstract get deleteDialogText(): string;
   protected abstract get newDialogComponent(): ComponentType<any>;
   protected abstract get root(): string;
-  protected abstract get paginationRoot(): string;
+  protected abstract get paginationRoute(): string;
   // </editor-fold>
 
   // <editor-fold desc='Abstract public getters'>
@@ -77,13 +84,15 @@ export abstract class ThumbController<
     this.listItems = new Array<L>();
     this.dialogRef = undefined;
     this.currentPage = undefined;
+    this.treeItems = undefined;
   }
   // </editor-fold>
 
   // <editor-fold desc='Abstract public methods'>
   public abstract processParamMap(paramMap: ParamMap): void;
+  public abstract getTreeItems(list: Array<L>): Array<T> | undefined;
   // </editor-fold>
-  //
+
   // <editor-fold desc='Public Create related methods'>
   public create(): void {
     this.dialogRef = this.dialog.open(
@@ -181,16 +190,21 @@ export abstract class ThumbController<
   }
 
   public async loadList(): Promise<Array<L>> {
+    let url = `${this.root}?page=${this.page}&pageSize=${this.pageSize}`;
+    if (this.currentTreeItem?.queryString) {
+      url += `&${this.currentTreeItem.queryString}`;
+    }
     const request: IpcDataRequest = this.dataRequestFactory.createUntypedDataRequest(
       DataVerb.GET,
-      `${this.root}?page=${this.page}&pageSize=${this.pageSize}`);
+      url);
 
     const response = await this.ipcService
       .dataRequest<DtoListData<DtoL>>(request);
     this.listItems = response.data.listData.map(listDto => this.itemFactory.listDtoToListItem(listDto));
     const totalPages = Math.floor(response.data.count / this.pageSize) +
       ((response.data.count % this.pageSize) > 0 ? 1 : 0);
-    this.paginationController.setPagination(new PaginationParams(this.page, totalPages, this.paginationRoot));
+    this.paginationController.setPagination(new PaginationParams(this.page, totalPages, this.paginationRoute));
+    this.treeItems = this.getTreeItems(this.listItems);
     return this.listItems;
   }
 
@@ -225,6 +239,10 @@ export abstract class ThumbController<
           );
       }
     });
+  }
+
+  public toggleTreeItem(treeItem: T) {
+    this.currentTreeItem = treeItem;
   }
   // </editor-fold>
 }

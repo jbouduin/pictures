@@ -18,15 +18,16 @@ import { PictureEditItem } from './picture.edit-item';
 import { PictureItemFactory } from './picture.item-factory';
 import { PictureListItem } from './picture.list-item';
 import { PictureNewItem } from './picture.new-item';
+import { PictureTreeItem } from './picture-tree-item';
 
 @Injectable()
 export class PictureController extends ThumbController<
-  PictureListItem, PictureNewItem, PictureEditItem,
+  PictureListItem, PictureTreeItem, PictureNewItem, PictureEditItem,
   DtoListPicture, DtoGetPicture, DtoNewPicture, DtoSetPicture> {
 
   // <editor-fold desc='Private properties'>
   private currentRoot: string;
-  private currentPaginationRoot: string;
+  private currentPaginationRoute: string;
   // </editor-fold>
 
   // <editor-fold desc='Implementation of protected abstract getters'>
@@ -42,8 +43,8 @@ export class PictureController extends ThumbController<
     return PictureDialogComponent;
   }
 
-  protected get paginationRoot(): string {
-    return this.currentPaginationRoot;
+  protected get paginationRoute(): string {
+    return this.currentPaginationRoute;
   }
 
   protected get root(): string {
@@ -84,7 +85,7 @@ export class PictureController extends ThumbController<
     switch(paramMap.get('parent')) {
       case 'collection': {
         this.currentRoot = `/collection/${paramMap.get('id')}/pictures`;
-        this.currentPaginationRoot = `/picture/collection/${paramMap.get('id')}`;
+        this.currentPaginationRoute = `/picture/collection/${paramMap.get('id')}`;
         break;
       }
       default: {
@@ -99,7 +100,17 @@ export class PictureController extends ThumbController<
         this.page = undefined;
       }
     }
-    this.loadList();
+    // this.loadList();
   }
+
+  public getTreeItems(list: Array<PictureListItem>): Array<PictureTreeItem> | undefined {
+    const result = new Array<PictureTreeItem>();
+    const workList = list.map(item => item.path).sort();
+    const root = new PictureTreeItem('root');
+    result.push(root);
+    workList.forEach((item: string) => root.children.push(new PictureTreeItem(item)));
+
+    return result;
+  };
   // </editor-fold>
 }

@@ -2,6 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { MaterialModule } from './material.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NgxResizableModule } from '@3dgenomes/ngx-resizable';
 
 import { CoreModule } from '@core';
 import { SharedModule } from '@shared';
@@ -20,6 +21,7 @@ import { AppComponent } from './app.component';
     BrowserModule,
     BrowserAnimationsModule,
     MaterialModule,
+    NgxResizableModule,
     CoreModule,
     SharedModule,
     ShellModule,

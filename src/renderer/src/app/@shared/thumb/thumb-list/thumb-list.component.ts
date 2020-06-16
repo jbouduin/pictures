@@ -7,6 +7,8 @@ import { PaginationController} from '../../pagination/pagination.controller';
 import { BaseItem } from '../base-item';
 import { ListItem } from '../list-item';
 import { ThumbController } from '../thumb.controller';
+import { TreeItem } from '../tree-item';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-thumb-list',
@@ -27,15 +29,35 @@ export class ThumbListComponent implements OnInit {
   public get paginationController(): PaginationController {
     return this.controller.pagination;
   }
+
+  public get rszDirection(): Array<string> {
+    return this.controller.treeNodes ? ['right'] : ['none'];
+  }
+
+  public get treeItems(): Array<TreeItem> {
+    return this.controller.treeNodes;
+  }
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor(private controller:
-    ThumbController<ListItem, BaseItem, BaseItem, DtoListBase, DtoGetBase, DtoNewBase, DtoSetBase>) { }
+  public constructor(
+    private activatedRoute: ActivatedRoute,
+    private controller:
+      ThumbController<ListItem, TreeItem, BaseItem, BaseItem, DtoListBase, DtoGetBase, DtoNewBase, DtoSetBase>) { }
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methods'>
   public ngOnInit(): void {
-    this.controller.loadList();
+    this.activatedRoute.paramMap.subscribe(paramMap => {
+      this.controller.processParamMap(paramMap);
+      console.log('processed parammap');
+      this.controller.loadList();
+      console.log('loaded list');
+    });
+  }
+
+  public treeItemSelected(node: TreeItem) {
+    console.log(node);
+    this.controller.toggleTreeItem(node);
   }
 }
