@@ -1,9 +1,7 @@
-import * as events from 'events';
 import { inject, injectable } from 'inversify';
-import * as _ from 'lodash';
-import { match, MatchResult } from 'path-to-regexp';
+import _ from 'lodash';
+import { match } from 'path-to-regexp';
 import * as Collections from 'typescript-collections';
-import * as util from 'util';
 import 'reflect-metadata';
 
 import { DataStatus, DataVerb, DtoDataRequest, DtoDataResponse, DtoUntypedDataResponse, LogSource } from '@ipc';
@@ -16,11 +14,11 @@ import { RoutedRequest } from './routed-request';
 import SERVICETYPES from '../di/service.types';
 
 export interface IDataRouterService {
-  delete(path: string, callback: (request: RoutedRequest) => Promise<DtoDataResponse<any>>);
-  get(path: string, callback: (request: RoutedRequest) => Promise<DtoDataResponse<any>>);
+  delete(path: string, callback: (request: RoutedRequest) => Promise<DtoDataResponse<any>>): void;
+  get(path: string, callback: (request: RoutedRequest) => Promise<DtoDataResponse<any>>): void;
   // PATCH is not used
-  post(path: string, callback: (request: RoutedRequest) => Promise<DtoDataResponse<any>>);
-  put(path: string, callback: (request: RoutedRequest) => Promise<DtoDataResponse<any>>);
+  post(path: string, callback: (request: RoutedRequest) => Promise<DtoDataResponse<any>>): void;
+  put(path: string, callback: (request: RoutedRequest) => Promise<DtoDataResponse<any>>): void;
   initialize(): void;
   routeRequest(request: DtoDataRequest<any>): Promise<DtoDataResponse<any>>;
 }
@@ -66,19 +64,19 @@ export class DataRouterService implements IDataRouterService {
   // </editor-fold>
 
   // <editor-fold desc='IDataRouterService interface methods'>
-  public delete(path: string, callback: RouteCallback) {
+  public delete(path: string, callback: RouteCallback): void {
     this.deleteRoutes.setValue(path, callback);
   }
 
-  public get(path: string, callback: RouteCallback) {
+  public get(path: string, callback: RouteCallback): void {
     this.getRoutes.setValue(path, callback);
   }
 
-  public post(path: string, callback: RouteCallback) {
+  public post(path: string, callback: RouteCallback): void {
     this.postRoutes.setValue(path, callback);
   }
 
-  public put(path: string, callback: RouteCallback) {
+  public put(path: string, callback: RouteCallback): void {
     this.putRoutes.setValue(path, callback);
   }
 
@@ -140,8 +138,8 @@ export class DataRouterService implements IDataRouterService {
         this.logService.verbose(LogSource.Main, `Route found: ${matchedKey}`);
         const routedRequest = new RoutedRequest();
         routedRequest.route = matchedKey
-        routedRequest.path = matchResult2.path;
-        routedRequest.params = matchResult2.params;
+        routedRequest.path = (matchResult2 as any).path;
+        routedRequest.params = (matchResult2 as any).params;
         routedRequest.data = request.data;
         routedRequest.queryParams = { };
         if (splittedPath.length > 1) {
@@ -167,7 +165,7 @@ export class DataRouterService implements IDataRouterService {
         result = Promise.resolve(response);
       }
     } else {
-      this.logService.error(LogSource.Main, 'Route not found');
+      this.logService.error(LogSource.Main, 'Route not found', request.path);
       const response: DtoDataResponse<string> = {
         status: DataStatus.NotFound,
         data: ''
