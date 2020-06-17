@@ -52,7 +52,6 @@ export class ThumbListComponent implements OnInit {
     this.activatedRoute.paramMap.subscribe(paramMap => {
       this.treeController.processParamMap(paramMap);
       this.listController.processParamMap(paramMap);
-      console.log('processed parammaps');
       this.treeController
         .loadTree()
         .finally(() => this.listController.loadList(this.treeController.currentQueryString));
@@ -60,7 +59,7 @@ export class ThumbListComponent implements OnInit {
   }
 
   public treeItemSelected(node: BaseTreeItem) {
-    console.log(node);
     this.treeController.toggleTreeItem(node);
+    this.listController.loadList(this.treeController.currentQueryString);
   }
 }

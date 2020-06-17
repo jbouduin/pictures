@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 
-import { DataStatus, DtoDataResponse, LogSource } from '@ipc';
+import { LogSource } from '@ipc';
 
 import { Collection, Picture } from '../../database';
 import { IDatabaseService } from '../../database';
@@ -10,7 +10,6 @@ import { IImageService, ILogService } from '../../system';
 import { IConfigurationService } from '../configuration';
 import { IDataRouterService } from '../data-router.service';
 import { IDataService } from '../data-service';
-import { RoutedRequest } from '../routed-request';
 
 import SERVICETYPES from '../../di/service.types';
 

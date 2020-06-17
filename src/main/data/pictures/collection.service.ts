@@ -18,6 +18,7 @@ import { RoutedRequest } from '../routed-request';
 import { IPictureService } from './picture.service';
 
 import SERVICETYPES from '../../di/service.types';
+import { Like } from 'typeorm';
 
 export interface ICollectionService extends IDataService { }
 
@@ -196,7 +197,7 @@ export class CollectionService implements ICollectionService {
   private async getPictures(request: RoutedRequest): Promise<DtoListDataResponse<DtoListPicture>> {
     const paginationTake = request.queryParams.pageSize || 20;
     const paginationSkip = ((request.queryParams.page || 1) - 1) * paginationTake;
-
+    const picturePath = request.queryParams.path;
     try {
       const collection = await this.databaseService
         .getCollectionRepository()
@@ -206,9 +207,13 @@ export class CollectionService implements ICollectionService {
         name: collection.name,
         path: collection.path
       };
+      const where: any = { collection: collection };
+      if (picturePath ) {
+        where.path = Like(`${picturePath}%`)
+      }
       const qryResult = await this.databaseService.getPictureRepository()
         .findAndCount({
-          where: { collection: collection },
+          where,
           skip: paginationSkip,
           take: paginationTake
         });
@@ -274,7 +279,7 @@ export class CollectionService implements ICollectionService {
         })
         .map(path => path.split('/'))
       );
-    console.log(segmentedPaths);
+
     const tree = new Array<DtoTreeBase>();
     const root: DtoTreeBase = {
       label: collection.path,
@@ -431,7 +436,7 @@ export class CollectionService implements ICollectionService {
     const directChildren = paths.filter(path => path.length === level);
     directChildren.forEach(child => {
       const childItem: DtoTreeBase = {
-        label: child.join('/'),
+        label: child[level - 1],
         queryString: `path=${child.join('/')}`,
         children: new Array<DtoTreeBase>()
       };

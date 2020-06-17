@@ -8,7 +8,7 @@
     </li>
   </mat-tree-node>
   <!-- This is the tree node template for expandable nodes -->
-  <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild" (click)="clickNode(node)">
+  <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild" (click)="clickNode(node)" matTreeNodeToggle>
     <li>
       <div class="mat-tree-node" [ngClass]="{ 'background-highlight': selectedNode === node }">
         <button mat-icon-button matTreeNodeToggle
@@ -19,8 +19,10 @@
         </button>
         {{node.label}}
       </div>
-      <ul [class.example-tree-invisible]="!treeControl.isExpanded(node)">
-        <ng-container matTreeNodeOutlet></ng-container>
+      <ul>
+        <div *ngIf="treeControl.isExpanded(node)">
+          <ng-container matTreeNodeOutlet></ng-container>
+        </div>
       </ul>
     </li>
   </mat-nested-tree-node>

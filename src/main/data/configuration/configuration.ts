@@ -1,13 +1,10 @@
 import * as fs from 'fs';
 import * as glob from 'glob';
-import * as _ from 'lodash';
+import _ from 'lodash';
 import * as path from 'path';
-
-import { ConnectionType, DtoConnection } from '@ipc';
 
 import { CfgApplication } from './application/cfg-application';
 import { CfgEnvironment } from './environment/cfg-environment';
-import { CfgDatabase } from './database/cfg-database';
 
 export class Configuration {
 
@@ -36,9 +33,7 @@ export class Configuration {
     this.appPath = appPath;
     if (process.env.NODE_ENV) {
       this.environment = process.env.NODE_ENV.trim().toLowerCase();
-      // console(`Using ${process.env.NODE_ENV} environment`);
     } else {
-      // console('NODE_ENV not set. Presuming development environment.');
       this.environment = 'development';
     }
 
@@ -52,7 +47,7 @@ export class Configuration {
     const root = {};
 
     const files = glob.sync(pattern);
-    const promises = new Array<Promise<any>>();
+
     files
       .forEach(async file =>  {
         const absolutePath = path.resolve(process.cwd(), file);

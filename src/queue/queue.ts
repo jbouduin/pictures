@@ -7,7 +7,6 @@ process.on('message', (m) => {
   main.push(m);
 });
 
-
 class QueueService {
   // <editor-fold desc='Private properties'>
   private queue: Array<DtoTaskRequest<any>>;

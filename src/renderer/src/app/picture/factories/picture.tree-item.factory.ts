@@ -15,9 +15,16 @@ export class PictureTreeItemFactory extends BaseTreeItemFactory<PictureTreeItem,
   // </editor-fold>
 
   // <editor-fold desc='Abstract method implementations'>
-  public createTreeDataSet(dto: Array<DtoTreeBase>): Array<PictureTreeItem> {
-    // XXX:
-    throw new Error("Method not implemented.");
+  public createTreeDataSet(treeBases: Array<DtoTreeBase>): Array<PictureTreeItem> {
+    return treeBases.map(treeBase => this.processTreeBase(treeBase));
+  }
+  // </editor-fold>
+
+  // <editor-fold desc='Private methods'>
+  private processTreeBase(treeBase: DtoTreeBase): PictureTreeItem {
+    const result = new PictureTreeItem(treeBase);
+    result.children = treeBase.children.map(child => this.processTreeBase(child));
+    return result;
   }
   // </editor-fold>
 }
