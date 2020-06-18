@@ -32,6 +32,10 @@ export class PaginationController {
 
   // <editor-fold desc='Public methods'>
   public setPagination(params: PaginationParams): void {
+    this.buttons.splice(0, this.buttons.length);
+    if (params.totalPages === 0) {
+      return;
+    }
     this.baseRoute = params.baseRoute;
     this.buttons.length = 0;
     this.logService.debug(params);
