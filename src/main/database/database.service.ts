@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import { createConnection, getConnection } from 'typeorm';
+import { createConnection, getConnection, TreeRepository } from 'typeorm';
 import { Connection as TypeOrmConnection } from 'typeorm';
 import { Repository } from 'typeorm';
 import 'reflect-metadata';
@@ -16,6 +16,7 @@ import SERVICETYPES from '../di/service.types';
 export interface IDatabaseService {
   getCollectionRepository(): Repository<Collection>;
   getPictureRepository(): Repository<Picture>;
+  getTagTreeRepository(): TreeRepository<Tag>;
   initialize(): Promise<TypeOrmConnection>
 }
 
@@ -41,6 +42,11 @@ export class DatabaseService implements IDatabaseService {
       .getRepository(Picture);
   }
 
+  public getTagTreeRepository(): any {
+    return this
+      .getConnectionByTargetType(TargetType.PICTURES)
+      .getTreeRepository(Tag);
+  }
   public initialize(): Promise<TypeOrmConnection> {
     this.logService.debug(LogSource.Main, 'in initialize DatabaseService');
     return this.connectByName(

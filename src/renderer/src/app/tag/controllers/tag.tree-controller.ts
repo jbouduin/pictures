@@ -10,7 +10,7 @@ import { TagTreeItemFactory } from '../factories/tag.tree-item-factory';
 export class TagTreeController extends BaseTreeController<BaseTreeItem, DtoTreeBase> {
 
   // <editor-fold desc='Implementation of protected abstract getters'>
-  protected get root(): string { return ''; }
+  protected get root(): string { return '/tag/tree'; }
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>

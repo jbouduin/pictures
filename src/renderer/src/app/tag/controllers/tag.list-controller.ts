@@ -23,7 +23,7 @@ export class TagListController
   }
 
   protected get paginationRoute(): string {
-    return '/home';
+    return '/tag';
   }
 
   protected get root(): string { return '/tag'; }

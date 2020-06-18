@@ -5,7 +5,7 @@ import { DtoTreeBase } from '@ipc';
 
 import { IpcService, DataRequestFactory } from '@core';
 import { BaseTreeController } from '@shared';
-import { PictureTreeItem } from '../items/picture-tree-item';
+import { PictureTreeItem } from '../items/picture.tree-item';
 import { PictureTreeItemFactory } from '../factories/picture.tree-item.factory';
 
 @Injectable()

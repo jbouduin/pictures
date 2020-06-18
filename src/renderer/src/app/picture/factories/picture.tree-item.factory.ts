@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DtoTreeBase } from '@ipc';
 import { BaseTreeItemFactory } from '@shared';
-import { PictureTreeItem } from '../items/picture-tree-item';
+import { PictureTreeItem } from '../items/picture.tree-item';
 
 @Injectable({
   providedIn: 'root'

@@ -2,11 +2,11 @@ import { injectable, inject } from "inversify";
 import { IDataService } from "../data-service";
 import { IDataRouterService } from "../data-router.service";
 
-import { IDatabaseService } from "../../database";
+import { IDatabaseService, Tag } from "../../database";
 import { ILogService } from "../../system";
 
 import SERVICETYPES from "di/service.types";
-import { DtoUntypedDataResponse, DtoDataResponse, DtoListDataResponse } from "@ipc";
+import { DtoUntypedDataResponse, DtoDataResponse, DtoListDataResponse, DtoTreeBase, DataStatus } from "@ipc";
 import { DtoGetTag, DtoListTag } from "@ipc";
 import { RoutedRequest } from "data/routed-request";
 export interface ITagService extends IDataService {
@@ -28,6 +28,7 @@ export class TagService implements ITagService {
     router.delete('/tag/:tag', this.deleteTag.bind(this));
     // GET
     router.get('/tag', this.getTags.bind(this));
+    router.get('/tag/tree', this.getTree.bind(this));
     router.get('/tag/:tag', this.getTag.bind(this));
     // router.get('/tag/:tag/pictures', this.getPictures.bind(this));
     // POST
@@ -44,12 +45,40 @@ export class TagService implements ITagService {
   // </editor-fold>
 
   // <editor-fold desc='GET routes callbacks'>
-  private async getTags(request: RoutedRequest): Promise<DtoListDataResponse<DtoListTag>> {
+  private async getTag(request: RoutedRequest): Promise<DtoDataResponse<DtoGetTag>> {
     throw new Error('Not implemented');
   }
 
-  private async getTag(request: RoutedRequest): Promise<DtoDataResponse<DtoGetTag>> {
-    throw new Error('Not implemented');
+  private async getTags(request: RoutedRequest): Promise<DtoListDataResponse<DtoListTag>> {
+    console.log('get tags');
+    const result_1: DtoListDataResponse<DtoListTag> = {
+      status: DataStatus.Ok,
+      data: {
+        listData: new Array<DtoListTag>(),
+        count: 0
+      }
+    };
+    return result_1;
+  }
+
+  private async getTree(request: RoutedRequest): Promise<DtoDataResponse<Array<DtoTreeBase>>> {
+    const tags = await this.databaseService
+      .getTagTreeRepository()
+      .findTrees();
+
+    const result = new Array<DtoTreeBase>();
+    const root: DtoTreeBase = {
+      label: 'all',
+      queryString: undefined,
+      children: tags.map( (tag: Tag) => this.convertTagToTreeBase(tag))
+    };
+    result.push(root);
+    console.log(JSON.stringify(result, null, 2));
+    const result_1: DtoDataResponse<Array<DtoTreeBase>> = {
+      status: DataStatus.Ok,
+      data: result
+    };
+    return result_1;
   }
   // </editor-fold>
 
@@ -62,6 +91,17 @@ export class TagService implements ITagService {
   // <editor-fold desc='PUT routes callbacks'>
   private async updateTag(request: RoutedRequest): Promise<DtoDataResponse<DtoListTag>> {
     throw new Error('Not implemented');
+  }
+  // </editor-fold>
+
+  // <editor-fold desc='Helper methods'>
+  private convertTagToTreeBase(tag: Tag): DtoTreeBase {
+    const result: DtoTreeBase = {
+      queryString: `tag=${tag.id}`,
+      label: tag.name,
+      children: tag.children.map( (child: Tag) => this.convertTagToTreeBase(child))
+    };
+    return result;
   }
   // </editor-fold>
 }
