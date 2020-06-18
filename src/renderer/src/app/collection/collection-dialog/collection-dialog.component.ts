@@ -59,17 +59,25 @@ export class CollectionDialogComponent implements OnInit {
     private controller: DynamicDialogController,
     baseItem: BaseItem) {
 
-    this.collection = baseItem.isNew ?
-      (baseItem as any) as CollectionNewItem :
-      (baseItem as any) as CollectionEditItem;
-    this.dialogTitle = baseItem.isNew ?
-      'New collection' :
-      'Edit collection';
+    if (baseItem.isNew) {
+      this.collection = (baseItem as any) as CollectionNewItem;
+      this.dialogTitle = 'New collection';
+    } else {
+      this.collection = (baseItem as any) as CollectionEditItem;
+      this.dialogTitle = 'Edit collection';
+    }
 
+    const nameControl = new FormControl( '', [Validators.required]);
+    const pathControl = new FormControl( { value: '', disabled: !this.collection.isNew }, [Validators.required]);
     this.collectionData = this.formBuilder.group({
-        name: new FormControl('', [Validators.required]),
-        path: new FormControl( { value: '', disabled: !this.collection.isNew }, [Validators.required])
-      });
+      name: nameControl,
+      path: pathControl
+    });
+
+    if (!this.collection.isNew) {
+      nameControl.patchValue(this.collection.name);
+      pathControl.patchValue(this.collection.path);
+    }
   }
   // </editor-fold>
 
@@ -80,23 +88,16 @@ export class CollectionDialogComponent implements OnInit {
   // <editor-fold desc='UI triggered methods'>
   public cancel(): void {
     this.controller.cancelDialog();
-    // if (this.baseItem.isNew) {
-    //   this.listController.cancelDialog();
-    // } else {
-    //   this.cardController.cancelDialog();
-    // }
   }
 
   public save(): void {
+    this.commitForm();
     this.controller.commitDialog(this.collection);
-    // this.cardController
-    //   .commitEdit(this.collection as CollectionEditItem);
   }
 
   public create(): void {
+    this.commitForm();
     this.controller.commitDialog(this.collection);
-    // this.listController
-    //   .commitCreate(this.collection as CollectionNewItem);
   }
 
   public getErrorMessage(name: string): string | undefined {
@@ -108,4 +109,10 @@ export class CollectionDialogComponent implements OnInit {
   }
   // </editor-fold>
 
+  // <editor-fold desc='Private methods'>
+  private commitForm(): void {
+    this.collection.name = this.collectionData.get('name').value;
+    this.collection.path = this.collectionData.get('path').value;
+  }
+  // </editor-fold>
 }
