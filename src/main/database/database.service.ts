@@ -1,17 +1,17 @@
 import { inject, injectable } from 'inversify';
-import { createConnection, getConnection, getRepository } from 'typeorm';
+import { createConnection, getConnection } from 'typeorm';
 import { Connection as TypeOrmConnection } from 'typeorm';
 import { Repository } from 'typeorm';
 import 'reflect-metadata';
 
 import { ConnectionType, LogSource, TargetType } from '@ipc';
-import { DtoConfiguration, DtoConnection } from '@ipc';
+import { DtoConnection } from '@ipc';
 import { IConfigurationService } from '../data';
 import { ILogService } from '../system';
 
-import { Collection, Picture } from './entities';
-
+import { Collection, Picture, Tag } from './entities';
 import SERVICETYPES from '../di/service.types';
+
 
 export interface IDatabaseService {
   getCollectionRepository(): Repository<Collection>;
@@ -45,7 +45,7 @@ export class DatabaseService implements IDatabaseService {
     this.logService.debug(LogSource.Main, 'in initialize DatabaseService');
     return this.connectByName(
           this.getConnectionNameForTargetType(TargetType.PICTURES),
-          [Collection, Picture]);
+          [Collection, Picture, Tag]);
   }
   // </editor-fold>
 
