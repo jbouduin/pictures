@@ -44,7 +44,6 @@ export class CollectionCardController extends BaseCardController<CollectionEditI
       new ThumbCardFooterParams(undefined, 'icon-button hover red', 'delete', this.remove.bind(this))
     ]
   }
-
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>

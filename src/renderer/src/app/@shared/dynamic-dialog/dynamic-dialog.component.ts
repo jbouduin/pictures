@@ -1,8 +1,9 @@
 import { Component, Inject, Injector, OnInit } from '@angular/core';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
-
+import { ComponentType } from '@angular/cdk/portal';
+import { MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { BaseItem } from '../thumb/base-item';
-import { DynamicDialogParams, DynamicDialogParamsData } from './dynamic-dialog.params';
+import { DynamicDialogParamsData } from './dynamic-dialog.params';
+import { DynamicDialogController } from './dynamic-dialog.types';
 
 @Component({
   selector: 'app-dynamic-dialog',
@@ -11,24 +12,29 @@ import { DynamicDialogParams, DynamicDialogParamsData } from './dynamic-dialog.p
 })
 export class DynamicDialogComponent implements OnInit {
 
-  // <editor-fold desc='Private properties'>
+  // <editor-fold desc='Public properties'>
   public injector: Injector;
+  public component: ComponentType<any>;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
   public constructor(
     private readonly inj: Injector,
     private dialogRef: MatDialogRef<DynamicDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public params: DynamicDialogParamsData<any>) { }
+    @Inject(MAT_DIALOG_DATA) private params: DynamicDialogParamsData<any>) {
+    this.component = params.component;
+    }
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methods'>
   public ngOnInit(): void {
+    const controller = new  DynamicDialogController(this.params.cancelDialog, this.params.commitDialog);
     this.injector = Injector.create(
     {
       parent: this.inj,
       providers: [
-        { provide: BaseItem, useValue: this.params.item }
+        { provide: BaseItem, useValue: this.params.item },
+        { provide: DynamicDialogController, useValue: controller}
       ]
     });
   }

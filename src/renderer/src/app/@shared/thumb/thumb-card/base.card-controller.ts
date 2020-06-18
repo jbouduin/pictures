@@ -58,6 +58,7 @@ export abstract class BaseCardController<E extends BaseItem, DtoGet extends DtoG
 
   // <editor-fold desc='Public Edit related methods'>
   public edit(id: number): void {
+    console.log('edit', id);
     const request: IpcDataRequest = this.dataRequestFactory.createUntypedDataRequest(
       DataVerb.GET,
       `${this.root}/${id}`);
@@ -67,7 +68,9 @@ export abstract class BaseCardController<E extends BaseItem, DtoGet extends DtoG
         const params: DynamicDialogParams<E> = {
           data: {
             component: this.editDialogComponent,
-            item: this.itemFactory.getDtoToEditItem(response.data)
+            item: this.itemFactory.getDtoToEditItem(response.data),
+            cancelDialog: this.cancelDialog.bind(this),
+            commitDialog: this.commitEdit.bind(this)
           },
           width: '600px'
         };

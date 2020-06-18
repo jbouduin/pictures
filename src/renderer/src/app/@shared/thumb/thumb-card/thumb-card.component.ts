@@ -38,5 +38,10 @@ export class ThumbCardComponent implements OnInit {
     };
   }
   // </editor-fold>
-
+  public trackByIcon(_i: number, obj: any) {
+    return obj.icon;
+  }
+  public ccc(): void {
+    console.log('click')
+  }
 }

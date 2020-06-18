@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { BaseItem } from '@shared';
+import { BaseItem, DynamicDialogController } from '@shared';
 import { CollectionNewItem } from '../items/collection.new-item';
 import { CollectionEditItem } from '../items/collection.edit-item';
-import { CollectionCardController } from '../controllers/collection.card-controller';
-import { CollectionListController } from '../controllers/collection.list-controller';
 
 
 @Component({
@@ -55,14 +53,11 @@ export class CollectionDialogComponent implements OnInit {
   }
   // </editor-fold>
 
-
-
   // <editor-fold desc='Constructor & C°'>
   public constructor(
     private formBuilder: FormBuilder,
-    private cardController: CollectionCardController,
-    private listController: CollectionListController,
-    private baseItem: BaseItem) {
+    private controller: DynamicDialogController,
+    baseItem: BaseItem) {
 
     this.collection = baseItem.isNew ?
       (baseItem as any) as CollectionNewItem :
@@ -84,21 +79,24 @@ export class CollectionDialogComponent implements OnInit {
 
   // <editor-fold desc='UI triggered methods'>
   public cancel(): void {
-    if (this.baseItem.isNew) {
-      this.listController.cancelDialog();
-    } else {
-      this.cardController.cancelDialog();
-    }
+    this.controller.cancelDialog();
+    // if (this.baseItem.isNew) {
+    //   this.listController.cancelDialog();
+    // } else {
+    //   this.cardController.cancelDialog();
+    // }
   }
 
   public save(): void {
-    this.cardController
-      .commitEdit(this.collection as CollectionEditItem);
+    this.controller.commitDialog(this.collection);
+    // this.cardController
+    //   .commitEdit(this.collection as CollectionEditItem);
   }
 
   public create(): void {
-    this.listController
-      .commitCreate(this.collection as CollectionNewItem);
+    this.controller.commitDialog(this.collection);
+    // this.listController
+    //   .commitCreate(this.collection as CollectionNewItem);
   }
 
   public getErrorMessage(name: string): string | undefined {

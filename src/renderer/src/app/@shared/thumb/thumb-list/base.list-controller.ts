@@ -14,6 +14,7 @@ import { PaginationParams } from '../../pagination/pagination.params';
 import { ListItem } from './list-item';
 import { BaseItem } from '../base-item';
 import { BaseListItemFactory } from './base.list-item-factory';
+import { DynamicDialogParams } from '@shared';
 
 export abstract class BaseListController<
   L extends ListItem, N extends BaseItem,
@@ -91,16 +92,17 @@ export abstract class BaseListController<
 
   // <editor-fold desc='Public Create related methods'>
   public create(): void {
-    this.dialogRef = this.dialog.open(
-      DynamicDialogComponent,
-      {
-        data: {
-          component: this.newDialogComponent,
-          item: this.itemFactory.createNewItem()
-        },
-        width: '600px'
-      }
-    );
+    const params: DynamicDialogParams<N> = {
+      data: {
+        component: this.newDialogComponent,
+        item: this.itemFactory.createNewItem(),
+        cancelDialog: this.cancelDialog.bind(this),
+        commitDialog: this.commitCreate.bind(this)
+      },
+      width: '600px'
+
+    }
+    this.dialogRef = this.dialog.open(DynamicDialogComponent, params);
     this.dialogRef.afterClosed().subscribe( () => this.dialogRef = undefined);
   }
 

@@ -3,6 +3,7 @@ export * from './confirmation-dialog/confirmation-dialog.params';
 
 export * from './dynamic-dialog/dynamic-dialog.component';
 export * from './dynamic-dialog/dynamic-dialog.params';
+export * from './dynamic-dialog/dynamic-dialog.types';
 
 export * from './floating-button/floating-button.component';
 export * from './floating-button/floating-button.params';
