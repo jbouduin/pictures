@@ -7,7 +7,8 @@ const SERVICETYPES = {
   ImageService: Symbol('ImageService'),
   LogService: Symbol('LogService'),
   PictureService: Symbol('PictureService'),
-  QueueService: Symbol('QueueService')
+  QueueService: Symbol('QueueService'),
+  TagService: Symbol('TagService')
 };
 
 export default SERVICETYPES;

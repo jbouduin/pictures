@@ -10,6 +10,7 @@ import { ILogService } from '../system';
 import { IConfigurationService } from './configuration';
 import { ICollectionService } from './pictures/collection.service';
 import { RoutedRequest } from './routed-request';
+import { ITagService } from './tags/tag.service';
 
 import SERVICETYPES from '../di/service.types';
 
@@ -39,7 +40,8 @@ export class DataRouterService implements IDataRouterService {
   public constructor(
     @inject(SERVICETYPES.LogService) private logService: ILogService,
     @inject(SERVICETYPES.ConfigurationService) private configurationService: IConfigurationService,
-    @inject(SERVICETYPES.CollectionService) private collectionService: ICollectionService) {
+    @inject(SERVICETYPES.CollectionService) private collectionService: ICollectionService,
+    @inject(SERVICETYPES.TagService) private tagService: ITagService) {
     this.deleteRoutes = new Collections.Dictionary<string, RouteCallback>();
     this.getRoutes = new Collections.Dictionary<string, RouteCallback>();
     this.postRoutes = new Collections.Dictionary<string, RouteCallback>();
@@ -52,6 +54,7 @@ export class DataRouterService implements IDataRouterService {
     this.logService.verbose(LogSource.Main, 'in initialize DataRouterService');
     this.configurationService.setRoutes(this);
     this.collectionService.setRoutes(this);
+    this.tagService.setRoutes(this);
     this.logService.verbose(LogSource.Main, 'registered DELETE routes:');
     this.deleteRoutes.keys().forEach(route => this.logService.verbose(LogSource.Main, route));
     this.logService.verbose(LogSource.Main, 'registered GET routes:');

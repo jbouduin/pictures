@@ -12,6 +12,7 @@ import { ShellModule } from './shell';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { TagModule } from './tag';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { AppComponent } from './app.component';
     ShellModule,
     CollectionModule,
     PictureModule,
+    TagModule,
     AppRoutingModule // must be imported as the last module as it contains the fallback route
   ],
   providers: [],

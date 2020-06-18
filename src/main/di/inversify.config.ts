@@ -9,6 +9,7 @@ import { IImageService, ImageService } from '../system';
 import { ILogService, LogService } from '../system';
 import { IPictureService, PictureService } from '../data';
 import { IQueueService, QueueService } from '../system';
+import { ITagService, TagService } from '../data';
 
 import SERVICETYPES from './service.types';
 
@@ -24,6 +25,7 @@ container.bind<IImageService>(SERVICETYPES.ImageService).to(ImageService);
 container.bind<ILogService>(SERVICETYPES.LogService).to(LogService).inSingletonScope();
 container.bind<IPictureService>(SERVICETYPES.PictureService).to(PictureService);
 container.bind<IQueueService>(SERVICETYPES.QueueService).to(QueueService).inSingletonScope();
+container.bind<ITagService>(SERVICETYPES.TagService).to(TagService);
 // </editor-fold>
 
 export default container;

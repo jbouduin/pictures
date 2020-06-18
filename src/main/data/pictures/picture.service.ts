@@ -32,7 +32,7 @@ export class PictureService implements IPictureService {
   // </editor-fold>
 
   // <editor-fold desc='IDataService interface methods'>
-  public setRoutes(router: IDataRouterService): void { }
+  public setRoutes(_router: IDataRouterService): void { }
   // </editor-fold>
 
   // <editor-fold desc='IPictureService interface methods'>
