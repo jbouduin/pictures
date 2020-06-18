@@ -44,7 +44,10 @@ export class ThumbListComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private treeController: BaseTreeController<BaseTreeItem, DtoTreeBase>,
     public cardController: BaseCardController<BaseItem, DtoGetBase, DtoSetBase>,
-    private listController: BaseListController<ListItem, BaseItem, DtoListBase, DtoNewBase>) { }
+    private listController: BaseListController<ListItem, BaseItem, DtoListBase, DtoNewBase>) {
+      this.listController.subscribeAfterDelete(this.cardController.afterDelete);
+      this.listController.subscribeAfterUpdate(this.cardController.afterUpdate);
+    }
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methods'>
@@ -62,4 +65,6 @@ export class ThumbListComponent implements OnInit {
     this.treeController.toggleTreeItem(node);
     this.listController.loadList(this.treeController.currentQueryString);
   }
+  // </editor-fold>
+
 }

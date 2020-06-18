@@ -23,8 +23,7 @@
           </div>
           <div class="thumb-actions">
             <ng-container *ngFor="let params of controller.thumbCardFooterParams, trackBy:trackByIcon">
-              <button class="{{params.cssClass}}" (click)="ccc()">
-              <!-- "params.click(item.id)"> -->
+              <button class="{{params.cssClass}}" (click)="params.click(item)">
                 <mat-icon>
                   {{params.icon}}
                 </mat-icon>

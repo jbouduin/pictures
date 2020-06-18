@@ -15,6 +15,8 @@ import { ListItem } from './list-item';
 import { BaseItem } from '../base-item';
 import { BaseListItemFactory } from './base.list-item-factory';
 import { DynamicDialogParams } from '@shared';
+import { EventEmitter } from '@angular/core';
+import { Subscription } from 'rxjs';
 
 export abstract class BaseListController<
   L extends ListItem, N extends BaseItem,
@@ -29,6 +31,8 @@ export abstract class BaseListController<
   private listItems: Array<L>;
   private dialogRef: MatDialogRef<any>;
   private currentPage: number;
+  private afterDeleteSubscription: Subscription;
+  private afterUpdateSubscription: Subscription;
   // </editor-fold>
 
   // <editor-fold desc='Protected properties'>
@@ -129,7 +133,33 @@ export abstract class BaseListController<
   }
   // </editor-fold>
 
+  // <editor-fold desc='Private subscribe methods'>
+  private afterDelete(id: number) {
+    const index = this.listItems.findIndex( item => item.id === id);
+    if (index >= 0) {
+      this.listItems.splice(index, 1);
+    }
+  }
+
+  private afterUpdate(item: any) {
+    const listItem = this.itemFactory.listDtoToListItem(item);
+    const index = this.listItems.findIndex(item => item.id === listItem.id);
+    this.listItems[index] = listItem;
+  }
+  // </editor-fold>
+
   // <editor-fold desc='Other methods'>
+  public subscribeAfterDelete(emitter: EventEmitter<number>): void {
+    if (!this.afterDeleteSubscription) {
+      this.afterDeleteSubscription = emitter.subscribe(this.afterDelete.bind(this));
+    }
+  }
+
+  public subscribeAfterUpdate(emitter: EventEmitter<BaseItem>) {
+    if (!this.afterUpdateSubscription) {
+      this.afterUpdateSubscription = emitter.subscribe(this.afterUpdate.bind(this));
+    }
+  }
   public cancelDialog(): void {
     if (this.dialogRef) {
       // TODO check for changes
@@ -155,4 +185,6 @@ export abstract class BaseListController<
     return this.listItems;
   }
   // </editor-fold>
+
+
 }

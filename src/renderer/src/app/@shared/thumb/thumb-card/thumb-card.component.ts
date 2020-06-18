@@ -11,8 +11,11 @@ import { BaseCardController } from './base.card-controller';
   styleUrls: ['./thumb-card.component.scss']
 })
 export class ThumbCardComponent implements OnInit {
-  @Input() item: ListItem;
-  @Input() controller: BaseCardController<BaseItem,  DtoGetBase, DtoSetBase>;
+
+  // <editor-fold desc='@Input properties'>
+  @Input() public item: ListItem;
+  @Input() public controller: BaseCardController<BaseItem, DtoGetBase, DtoSetBase>;
+  // </editor-fold>
 
   // <editor-fold desc='Public properties'>
   public thumbnailStyle: Object;
@@ -38,10 +41,11 @@ export class ThumbCardComponent implements OnInit {
     };
   }
   // </editor-fold>
+
+  // <editor-fold desc='UI Triggered method'>
   public trackByIcon(_i: number, obj: any) {
     return obj.icon;
   }
-  public ccc(): void {
-    console.log('click')
-  }
+  // </editor-fold>
+
 }

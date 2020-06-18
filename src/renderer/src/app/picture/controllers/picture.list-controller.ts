@@ -13,10 +13,6 @@ import { PictureListItem } from '../items/picture.list-item';
 import { PictureListItemFactory } from '../factories/picture.list-item-factory';
 import { PictureDialogComponent } from '../picture-dialog/picture-dialog.component';
 
-// FIXME WARNING in Circular dependency detected:
-// src\renderer\src\app\collection\collection-dialog\collection-dialog.component.ts -> src\renderer\src\app\collection\new.controller.ts -
-// > src\renderer\src\app\collection\collection-dialog\collection-dialog.component.ts
-
 @Injectable()
 export class PictureListController extends BaseListController<
   PictureListItem, PictureNewItem, DtoListPicture, DtoNewPicture> {

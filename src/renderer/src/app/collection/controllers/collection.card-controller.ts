@@ -13,10 +13,6 @@ import { CollectionDialogComponent } from '../collection-dialog/collection-dialo
 import { CollectionListItem } from '../items/collection.list-item';
 import { CollectionCardItemFactory } from '../factories/collection.card-item-factory';
 
-// FIXME WARNING in Circular dependency detected:
-// src\renderer\src\app\collection\collection-dialog\collection-dialog.component.ts -> src\renderer\src\app\collection\new.controller.ts -
-// > src\renderer\src\app\collection\collection-dialog\collection-dialog.component.ts
-
 @Injectable()
 export class CollectionCardController extends BaseCardController<CollectionEditItem, DtoGetCollection, DtoSetCollection> {
 

@@ -13,6 +13,7 @@ import { DynamicDialogParams } from '../../dynamic-dialog/dynamic-dialog.params'
 import { BaseItem } from '../base-item';
 import { ThumbCardFooterParams } from './thumb-card-footer.params';
 import { BaseCardItemFactory } from './base.card-item-factory';
+import { EventEmitter } from '@angular/core';
 
 export abstract class BaseCardController<E extends BaseItem, DtoGet extends DtoGetBase, DtoSet extends DtoSetBase> {
 
@@ -38,6 +39,11 @@ export abstract class BaseCardController<E extends BaseItem, DtoGet extends DtoG
   public abstract get cardFooterIcon(): string;
   // </editor-fold>
 
+  // <editor-fold desc='Public properties'>
+  public afterUpdate: EventEmitter<BaseItem>;
+  public afterDelete: EventEmitter<number>;
+  // </editor-fold>
+
   // <editor-fold desc='Constructor & C°'>
   constructor(
     dialog: MatDialog,
@@ -50,18 +56,16 @@ export abstract class BaseCardController<E extends BaseItem, DtoGet extends DtoG
     this.dataRequestFactory = dataRequestFactory;
     this.itemFactory = itemFactory;
     this.dialogRef = undefined;
+    this.afterUpdate = new EventEmitter<BaseItem>();
+    this.afterDelete = new EventEmitter<number>();
   }
   // </editor-fold>
 
-  // <editor-fold desc='Abstract public methods'>
-  // </editor-fold>
-
   // <editor-fold desc='Public Edit related methods'>
-  public edit(id: number): void {
-    console.log('edit', id);
+  public edit(listItem: BaseItem): void {
     const request: IpcDataRequest = this.dataRequestFactory.createUntypedDataRequest(
       DataVerb.GET,
-      `${this.root}/${id}`);
+      `${this.root}/${listItem.id}`);
     this.ipcService
       .dataRequest<DtoGet>(request)
       .then(response => {
@@ -91,19 +95,16 @@ export abstract class BaseCardController<E extends BaseItem, DtoGet extends DtoG
     try {
       const response = await this.ipcService
         .dataRequest<any>(request);
-      // XXX const listItem = this.itemFactory.listDtoToListItem(response.data);
-      // const index = this.listItems.findIndex(item => item.id === listItem.id);
-      // this.listItems[index] = listItem;
+      this.afterUpdate.emit(response.data);
+
       if (this.dialogRef) {
         this.dialogRef.close();
       }
-      ;
-      return true; //listItem;
+      return true;
     }
     catch (error) {
-      // const listItem_1 = this.itemFactory.listDtoToListItem(error.data);
       alert(error.message);
-      return false; //listItem_1;
+      return false;
     }
   }
   // </editor-fold>
@@ -116,10 +117,10 @@ export abstract class BaseCardController<E extends BaseItem, DtoGet extends DtoG
     }
   }
 
-  public remove(_listItem: any): void {
+  public remove(listItem: BaseItem): void {
     const dialogParams = new ConfirmationDialogParams();
     dialogParams.okButtonLabel = 'Delete';
-    dialogParams.title = `Delete '${_listItem.name}'?`;
+    dialogParams.title = `Delete '${listItem.name}'?`;
     dialogParams.text = this.deleteDialogText;
 
     const confirmDialog = this.dialog.open(
@@ -133,13 +134,12 @@ export abstract class BaseCardController<E extends BaseItem, DtoGet extends DtoG
        if (dialogResult) {
          const request: IpcDataRequest = this.dataRequestFactory.createUntypedDataRequest(
            DataVerb.DELETE,
-           `${this.root}/${_listItem.id}`);
+           `${this.root}/${listItem.id}`);
          this.ipcService
            .dataRequest<string>(request)
            .then(
              _response => {
-    //           const index = this.listItems.findIndex( item => item.id === listItem.id);
-    //           this.listItems.splice(index, 1);
+               this.afterDelete.emit(listItem.id);
              },
              error => {
                alert(error.message);
@@ -148,7 +148,5 @@ export abstract class BaseCardController<E extends BaseItem, DtoGet extends DtoG
        }
      });
   }
-
-
   // </editor-fold>
 }

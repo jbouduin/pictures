@@ -8,10 +8,6 @@ import { BaseTreeController } from '@shared';
 import { PictureTreeItem } from '../items/picture-tree-item';
 import { PictureTreeItemFactory } from '../factories/picture.tree-item.factory';
 
-// FIXME WARNING in Circular dependency detected:
-// src\renderer\src\app\collection\collection-dialog\collection-dialog.component.ts -> src\renderer\src\app\collection\new.controller.ts -
-// > src\renderer\src\app\collection\collection-dialog\collection-dialog.component.ts
-
 @Injectable()
 export class PictureTreeController extends BaseTreeController<PictureTreeItem, DtoTreeBase> {
 

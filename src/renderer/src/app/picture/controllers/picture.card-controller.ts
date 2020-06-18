@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ComponentType } from '@angular/cdk/portal';
 import { MatDialog } from '@angular/material/dialog';
-import { ParamMap } from '@angular/router';
 
 import { DtoGetPicture, DtoSetPicture } from '@ipc';
 
@@ -10,10 +9,6 @@ import { BaseCardController, ThumbCardFooterParams } from '@shared';
 import { PictureEditItem } from '../items/picture.edit-item';
 import { PictureCardItemFactory } from '../factories/picture.card-item-factory';
 import { PictureDialogComponent } from '../picture-dialog/picture-dialog.component';
-
-// FIXME WARNING in Circular dependency detected:
-// src\renderer\src\app\collection\collection-dialog\collection-dialog.component.ts -> src\renderer\src\app\collection\new.controller.ts -
-// > src\renderer\src\app\collection\collection-dialog\collection-dialog.component.ts
 
 @Injectable()
 export class PictureCardController extends BaseCardController<PictureEditItem, DtoGetPicture, DtoSetPicture> {
