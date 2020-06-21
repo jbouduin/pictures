@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import { createConnection, getConnection, TreeRepository } from 'typeorm';
+import { createConnection, getConnection, TreeRepository, DeleteQueryBuilder } from 'typeorm';
 import { Connection as TypeOrmConnection } from 'typeorm';
 import { Repository } from 'typeorm';
 import 'reflect-metadata';
@@ -15,6 +15,7 @@ import SERVICETYPES from '../di/service.types';
 
 export interface IDatabaseService {
   getCollectionRepository(): Repository<Collection>;
+  getDeleteQueryBuilder(): DeleteQueryBuilder<any>;
   getPictureRepository(): Repository<Picture>;
   getTagRepository(): Repository<Tag>;
   getTagTreeRepository(): TreeRepository<Tag>;
@@ -35,6 +36,10 @@ export class DatabaseService implements IDatabaseService {
     return this
       .getConnectionByTargetType(TargetType.PICTURES)
       .getRepository(Collection);
+  }
+
+  public getDeleteQueryBuilder(): DeleteQueryBuilder<any> {
+    return this.getConnectionByTargetType(TargetType.PICTURES).createQueryBuilder().delete();
   }
 
   public getPictureRepository(): Repository<Picture> {

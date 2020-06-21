@@ -42,8 +42,41 @@ export class TagService implements ITagService {
   // </editor-fold>
 
   // <editor-fold desc='DELETE route callback'>
-  private async deleteTag(_request: RoutedRequest): Promise<DtoUntypedDataResponse> {
-    throw new Error('Not implemented');
+  private async deleteTag(request: RoutedRequest): Promise<DtoUntypedDataResponse> {
+    const repository = this.databaseService.getTagRepository();
+
+    try {
+      await repository.findOneOrFail(request.params.tag);
+      try {
+        const deleteQueryBuilder = this.databaseService.getDeleteQueryBuilder();
+        await deleteQueryBuilder
+          .from('tag_closure')
+          .where('tag_closure.id_ancestor = :id', { id: Number.parseInt(request.params.tag) })
+          .orWhere('tag_closure.id_descendant = :id', { id: Number.parseInt(request.params.tag) })
+          .execute();
+        await deleteQueryBuilder.from(Tag).where("tag.id = :id", { id: Number.parseInt(request.params.tag) }).execute();
+        const response: DtoUntypedDataResponse = {
+          status: DataStatus.Ok
+        };
+        return response;
+      }
+      catch (error) {
+        this.logService.error(LogSource.Main, error);
+        const errorResponse: DtoUntypedDataResponse = {
+          status: DataStatus.Error,
+          message: `${error.name}: ${error.message}`
+        };
+        return errorResponse;
+      }
+    }
+    catch (error) {
+      this.logService.error(LogSource.Main, error);
+      const errorResponse: DtoUntypedDataResponse = {
+        status: DataStatus.NotFound,
+        message: `${error.name}: ${error.message}`
+      };
+      return errorResponse;
+    }
   }
   // </editor-fold>
 
