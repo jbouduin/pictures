@@ -19,5 +19,9 @@ export class CollectionTreeItemFactory extends BaseTreeItemFactory<BaseTreeItem,
   public createTreeDataSet(_dto: Array<DtoTreeBase>): Array<BaseTreeItem> {
     return undefined;
   }
+
+  public createTreeItem(dto: DtoTreeBase): BaseTreeItem {
+    return undefined;
+  }
   // </editor-fold>
 }

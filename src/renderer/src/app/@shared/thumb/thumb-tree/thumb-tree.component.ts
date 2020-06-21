@@ -34,6 +34,7 @@ export class ThumbTreeComponent implements OnInit, OnChanges {
   public ngOnInit(): void { }
 
   public ngOnChanges(changes: SimpleChanges): void {
+    console.log('ngOnChanges');
     for (const propName in changes) {
       if (changes.hasOwnProperty(propName)) {
         switch (propName) {

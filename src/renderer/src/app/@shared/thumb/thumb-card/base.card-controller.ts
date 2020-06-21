@@ -40,7 +40,7 @@ export abstract class BaseCardController<E extends BaseItem, DtoGet extends DtoG
   // </editor-fold>
 
   // <editor-fold desc='Public properties'>
-  public afterUpdate: EventEmitter<BaseItem>;
+  public afterUpdate: EventEmitter<number>;
   public afterDelete: EventEmitter<number>;
   // </editor-fold>
 
@@ -56,7 +56,7 @@ export abstract class BaseCardController<E extends BaseItem, DtoGet extends DtoG
     this.dataRequestFactory = dataRequestFactory;
     this.itemFactory = itemFactory;
     this.dialogRef = undefined;
-    this.afterUpdate = new EventEmitter<BaseItem>();
+    this.afterUpdate = new EventEmitter<number>();
     this.afterDelete = new EventEmitter<number>();
   }
   // </editor-fold>
@@ -87,7 +87,7 @@ export abstract class BaseCardController<E extends BaseItem, DtoGet extends DtoG
     );
   }
 
-  public async commitEdit(editedItem: E): Promise<any> {
+  public async commitEdit(editedItem: E): Promise<void> {
     const request: IpcDataRequest = this.dataRequestFactory.createDataRequest(
       DataVerb.PUT,
       `${this.root}/${editedItem.id}`,
@@ -95,16 +95,14 @@ export abstract class BaseCardController<E extends BaseItem, DtoGet extends DtoG
     try {
       const response = await this.ipcService
         .dataRequest<any>(request);
-      this.afterUpdate.emit(response.data);
+      this.afterUpdate.emit(response.data.id);
 
       if (this.dialogRef) {
         this.dialogRef.close();
       }
-      return true;
     }
     catch (error) {
       alert(error.message);
-      return false;
     }
   }
   // </editor-fold>

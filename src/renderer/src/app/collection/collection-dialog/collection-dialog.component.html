@@ -16,7 +16,6 @@
       <input matInput required
         placeholder="enter a name for your collection"
         formControlName="name"/>
-        <!-- [(ngModel)]="collection.name"/> -->
       <mat-error>{{ getErrorMessage('name') }}</mat-error>
     </mat-form-field>
   </div>
@@ -26,8 +25,6 @@
       <input matInput required
         placeholder="enter the location of your collection"
         formControlName="path" />
-        <!-- [(ngModel)]="collection.path"
-      /> -->
       <mat-error>{{ getErrorMessage('path') }}</mat-error>
     </mat-form-field>
   </div>

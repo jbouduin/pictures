@@ -11,6 +11,9 @@ export class CollectionTreeController extends BaseTreeController<BaseTreeItem, D
 
   // <editor-fold desc='Implementation of protected abstract getters'>
   protected get root(): string { return ''; }
+  protected get subscribeToAfterCreate(): boolean { return false; }
+  protected get subscribeToAfterDelete(): boolean { return false; }
+  protected get subscribeToAfterUpdate(): boolean { return false; }
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>

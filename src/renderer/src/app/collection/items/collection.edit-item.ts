@@ -15,8 +15,7 @@ export class CollectionEditItem extends BaseItem {
 
   // <editor-fold desc='Constructor & C°'>
   public constructor(dtoCollection: DtoGetCollection) {
-    super(dtoCollection.id);
-    this.name = dtoCollection.name;
+    super(dtoCollection.id, dtoCollection.name);
     this.path = dtoCollection.path;
     this.created = dtoCollection.created;
     this.modified = dtoCollection.modified;

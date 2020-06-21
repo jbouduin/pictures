@@ -42,7 +42,9 @@ export class CollectionService implements ICollectionService {
     // DELETE
     router.delete('/collection/:collection', this.deleteCollection.bind(this));
     // GET
-    router.get('/collection', this.getCollections.bind(this));
+    router.get('/collection', this.getCollectionListItems.bind(this));
+    router.get('/collection/list', this.getCollectionListItems.bind(this));
+    router.get('/collection/list/:collection', this.getCollectionListItem.bind(this));
     router.get('/collection/:collection', this.getCollection.bind(this));
     router.get('/collection/:collection/pictures', this.getPictures.bind(this));
     router.get('/collection/:collection/tree', this.getTree.bind(this));
@@ -89,7 +91,72 @@ export class CollectionService implements ICollectionService {
   // </editor-fold>
 
   // <editor-fold desc='GET routes callbacks'>
-  private async getCollections(request: RoutedRequest): Promise<DtoListDataResponse<DtoListCollection>> {
+  private async getCollectionListItem(request: RoutedRequest): Promise<DtoDataResponse<DtoListCollection>> {
+
+    const collectionQry = this.databaseService
+      .getCollectionRepository()
+      .createQueryBuilder('collection')
+      .select('id')
+      .where ('id = :id', { id: Number.parseInt(request.params.collection) })
+      .addSelect('name')
+      .addSelect('path')
+      .leftJoin( (cntQry) => {
+        return cntQry
+          .select('collectionId')
+          .addSelect("id as thumbId")
+          .addSelect("path as thumbPath")
+          .addSelect("name as thumbName")
+          .addSelect("COUNT(*) AS count")
+          .from('picture', null)
+          .orderBy("path", "DESC")
+          .addOrderBy("thumbName", "DESC")
+          .groupBy("picture.collectionId")
+        },
+        'cnt',
+        'cnt.collectionId = collection.Id',
+      )
+      .addSelect('cnt.count')
+      .addSelect('cnt.thumbId')
+      .addSelect('cnt.thumbPath')
+      .addSelect('cnt.thumbName')
+      .orderBy('collection.name');
+    this.logService.debug(LogSource.Main, collectionQry.getQuery());
+
+    try {
+      const collection = await collectionQry.getRawOne();
+      let thumbnailPath: string = undefined;
+      if (collection.thumbName) {
+        const collectionThumbnailPath = `${this.configurationService.environment.thumbBaseDirectory}/${collection.id}`;
+        const thumbnailExtension = collection.thumbName.split('.').pop();
+        thumbnailPath = `${collectionThumbnailPath}/${collection.thumbId}.${thumbnailExtension}`;
+        if (!this.fileService.fileOrDirectoryExistsSync(thumbnailPath)) {
+          thumbnailPath = `${collection.path}/${collection.thumbPath}/${collection.thumbName}`;
+        }
+      }
+      const result: DtoListCollection = {
+        id: collection.id,
+        name: collection.name,
+        path: collection.path,
+        pictures: collection.count || 0,
+        thumbPath: thumbnailPath
+      };
+      const response: DtoDataResponse<DtoListCollection> = {
+        status: DataStatus.Ok,
+        data: result
+      };
+      return response;
+    }
+    catch (error) {
+      this.logService.error(LogSource.Main, error);
+      const errorResponse: DtoDataResponse<DtoListCollection> = {
+        status: DataStatus.Error,
+        message: `${error.name}: ${error.message}`
+      };
+      return errorResponse;
+    }
+  }
+
+  private async getCollectionListItems(request: RoutedRequest): Promise<DtoListDataResponse<DtoListCollection>> {
     const paginationTake = request.queryParams.pageSize || 20;
     const paginationSkip = ((request.queryParams.page || 1) - 1) * paginationTake;
 
@@ -147,22 +214,22 @@ export class CollectionService implements ICollectionService {
         };
         return result;
       });
-      const result_1: DtoListDataResponse<DtoListCollection> = {
+      const errorResult: DtoListDataResponse<DtoListCollection> = {
         status: DataStatus.Ok,
         data: {
           listData: dtoCollections,
           count: count
         }
       };
-      return result_1;
+      return errorResult;
     }
     catch (error) {
       this.logService.error(LogSource.Main, error);
-      const result_2: DtoListDataResponse<DtoListCollection> = {
+      const errorResult: DtoListDataResponse<DtoListCollection> = {
         status: DataStatus.Error,
         message: `${error.name}: ${error.message}`
       };
-      return result_2;
+      return errorResult;
     }
   }
 
@@ -186,11 +253,11 @@ export class CollectionService implements ICollectionService {
       return result;
     }
     catch (error) {
-      const result_1: DtoDataResponse<DtoGetCollection> = {
+      const errorResult: DtoDataResponse<DtoGetCollection> = {
         status: DataStatus.Conflict,
         message: `${error.name}: ${error.message}`
       };
-      return result_1;
+      return errorResult;
     }
   }
 
@@ -244,10 +311,10 @@ export class CollectionService implements ICollectionService {
     }
     catch (error) {
       this.logService.error(LogSource.Main, 'found no collection');
-      const result_1: DtoListDataResponse<DtoListPicture> = {
+      const errorResult: DtoListDataResponse<DtoListPicture> = {
         status: DataStatus.NotFound
       };
-      return result_1;
+      return errorResult;
     }
   }
 
@@ -282,7 +349,8 @@ export class CollectionService implements ICollectionService {
 
     const tree = new Array<DtoTreeBase>();
     const root: DtoTreeBase = {
-      label: collection.path,
+      name: collection.path,
+      id: undefined,
       queryString: undefined,
       children: new Array<DtoTreeBase>()
     };
@@ -325,18 +393,18 @@ export class CollectionService implements ICollectionService {
         pictures: 0,
         thumbPath: undefined,
       };
-      const result_1: DtoDataResponse<DtoListCollection> = {
+      const errorResult: DtoDataResponse<DtoListCollection> = {
         status: DataStatus.Ok,
         data: listItem
       };
-      return result_1;
+      return errorResult;
     }
     catch (error) {
-      const result_2: DtoDataResponse<DtoListCollection> = {
+      const errorResult: DtoDataResponse<DtoListCollection> = {
         status: DataStatus.Conflict,
         message: `${error.name}: ${error.message}`
       };
-      return result_2;
+      return errorResult;
     }
   }
 
@@ -351,11 +419,11 @@ export class CollectionService implements ICollectionService {
       return result;
     }
     catch (error) {
-      const result_1: DtoUntypedDataResponse = {
+      const errorResult: DtoUntypedDataResponse = {
         status: DataStatus.Error,
         message: `${error.name}: ${error.message}`
       };
-      return result_1;
+      return errorResult;
     }
   }
   // </editor-fold>
@@ -382,19 +450,19 @@ export class CollectionService implements ICollectionService {
         return result;
       }
       catch (e) {
-        const result_1: DtoDataResponse<DtoListCollection> = {
+        const errorResult: DtoDataResponse<DtoListCollection> = {
           status: DataStatus.Conflict,
           data: undefined
         };
-        return result_1;
+        return errorResult;
       }
     }
     catch (e) {
-      const result_2: DtoDataResponse<DtoListCollection> = {
+      const errorResult: DtoDataResponse<DtoListCollection> = {
         status: DataStatus.Conflict,
         data: undefined
       };
-      return result_2;
+      return errorResult;
     }
   }
   // </editor-fold>
@@ -436,7 +504,8 @@ export class CollectionService implements ICollectionService {
     const directChildren = paths.filter(path => path.length === level);
     directChildren.forEach(child => {
       const childItem: DtoTreeBase = {
-        label: child[level - 1],
+        name: child[level - 1],
+        id: undefined,
         queryString: `path=${child.join('/')}`,
         children: new Array<DtoTreeBase>()
       };

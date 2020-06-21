@@ -28,7 +28,8 @@ export class TagListItemFactory extends BaseListItemFactory<
 
   public newItemToNewDto(item: TagNewItem): DtoNewTag {
     const result: DtoNewTag = {
-      name: item.name
+      name: item.name,
+      canAssign: item.canAssign
     };
     return result;
   }

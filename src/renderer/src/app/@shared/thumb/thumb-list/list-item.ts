@@ -9,8 +9,8 @@ export abstract class ListItem extends BaseItem {
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor(id: number) {
-    super(id);
+  public constructor(id: number, name: string) {
+    super(id, name);
   }
   // </editor-fold>
 }

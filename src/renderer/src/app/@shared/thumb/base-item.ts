@@ -11,8 +11,9 @@ export abstract class BaseItem {
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor(id: number) {
+  public constructor(id: number, name: string) {
     this.id = id;
+    this.name = name;
   }
   // </editor-fold>
 

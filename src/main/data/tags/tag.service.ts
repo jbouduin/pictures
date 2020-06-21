@@ -6,7 +6,7 @@ import { IDatabaseService, Tag } from "../../database";
 import { ILogService } from "../../system";
 
 import SERVICETYPES from "di/service.types";
-import { DtoUntypedDataResponse, DtoDataResponse, DtoListDataResponse, DtoTreeBase, DataStatus } from "@ipc";
+import { DtoUntypedDataResponse, DtoDataResponse, DtoListDataResponse, DtoTreeBase, DataStatus, LogSource, DtoTreeItemData } from "@ipc";
 import { DtoGetTag, DtoListTag } from "@ipc";
 import { RoutedRequest } from "data/routed-request";
 export interface ITagService extends IDataService {
@@ -27,8 +27,11 @@ export class TagService implements ITagService {
     // DELETE
     router.delete('/tag/:tag', this.deleteTag.bind(this));
     // GET
-    router.get('/tag', this.getTags.bind(this));
-    router.get('/tag/tree', this.getTree.bind(this));
+    router.get('/tag', this.getTagListItems.bind(this));
+    router.get('/tag/list', this.getTagListItems.bind(this));
+    router.get('/tag/list/:tag', this.getTagListItem.bind(this));
+    router.get('/tag/tree', this.getTreeItems.bind(this));
+    router.get('/tag/tree/:tag', this.getTreeItem.bind(this));
     router.get('/tag/:tag', this.getTag.bind(this));
     // router.get('/tag/:tag/pictures', this.getPictures.bind(this));
     // POST
@@ -46,51 +49,233 @@ export class TagService implements ITagService {
 
   // <editor-fold desc='GET routes callbacks'>
   private async getTag(request: RoutedRequest): Promise<DtoDataResponse<DtoGetTag>> {
-    throw new Error('Not implemented');
+    try {
+      const tag = await this.databaseService
+        .getTagRepository()
+        .findOneOrFail(request.params.tag);
+      const result: DtoGetTag = {
+        id: tag.id,
+        created: tag.created,
+        modified: tag.modified,
+        version: tag.version,
+        name: tag.name,
+        canAssign: tag.canAssign
+      };
+      const response: DtoDataResponse<DtoGetTag> = {
+        status: DataStatus.Ok,
+        data: result
+      };
+      return response;
+    }
+    catch (error) {
+      const errorResponse: DtoDataResponse<DtoGetTag> = {
+        status: DataStatus.Conflict,
+        message: `${error.name}: ${error.message}`
+      };
+      return errorResponse;
+    }
   }
 
-  private async getTags(request: RoutedRequest): Promise<DtoListDataResponse<DtoListTag>> {
-    console.log('get tags');
-    const result_1: DtoListDataResponse<DtoListTag> = {
-      status: DataStatus.Ok,
-      data: {
-        listData: new Array<DtoListTag>(),
-        count: 0
-      }
-    };
-    return result_1;
+  private async getTagListItem(request: RoutedRequest): Promise<DtoDataResponse<DtoListTag>> {
+    try {
+      const tag = await this.databaseService.getTagRepository()
+        .findOneOrFail(request.params.tag);
+      const dtoListTag: DtoListTag = {
+          id: tag.id,
+          name: tag.name,
+          canAssign: tag.canAssign,
+          pictures: 0,
+          thumbPath: undefined
+        };
+
+      const response: DtoDataResponse<DtoListTag> = {
+        status: DataStatus.Ok,
+        data: dtoListTag
+      };
+      return response;
+    }
+    catch (error) {
+      this.logService.error(LogSource.Main, error);
+      const errorResponse: DtoDataResponse<DtoListTag> = {
+        status: DataStatus.NotFound
+      };
+      return errorResponse;
+    }
   }
 
-  private async getTree(request: RoutedRequest): Promise<DtoDataResponse<Array<DtoTreeBase>>> {
+  private async getTagListItems(request: RoutedRequest): Promise<DtoListDataResponse<DtoListTag>> {
+    const paginationTake = request.queryParams.pageSize || 20;
+    const paginationSkip = ((request.queryParams.page || 1) - 1) * paginationTake;
+    // const tagPath = request.queryParams.path;
+    try {
+      // let where: any = {};
+      // if (tagPath) {
+      //   where.path = Like(`${tagPath}%`)
+      // }
+      const qryResult = await this.databaseService.getTagRepository()
+        .findAndCount({
+          // where,
+          skip: paginationSkip,
+          take: paginationTake
+        });
+
+      const result = qryResult[0].map(tag => {
+        const dtoListTag: DtoListTag = {
+          id: tag.id,
+          name: tag.name,
+          canAssign: tag.canAssign,
+          pictures: 0,
+          thumbPath: undefined
+        };
+        return dtoListTag;
+      });
+      const response: DtoListDataResponse<DtoListTag> = {
+        status: DataStatus.Ok,
+        data: {
+          listData: result,
+          count: qryResult[1]
+        }
+      };
+      return response;
+    }
+    catch (error) {
+      this.logService.error(LogSource.Main, error);
+      const errorResponse: DtoListDataResponse<DtoListTag> = {
+        status: DataStatus.NotFound
+      };
+      return errorResponse;
+    }
+  }
+
+  private async getTreeItems(_request: RoutedRequest): Promise<DtoDataResponse<Array<DtoTreeBase>>> {
     const tags = await this.databaseService
       .getTagTreeRepository()
       .findTrees();
 
-    const result = new Array<DtoTreeBase>();
+    const resultArray = new Array<DtoTreeBase>();
     const root: DtoTreeBase = {
-      label: 'all',
+      name: 'all',
+      id: 0,
       queryString: undefined,
       children: tags.map( (tag: Tag) => this.convertTagToTreeBase(tag))
     };
-    result.push(root);
-    console.log(JSON.stringify(result, null, 2));
-    const result_1: DtoDataResponse<Array<DtoTreeBase>> = {
+    resultArray.push(root);
+    const response: DtoDataResponse<Array<DtoTreeBase>> = {
       status: DataStatus.Ok,
-      data: result
+      data: resultArray
     };
-    return result_1;
+    return response;
+  }
+
+  private async getTreeItem(request: RoutedRequest): Promise<DtoDataResponse<DtoTreeItemData<DtoTreeBase>>> {
+    try {
+
+      const tag = await this.databaseService
+         .getTagRepository()
+         .findOneOrFail(request.params.tag);
+
+      const treeRepository = this.databaseService.getTagTreeRepository();
+      const tagWithChildren = await treeRepository
+        .createDescendantsQueryBuilder("tag", "tagClosure", tag)
+        .getOne();
+      const parents = await treeRepository.findAncestors(tag);
+      // console.log('parents', parents);
+      const result: DtoTreeItemData<DtoTreeBase> = {
+        treeItem: this.convertTagToTreeBase(tagWithChildren),
+        parent: parents.length > 1 ? parents[1].id : 0
+      };
+      // const parents2 = await treeRepository.findAncestorsTree(tag);
+      // console.log('parents2', parents);
+      // console.log(JSON.stringify(result, null, 2));
+      const response: DtoDataResponse<DtoTreeItemData<DtoTreeBase>> = {
+        status: DataStatus.Ok,
+        data: result
+      };
+
+      return response;
+    }
+    catch (error) {
+      const errorResponse: DtoDataResponse<DtoTreeItemData<DtoTreeBase>> = {
+        status: DataStatus.Conflict,
+        message: `${error.name}: ${error.message}`
+      };
+      return errorResponse;
+    }
   }
   // </editor-fold>
 
   // <editor-fold desc='POST routes callbacks'>
   private async createTag(request: RoutedRequest): Promise<DtoDataResponse<DtoListTag>> {
-    throw new Error('Not implemented');
+    const repository = this.databaseService
+      .getTagRepository();
+
+    const newTag = repository.create({
+      name: request.data.name,
+      canAssign: request.data.canAssign
+    });
+
+    try {
+      const tag = await repository.save(newTag);
+      const listItem: DtoListTag = {
+        id: tag.id,
+        name: tag.name,
+        canAssign: tag.canAssign,
+        pictures: 0,
+        thumbPath: undefined,
+      };
+      const response: DtoDataResponse<DtoListTag> = {
+        status: DataStatus.Ok,
+        data: listItem
+      };
+      return response;
+    }
+    catch (error) {
+      const errorResponse: DtoDataResponse<DtoListTag> = {
+        status: DataStatus.Conflict,
+        message: `${error.name}: ${error.message}`
+      };
+      return errorResponse;
+    }
   }
   // </editor-fold>
 
   // <editor-fold desc='PUT routes callbacks'>
   private async updateTag(request: RoutedRequest): Promise<DtoDataResponse<DtoListTag>> {
-    throw new Error('Not implemented');
+    const repository = this.databaseService.getTagRepository();
+    try {
+      const tag = await repository.findOneOrFail(request.params.tag);
+      tag.name = request.data.name;
+      tag.canAssign = request.data.canAssign;
+      try {
+        const savedTag = await repository.save(tag);
+        const dtoListCollection: DtoListTag = {
+          id: savedTag.id,
+          name: savedTag.name,
+          canAssign: savedTag.canAssign,
+          pictures: 0,
+          thumbPath: undefined
+        };
+        const response: DtoDataResponse<DtoListTag> = {
+          status: DataStatus.Ok,
+          data: dtoListCollection,
+        };
+        return response;
+      }
+      catch (error) {
+        const errorResponse: DtoDataResponse<DtoListTag> = {
+          status: DataStatus.Conflict,
+          data: undefined
+        };
+        return errorResponse;
+      }
+    }
+    catch (error) {
+      const errorResponse: DtoDataResponse<DtoListTag> = {
+        status: DataStatus.Conflict,
+        data: undefined
+      };
+      return errorResponse;
+    }
   }
   // </editor-fold>
 
@@ -98,8 +283,11 @@ export class TagService implements ITagService {
   private convertTagToTreeBase(tag: Tag): DtoTreeBase {
     const result: DtoTreeBase = {
       queryString: `tag=${tag.id}`,
-      label: tag.name,
-      children: tag.children.map( (child: Tag) => this.convertTagToTreeBase(child))
+      name: tag.name,
+      id: tag.id,
+      children: tag.children ?
+        tag.children.map( (child: Tag) => this.convertTagToTreeBase(child)) :
+        new Array<DtoTreeBase>()
     };
     return result;
   }

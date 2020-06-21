@@ -71,6 +71,10 @@ export abstract class BaseListController<
   public abstract get floatingButtonParams(): FloatingButtonParams;
   // </editor-fold>
 
+  // <editor-fold desc='Public properties'>
+  public afterCreate: EventEmitter<number>;
+  // </editor-fold>
+  //
   // <editor-fold desc='Constructor & C°'>
   constructor(
     dialog: MatDialog,
@@ -87,6 +91,7 @@ export abstract class BaseListController<
     this.listItems = new Array<L>();
     this.dialogRef = undefined;
     this.currentPage = undefined;
+    this.afterCreate = new EventEmitter<number>();
   }
   // </editor-fold>
 
@@ -123,6 +128,7 @@ export abstract class BaseListController<
       if (this.dialogRef) {
         this.dialogRef.close();
       }
+      this.afterCreate.emit(listItem.id);
       return listItem;
     }
     catch (error) {
@@ -141,8 +147,8 @@ export abstract class BaseListController<
     }
   }
 
-  private afterUpdate(item: any) {
-    const listItem = this.itemFactory.listDtoToListItem(item);
+  private async afterUpdate(id: number) {
+    const listItem = await this.loadListItem(id);
     const index = this.listItems.findIndex(item => item.id === listItem.id);
     this.listItems[index] = listItem;
   }
@@ -155,11 +161,12 @@ export abstract class BaseListController<
     }
   }
 
-  public subscribeAfterUpdate(emitter: EventEmitter<BaseItem>) {
+  public subscribeAfterUpdate(emitter: EventEmitter<number>) {
     if (!this.afterUpdateSubscription) {
       this.afterUpdateSubscription = emitter.subscribe(this.afterUpdate.bind(this));
     }
   }
+
   public cancelDialog(): void {
     if (this.dialogRef) {
       // TODO check for changes
@@ -176,13 +183,21 @@ export abstract class BaseListController<
       DataVerb.GET,
       url);
 
-    const response = await this.ipcService
-      .dataRequest<DtoListData<DtoList>>(request);
+    const response = await this.ipcService.dataRequest<DtoListData<DtoList>>(request);
     this.listItems = response.data.listData.map(listDto => this.itemFactory.listDtoToListItem(listDto));
     const totalPages = Math.floor(response.data.count / this.pageSize) +
       ((response.data.count % this.pageSize) > 0 ? 1 : 0);
     this.paginationController.setPagination(new PaginationParams(this.page, totalPages, this.paginationRoute));
     return this.listItems;
+  }
+
+  public async loadListItem(id: number): Promise<L> {
+    const request: IpcDataRequest = this.dataRequestFactory.createUntypedDataRequest(
+      DataVerb.GET,
+      `${this.root}/list/${id}`);
+
+    const response = await this.ipcService.dataRequest<DtoList>(request);
+    return this.itemFactory.listDtoToListItem(response.data);
   }
   // </editor-fold>
 

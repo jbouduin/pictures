@@ -45,8 +45,12 @@ export class ThumbListComponent implements OnInit {
     private treeController: BaseTreeController<BaseTreeItem, DtoTreeBase>,
     public cardController: BaseCardController<BaseItem, DtoGetBase, DtoSetBase>,
     private listController: BaseListController<ListItem, BaseItem, DtoListBase, DtoNewBase>) {
+      // wire the controllers
       this.listController.subscribeAfterDelete(this.cardController.afterDelete);
       this.listController.subscribeAfterUpdate(this.cardController.afterUpdate);
+      this.treeController.subscribeAfterDelete(this.cardController.afterDelete);
+      this.treeController.subscribeAfterUpdate(this.cardController.afterUpdate);
+      this.treeController.subscribeAfterCreate(this.listController.afterCreate);
     }
   // </editor-fold>
 

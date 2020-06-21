@@ -18,6 +18,10 @@ export class PictureTreeItemFactory extends BaseTreeItemFactory<PictureTreeItem,
   public createTreeDataSet(treeBases: Array<DtoTreeBase>): Array<PictureTreeItem> {
     return treeBases.map(treeBase => this.processTreeBase(treeBase));
   }
+
+  public createTreeItem(dto: DtoTreeBase): PictureTreeItem {
+    return this.processTreeBase(dto);
+  }
   // </editor-fold>
 
   // <editor-fold desc='Private methods'>

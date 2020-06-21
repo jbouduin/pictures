@@ -20,6 +20,10 @@ export class TagTreeItemFactory extends BaseTreeItemFactory<BaseTreeItem, DtoTre
   public createTreeDataSet(treeBases: Array<DtoTreeBase>): Array<BaseTreeItem> {
     return treeBases.map(treeBase => this.processTreeBase(treeBase));
   }
+
+  public createTreeItem(dto: DtoTreeBase): TagTreeItem {
+    return this.processTreeBase(dto);
+  }
   // </editor-fold>
 
   // <editor-fold desc='Private methods'>

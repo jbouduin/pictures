@@ -18,7 +18,7 @@ export class TagCardController extends BaseCardController<TagEditItem, DtoGetTag
 
   // <editor-fold desc='Implementation of protected abstract getters'>
   protected get deleteDialogText(): string {
-    return `Click on 'Delete' to remove the tag. This will remove the tag and all related data from the database. Physical files on disk will remain untouched.`;
+    return `Click on 'Delete' to remove the tag. This will remove the tag and all related data from the database`;
   }
 
   protected get editDialogComponent(): ComponentType<any> {
@@ -35,7 +35,6 @@ export class TagCardController extends BaseCardController<TagEditItem, DtoGetTag
 
   public get thumbCardFooterParams(): Array<ThumbCardFooterParams> {
     return [
-      new ThumbCardFooterParams(undefined, 'icon-button hover green', 'refresh', this.scan.bind(this)),
       new ThumbCardFooterParams(undefined, 'icon-button hover green', 'edit', this.edit.bind(this)),
       new ThumbCardFooterParams(undefined, 'icon-button hover red', 'delete', this.remove.bind(this))
     ]

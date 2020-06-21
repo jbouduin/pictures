@@ -8,8 +8,7 @@ export class CollectionNewItem extends BaseItem {
 
   // <editor-fold desc='Constructor & C°'>
   public constructor() {
-    super(undefined);
-    this.name = undefined;
+    super(undefined, undefined);
     this.path = undefined;
   }
   // </editor-fold>

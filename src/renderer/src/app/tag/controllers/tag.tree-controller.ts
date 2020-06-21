@@ -11,6 +11,9 @@ export class TagTreeController extends BaseTreeController<BaseTreeItem, DtoTreeB
 
   // <editor-fold desc='Implementation of protected abstract getters'>
   protected get root(): string { return '/tag/tree'; }
+  protected get subscribeToAfterCreate(): boolean { return true; }
+  protected get subscribeToAfterUpdate(): boolean { return true; }
+  protected get subscribeToAfterDelete(): boolean { return true; }
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>

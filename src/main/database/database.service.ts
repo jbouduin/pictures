@@ -16,6 +16,7 @@ import SERVICETYPES from '../di/service.types';
 export interface IDatabaseService {
   getCollectionRepository(): Repository<Collection>;
   getPictureRepository(): Repository<Picture>;
+  getTagRepository(): Repository<Tag>;
   getTagTreeRepository(): TreeRepository<Tag>;
   initialize(): Promise<TypeOrmConnection>
 }
@@ -42,7 +43,13 @@ export class DatabaseService implements IDatabaseService {
       .getRepository(Picture);
   }
 
-  public getTagTreeRepository(): any {
+  public getTagRepository(): Repository<Tag> {
+    return this
+      .getConnectionByTargetType(TargetType.PICTURES)
+      .getRepository(Tag);
+  }
+
+  public getTagTreeRepository(): TreeRepository<Tag> {
     return this
       .getConnectionByTargetType(TargetType.PICTURES)
       .getTreeRepository(Tag);

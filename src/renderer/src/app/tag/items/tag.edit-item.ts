@@ -7,18 +7,19 @@ import { Injectable } from '@angular/core';
 export class TagEditItem extends BaseItem {
 
   // <editor-fold desc='Public properties'>
+  public canAssign: boolean;
   public created: Date;
   public modified: Date;
   public version: number;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor(dtotag: DtoGetTag) {
-    super(dtotag.id);
-    this.name = dtotag.name;
-    this.created = dtotag.created;
-    this.modified = dtotag.modified;
-    this.version = dtotag.version;
+  public constructor(dtoTag: DtoGetTag) {
+    super(dtoTag.id, dtoTag.name);
+    this.canAssign = dtoTag.canAssign;
+    this.created = dtoTag.created;
+    this.modified = dtoTag.modified;
+    this.version = dtoTag.version;
   }
   // </editor-fold>
 }

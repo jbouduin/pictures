@@ -19,6 +19,10 @@ export class PictureTreeController extends BaseTreeController<PictureTreeItem, D
   protected get root(): string {
     return this.currentRoot;
   }
+
+  protected get subscribeToAfterCreate(): boolean { return false; }
+  protected get subscribeToAfterUpdate(): boolean { return false; }
+  protected get subscribeToAfterDelete(): boolean { return false; }
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>

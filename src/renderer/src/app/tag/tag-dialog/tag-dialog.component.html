@@ -1,1 +1,55 @@
-<p>tag-dialog works!</p>
+<h1 mat-dialog-title>{{dialogTitle}}</h1>
+<div mat-dialog-content [formGroup]="tagData">
+  <div *ngIf="!tag.isNew" fxLayout="row" fxLayoutAlign="space-between center">
+    <mat-form-field >
+      <mat-label>Id</mat-label>
+      <input matInput [value]="id" [disabled]="true"/>
+    </mat-form-field>
+    <mat-form-field >
+      <mat-label>Version</mat-label>
+      <input matInput [value]="version" [disabled]="true"/>
+    </mat-form-field>
+  </div>
+  <div>
+    <mat-form-field class="full-width">
+      <mat-label>Name</mat-label>
+      <input matInput required
+        placeholder="enter a name for your tag"
+        formControlName="name"/>
+      <mat-error>{{ getErrorMessage('name') }}</mat-error>
+    </mat-form-field>
+  </div>
+  <div>
+    <!-- <mat-form-field class="full-width"> -->
+      <mat-slide-toggle formControlName="canAssign" color=primary>Tag can be assigned</mat-slide-toggle>
+    <!-- </mat-form-field> -->
+  </div>
+  <div *ngIf="!tag.isNew" fxLayout="row" fxLayoutAlign="space-between center">
+    <mat-form-field >
+      <mat-label>Created</mat-label>
+      <input matInput [value]="created | date:'d.M.yyyy HH:mm:SS'" [disabled]="true"/>
+    </mat-form-field>
+    <mat-form-field >
+      <mat-label>Updated</mat-label>
+      <input matInput [value]="modified | date:'d.M.yyyy HH:mm:SS'" [disabled]="true"/>
+    </mat-form-field>
+  </div>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="cancel()">Cancel</button>
+  <button
+    *ngIf="!tag.isNew"
+    mat-button
+    cdkFocusInitial
+    [disabled]="tagData.invalid"
+    (click)="save()">
+      Save
+  </button>
+  <button
+    *ngIf="tag.isNew"
+    mat-button
+    [disabled]="tagData.invalid"
+    (click)="create()">
+      Create
+  </button>
+</div>

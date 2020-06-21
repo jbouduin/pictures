@@ -14,8 +14,7 @@ export class PictureEditItem extends BaseItem {
 
   // <editor-fold desc='Constructor & C°'>
   public constructor(dtoGetPicture: DtoGetPicture) {
-    super(dtoGetPicture.id);
-    this.name = dtoGetPicture.name;
+    super(dtoGetPicture.id, dtoGetPicture.name);
     this.created = dtoGetPicture.created;
     this.modified = dtoGetPicture.modified;
     this.version = dtoGetPicture.version;
