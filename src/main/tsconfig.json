@@ -16,6 +16,7 @@
       "paths" : {
         "@ipc": ["../shared/ipc"],
         "@ipc/*": ["../shared/ipc*"],
+        "@extensions/*": ["../shared/extensions*"]
       }
     }
   }

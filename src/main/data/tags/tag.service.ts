@@ -1,4 +1,5 @@
 import { injectable, inject } from "inversify";
+import '../../../shared/extensions/array';
 import { IDataService } from "../data-service";
 import { IDataRouterService } from "../data-router.service";
 
@@ -201,7 +202,7 @@ export class TagService implements ITagService {
       name: 'all',
       id: 0,
       queryString: undefined,
-      children: tags.map( (tag: Tag) => this.convertTagToTreeBase(tag))
+      children: tags.map( (tag: Tag) => this.convertTagToTreeBase(tag)).sortBy(tag => tag.name, false)
     };
     resultArray.push(root);
     const response: DtoDataResponse<Array<DtoTreeBase>> = {
@@ -332,7 +333,7 @@ export class TagService implements ITagService {
       name: tag.name,
       id: tag.id,
       children: tag.children ?
-        tag.children.map( (child: Tag) => this.convertTagToTreeBase(child)) :
+        tag.children.map( (child: Tag) => this.convertTagToTreeBase(child)).sortBy(tag => tag.name, false) :
         new Array<DtoTreeBase>()
     };
     return result;

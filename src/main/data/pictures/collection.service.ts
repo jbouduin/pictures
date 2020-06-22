@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
-
+import '../../../shared/extensions/array';
 import { DataStatus, DtoDataResponse, DtoListDataResponse, DtoUntypedDataResponse, DtoTreeBase } from '@ipc';
 import { DtoGetCollection, DtoListCollection } from '@ipc';
 import { DtoListPicture, DtoListPictureCollection } from '@ipc';
@@ -46,8 +46,8 @@ export class CollectionService implements ICollectionService {
     router.get('/collection/list', this.getCollectionListItems.bind(this));
     router.get('/collection/list/:collection', this.getCollectionListItem.bind(this));
     router.get('/collection/:collection', this.getCollection.bind(this));
-    router.get('/collection/:collection/pictures', this.getPictures.bind(this));
-    router.get('/collection/:collection/tree', this.getTree.bind(this));
+    router.get('/collection/:collection/pictures', this.getCollectionPictures.bind(this));
+    router.get('/collection/:collection/tree', this.getCollectionTree.bind(this));
     // POST
     router.post('/collection', this.createCollection.bind(this));
     router.post('/collection/:collection/scan', this.scanCollection.bind(this));
@@ -187,7 +187,7 @@ export class CollectionService implements ICollectionService {
       .addSelect('cnt.thumbName')
       .offset(paginationSkip)
       .limit(paginationTake)
-      .orderBy('collection.name');
+      .orderBy('lower(collection.name)');
     this.logService.debug(LogSource.Main, collectionQry.getQuery());
 
     const count = await this.databaseService
@@ -195,25 +195,27 @@ export class CollectionService implements ICollectionService {
       .count();
     try {
       const collections = await collectionQry.getRawMany();
-      const dtoCollections: Array<DtoListCollection> = collections.map(collection => {
-        let thumbnailPath: string = undefined;
-        if (collection.thumbName) {
-          const collectionThumbnailPath = `${this.configurationService.environment.thumbBaseDirectory}/${collection.id}`;
-          const thumbnailExtension = collection.thumbName.split('.').pop();
-          thumbnailPath = `${collectionThumbnailPath}/${collection.thumbId}.${thumbnailExtension}`;
-          if (!this.fileService.fileOrDirectoryExistsSync(thumbnailPath)) {
-            thumbnailPath = `${collection.path}/${collection.thumbPath}/${collection.thumbName}`;
+      const dtoCollections: Array<DtoListCollection> = collections
+        // .sortBy( collection => collection.name, false)
+        .map(collection => {
+          let thumbnailPath: string = undefined;
+          if (collection.thumbName) {
+            const collectionThumbnailPath = `${this.configurationService.environment.thumbBaseDirectory}/${collection.id}`;
+            const thumbnailExtension = collection.thumbName.split('.').pop();
+            thumbnailPath = `${collectionThumbnailPath}/${collection.thumbId}.${thumbnailExtension}`;
+            if (!this.fileService.fileOrDirectoryExistsSync(thumbnailPath)) {
+              thumbnailPath = `${collection.path}/${collection.thumbPath}/${collection.thumbName}`;
+            }
           }
-        }
-        const result: DtoListCollection = {
-          id: collection.id,
-          name: collection.name,
-          path: collection.path,
-          pictures: collection.count || 0,
-          thumbPath: thumbnailPath
-        };
-        return result;
-      });
+          const result: DtoListCollection = {
+            id: collection.id,
+            name: collection.name,
+            path: collection.path,
+            pictures: collection.count || 0,
+            thumbPath: thumbnailPath
+          };
+          return result;
+        });
       const errorResult: DtoListDataResponse<DtoListCollection> = {
         status: DataStatus.Ok,
         data: {
@@ -261,7 +263,7 @@ export class CollectionService implements ICollectionService {
     }
   }
 
-  private async getPictures(request: RoutedRequest): Promise<DtoListDataResponse<DtoListPicture>> {
+  private async getCollectionPictures(request: RoutedRequest): Promise<DtoListDataResponse<DtoListPicture>> {
     const paginationTake = request.queryParams.pageSize || 20;
     const paginationSkip = ((request.queryParams.page || 1) - 1) * paginationTake;
     const picturePath = request.queryParams.path;
@@ -318,7 +320,7 @@ export class CollectionService implements ICollectionService {
     }
   }
 
-  private async getTree(request: RoutedRequest): Promise<DtoDataResponse<Array<DtoTreeBase>>> {
+  private async getCollectionTree(request: RoutedRequest): Promise<DtoDataResponse<Array<DtoTreeBase>>> {
     const collection = await this.databaseService
       .getCollectionRepository()
       .findOneOrFail(request.params.collection);
@@ -332,19 +334,8 @@ export class CollectionService implements ICollectionService {
     const segmentedPaths = await qryBuilder
       .getRawMany()
       .then(results => results
-        .map(path => path.path)
-        .sort((path1: string, path2: string) => {
-          const lc1 = path1.toLowerCase();
-          const lc2 = path2.toLowerCase();
-          if (lc1 < lc2) {
-            return -1;
-          } else if ( lc1 > lc2 ) {
-            return 1;
-          } else {
-            return 0;
-          }
-        })
-        .map(path => path.split('/'))
+        .sortBy(path => path.path, false)
+        .map(path => path.path.split('/'))
       );
 
     const tree = new Array<DtoTreeBase>();
