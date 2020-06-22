@@ -138,19 +138,31 @@ export class TagService implements ITagService {
 
   private async getTagListItems(request: RoutedRequest): Promise<DtoListDataResponse<DtoListTag>> {
     const paginationTake = request.queryParams.pageSize || 20;
-    const paginationSkip = ((request.queryParams.page || 1) - 1) * paginationTake;
-    // const tagPath = request.queryParams.path;
+    let paginationSkip = ((request.queryParams.page || 1) - 1) * paginationTake;
+    const parent = request.queryParams.tag;
+    console.log('getTagListItems: tag =', request.queryParams.tag);
     try {
-      // let where: any = {};
-      // if (tagPath) {
-      //   where.path = Like(`${tagPath}%`)
-      // }
-      const qryResult = await this.databaseService.getTagRepository()
-        .findAndCount({
-          // where,
-          skip: paginationSkip,
-          take: paginationTake
-        });
+
+      const repository = this.databaseService.getTagRepository();
+      let qryResult: [Array<Tag>, number];
+
+      if (parent)
+      {
+        const tag = await repository.findOneOrFail(parent);
+        const numberOfDescendants = await repository.countDescendants(tag);
+        const descendants = await repository.findDescendants(tag);
+        paginationSkip++; // because the first entry is the parent tag itself
+        qryResult = [
+          descendants.slice(paginationSkip, paginationSkip + paginationTake),
+          numberOfDescendants
+        ];
+      } else {
+        qryResult = await this.databaseService.getTagRepository()
+          .findAndCount({
+            skip: paginationSkip,
+            take: paginationTake
+          });
+      }
 
       const result = qryResult[0].map(tag => {
         const dtoListTag: DtoListTag = {
@@ -182,7 +194,7 @@ export class TagService implements ITagService {
 
   private async getTagTreeItems(_request: RoutedRequest): Promise<DtoDataResponse<Array<DtoTreeBase>>> {
     const tags = await this.databaseService
-      .getTagTreeRepository()
+      .getTagRepository()
       .findTrees();
 
     const resultArray = new Array<DtoTreeBase>();
@@ -207,7 +219,7 @@ export class TagService implements ITagService {
          .getTagRepository()
          .findOneOrFail(request.params.tag);
 
-      const treeRepository = this.databaseService.getTagTreeRepository();
+      const treeRepository = this.databaseService.getTagRepository();
       const tagWithChildren = await treeRepository
         .createDescendantsQueryBuilder("tag", "tagClosure", tag)
         .getOne();
@@ -240,7 +252,7 @@ export class TagService implements ITagService {
   // <editor-fold desc='POST routes callbacks'>
   private async createTag(request: RoutedRequest): Promise<DtoDataResponse<DtoListTag>> {
     const repository = this.databaseService
-      .getTagTreeRepository();
+      .getTagRepository();
 
     const parent = await repository.findOne(request.data.parent);
     const newTag = repository.create({

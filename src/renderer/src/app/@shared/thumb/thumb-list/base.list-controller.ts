@@ -182,10 +182,12 @@ export abstract class BaseListController<
   }
 
   public async loadList(): Promise<Array<L>> {
+    console.log(this.currentTreeItem);
     let url = `${this.root}?page=${this.page}&pageSize=${this.pageSize}`;
-    if (this.currentTreeItem) {
+    if (this.currentTreeItem?.queryString) {
       url += `&${this.currentTreeItem.queryString}`;
     }
+    console.log(url);
     const request: IpcDataRequest = this.dataRequestFactory.createUntypedDataRequest(
       DataVerb.GET,
       url);

@@ -17,8 +17,7 @@ export interface IDatabaseService {
   getCollectionRepository(): Repository<Collection>;
   getDeleteQueryBuilder(): DeleteQueryBuilder<any>;
   getPictureRepository(): Repository<Picture>;
-  getTagRepository(): Repository<Tag>;
-  getTagTreeRepository(): TreeRepository<Tag>;
+  getTagRepository(): TreeRepository<Tag>;
   initialize(): Promise<TypeOrmConnection>
 }
 
@@ -48,17 +47,12 @@ export class DatabaseService implements IDatabaseService {
       .getRepository(Picture);
   }
 
-  public getTagRepository(): Repository<Tag> {
-    return this
-      .getConnectionByTargetType(TargetType.PICTURES)
-      .getRepository(Tag);
-  }
-
-  public getTagTreeRepository(): TreeRepository<Tag> {
+  public getTagRepository(): TreeRepository<Tag> {
     return this
       .getConnectionByTargetType(TargetType.PICTURES)
       .getTreeRepository(Tag);
   }
+
   public initialize(): Promise<TypeOrmConnection> {
     this.logService.debug(LogSource.Main, 'in initialize DatabaseService');
     return this.connectByName(

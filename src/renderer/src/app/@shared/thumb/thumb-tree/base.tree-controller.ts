@@ -92,7 +92,7 @@ export abstract class BaseTreeController<T extends BaseTreeItem, Dto extends Dto
     if (id) {
       const treeItemData = await this.getTreeItemData(id);
       const treeItem = this.itemFactory.createTreeItem(treeItemData.treeItem);
-      if (this.currentTreeItem) { // XXX && this.currentTreeItem.id === treeItemData.parent
+      if (this.currentTreeItem && this.currentTreeItem.id === treeItemData.parent) {
         this.currentTreeItem.children = [...this.currentTreeItem.children!, treeItem];
         return;
       }
