@@ -10,9 +10,9 @@ import { FloatingButtonParams } from '../../floating-button/floating-button.para
 import { DynamicDialogComponent } from '../../dynamic-dialog/dynamic-dialog.component';
 import { PaginationController } from '../../pagination/pagination.controller';
 import { PaginationParams } from '../../pagination/pagination.params';
-
-import { ListItem } from './list-item';
+import { BaseTreeItem } from '../thumb-tree/base.tree-item';
 import { BaseItem } from '../base-item';
+import { ListItem } from './list-item';
 import { BaseListItemFactory } from './base.list-item-factory';
 import { DynamicDialogParams } from '@shared';
 import { EventEmitter } from '@angular/core';
@@ -31,6 +31,7 @@ export abstract class BaseListController<
   private listItems: Array<L>;
   private dialogRef: MatDialogRef<any>;
   private currentPage: number;
+  private currentTreeItem: BaseTreeItem;
   private afterDeleteSubscription: Subscription;
   private afterUpdateSubscription: Subscription;
   // </editor-fold>
@@ -105,6 +106,7 @@ export abstract class BaseListController<
       data: {
         component: this.newDialogComponent,
         item: this.itemFactory.createNewItem(),
+        parent: this.currentTreeItem,
         cancelDialog: this.cancelDialog.bind(this),
         commitDialog: this.commitCreate.bind(this)
       },
@@ -174,10 +176,15 @@ export abstract class BaseListController<
     }
   }
 
-  public async loadList(treeQueryString: string): Promise<Array<L>> {
+  public toggleTreeItem(baseTreeitem: BaseTreeItem) {
+    this.currentTreeItem = baseTreeitem;
+    this.loadList();
+  }
+
+  public async loadList(): Promise<Array<L>> {
     let url = `${this.root}?page=${this.page}&pageSize=${this.pageSize}`;
-    if (treeQueryString) {
-      url += `&${treeQueryString}`;
+    if (this.currentTreeItem) {
+      url += `&${this.currentTreeItem.queryString}`;
     }
     const request: IpcDataRequest = this.dataRequestFactory.createUntypedDataRequest(
       DataVerb.GET,

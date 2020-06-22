@@ -7,6 +7,7 @@ import { Injectable } from '@angular/core';
 export class TagEditItem extends BaseItem {
 
   // <editor-fold desc='Public properties'>
+  public parent: number;
   public canAssign: boolean;
   public created: Date;
   public modified: Date;

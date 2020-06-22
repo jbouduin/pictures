@@ -61,13 +61,14 @@ export class ThumbListComponent implements OnInit {
       this.listController.processParamMap(paramMap);
       this.treeController
         .loadTree()
-        .finally(() => this.listController.loadList(this.treeController.currentQueryString));
+        .finally(() => this.listController.loadList());
     });
   }
 
   public treeItemSelected(node: BaseTreeItem) {
+    this.cardController.toggleTreeItem(node);
     this.treeController.toggleTreeItem(node);
-    this.listController.loadList(this.treeController.currentQueryString);
+    this.listController.toggleTreeItem(node);
   }
   // </editor-fold>
 

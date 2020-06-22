@@ -30,8 +30,8 @@ export class TagService implements ITagService {
     router.get('/tag', this.getTagListItems.bind(this));
     router.get('/tag/list', this.getTagListItems.bind(this));
     router.get('/tag/list/:tag', this.getTagListItem.bind(this));
-    router.get('/tag/tree', this.getTreeItems.bind(this));
-    router.get('/tag/tree/:tag', this.getTreeItem.bind(this));
+    router.get('/tag/tree', this.getTagTreeItems.bind(this));
+    router.get('/tag/tree/:tag', this.getTagTreeItem.bind(this));
     router.get('/tag/:tag', this.getTag.bind(this));
     // router.get('/tag/:tag/pictures', this.getPictures.bind(this));
     // POST
@@ -180,7 +180,7 @@ export class TagService implements ITagService {
     }
   }
 
-  private async getTreeItems(_request: RoutedRequest): Promise<DtoDataResponse<Array<DtoTreeBase>>> {
+  private async getTagTreeItems(_request: RoutedRequest): Promise<DtoDataResponse<Array<DtoTreeBase>>> {
     const tags = await this.databaseService
       .getTagTreeRepository()
       .findTrees();
@@ -200,7 +200,7 @@ export class TagService implements ITagService {
     return response;
   }
 
-  private async getTreeItem(request: RoutedRequest): Promise<DtoDataResponse<DtoTreeItemData<DtoTreeBase>>> {
+  private async getTagTreeItem(request: RoutedRequest): Promise<DtoDataResponse<DtoTreeItemData<DtoTreeBase>>> {
     try {
 
       const tag = await this.databaseService
@@ -240,11 +240,13 @@ export class TagService implements ITagService {
   // <editor-fold desc='POST routes callbacks'>
   private async createTag(request: RoutedRequest): Promise<DtoDataResponse<DtoListTag>> {
     const repository = this.databaseService
-      .getTagRepository();
+      .getTagTreeRepository();
 
+    const parent = await repository.findOne(request.data.parent);
     const newTag = repository.create({
       name: request.data.name,
-      canAssign: request.data.canAssign
+      canAssign: request.data.canAssign,
+      parent: parent
     });
 
     try {

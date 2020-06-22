@@ -39,7 +39,7 @@ export class ThumbTreeComponent implements OnInit, OnChanges {
         switch (propName) {
           case 'treeItems': {
             this.dataSource.data = changes[propName].currentValue;
-            this.selectedNode = this.dataSource.data[0];
+            this.clickNode(this.dataSource.data[0]);
           }
         }
       }
@@ -56,7 +56,7 @@ export class ThumbTreeComponent implements OnInit, OnChanges {
     if (this.selectedNode !== item) {
       this.selectedNode = item;
     } else {
-      this.selectedNode = undefined;
+      this.selectedNode = this.dataSource.data[0];
     }
     this.itemSelected.emit(this.selectedNode);
   }

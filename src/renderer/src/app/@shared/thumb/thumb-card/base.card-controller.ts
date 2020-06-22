@@ -14,11 +14,13 @@ import { BaseItem } from '../base-item';
 import { ThumbCardFooterParams } from './thumb-card-footer.params';
 import { BaseCardItemFactory } from './base.card-item-factory';
 import { EventEmitter } from '@angular/core';
+import { BaseTreeItem } from '../thumb-tree/base.tree-item';
 
 export abstract class BaseCardController<E extends BaseItem, DtoGet extends DtoGetBase, DtoSet extends DtoSetBase> {
 
   // <editor-fold desc='Private properties'>
   private dialogRef: MatDialogRef<any>;
+  private currentTreeItem: BaseTreeItem;
   // </editor-fold>
 
   // <editor-fold desc='Protected properties'>
@@ -51,6 +53,7 @@ export abstract class BaseCardController<E extends BaseItem, DtoGet extends DtoG
     dataRequestFactory: DataRequestFactory,
     itemFactory: BaseCardItemFactory<E, DtoGet, DtoSet>) {
 
+    this.currentTreeItem = undefined;
     this.dialog = dialog;
     this.ipcService = ipcService;
     this.dataRequestFactory = dataRequestFactory;
@@ -73,6 +76,7 @@ export abstract class BaseCardController<E extends BaseItem, DtoGet extends DtoG
           data: {
             component: this.editDialogComponent,
             item: this.itemFactory.getDtoToEditItem(response.data),
+            parent: this.currentTreeItem,
             cancelDialog: this.cancelDialog.bind(this),
             commitDialog: this.commitEdit.bind(this)
           },
@@ -113,6 +117,10 @@ export abstract class BaseCardController<E extends BaseItem, DtoGet extends DtoG
       // TODO check for changes
       this.dialogRef.close();
     }
+  }
+
+  public toggleTreeItem(baseTreeitem: BaseTreeItem) {
+    this.currentTreeItem = baseTreeitem;
   }
 
   public remove(listItem: BaseItem): void {

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { BaseItem, DynamicDialogController } from '@shared';
+import { BaseItem, DynamicDialogController, BaseTreeItem } from '@shared';
 import { TagNewItem } from '../items/tag.new-item';
 import { TagEditItem } from '../items/tag.edit-item';
 
@@ -51,13 +51,18 @@ export class TagDialogComponent implements OnInit {
       return (this.tag as TagEditItem).version;
     }
   }
+
+  public get parentLabel(): string {
+    return `${this.parent.name} (${this.parent.id})`;
+  }
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
   public constructor(
     private formBuilder: FormBuilder,
     private controller: DynamicDialogController,
-    baseItem: BaseItem) {
+    baseItem: BaseItem,
+    private parent: BaseTreeItem) {
 
     if (baseItem.isNew) {
       this.tag = (baseItem as any) as TagNewItem;
@@ -113,6 +118,7 @@ export class TagDialogComponent implements OnInit {
   private commitForm(): void {
     this.tag.name = this.tagData.get('name').value;
     this.tag.canAssign = this.tagData.get('canAssign').value;
+    this.tag.parent = this.parent.id
   }
   // </editor-fold>
 }

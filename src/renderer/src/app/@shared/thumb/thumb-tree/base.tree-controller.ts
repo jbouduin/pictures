@@ -56,9 +56,9 @@ export abstract class BaseTreeController<T extends BaseTreeItem, Dto extends Dto
   // <editor-fold desc='Private subscribe methods'>
   private afterDelete(id: number): void {
     if (id) {
-      const index = this.treeItems.findIndex( item => item.id === id);
-      if (index >= 0) {
-        this.treeItems.splice(index, 1);
+      const rootIndex = this.treeItems.findIndex( item => item.id === id);
+      if (rootIndex >= 0) {
+        this.treeItems.splice(rootIndex, 1);
       } else {
         let index = 0;
         let result = false;
@@ -92,6 +92,10 @@ export abstract class BaseTreeController<T extends BaseTreeItem, Dto extends Dto
     if (id) {
       const treeItemData = await this.getTreeItemData(id);
       const treeItem = this.itemFactory.createTreeItem(treeItemData.treeItem);
+      if (this.currentTreeItem) { // XXX && this.currentTreeItem.id === treeItemData.parent
+        this.currentTreeItem.children = [...this.currentTreeItem.children!, treeItem];
+        return;
+      }
       const rootIndex = this.treeItems.findIndex( item => item.id === treeItemData.parent);
       if (rootIndex >= 0) {
         this.treeItems[rootIndex].children.push(treeItem);
@@ -113,9 +117,9 @@ export abstract class BaseTreeController<T extends BaseTreeItem, Dto extends Dto
       return false;
     }
 
-    const index = treeItem.children.findIndex( item => item.id === id);
-    if (index >= 0) {
-      treeItem.children.splice(index, 1);
+    const rootIndex = treeItem.children.findIndex( item => item.id === id);
+    if (rootIndex >= 0) {
+      treeItem.children.splice(rootIndex, 1);
       return true;
     } else {
       let index = 0;
@@ -133,9 +137,9 @@ export abstract class BaseTreeController<T extends BaseTreeItem, Dto extends Dto
       return false;
     }
 
-    const index = parent.children.findIndex( item => item.id === treeItem.id);
-    if (index >= 0) {
-      parent.children[index] = treeItem;
+    const rootIndex = parent.children.findIndex( item => item.id === treeItem.id);
+    if (rootIndex >= 0) {
+      parent.children[rootIndex] = treeItem;
       return true;
     } else {
       let index = 0;
@@ -153,8 +157,8 @@ export abstract class BaseTreeController<T extends BaseTreeItem, Dto extends Dto
       return false;
     }
 
-    const index = parent.children.findIndex( item => item.id === parentId);
-    if (index >= 0) {
+    const rootIndex = parent.children.findIndex( item => item.id === parentId);
+    if (rootIndex >= 0) {
       parent.children.push(treeItem);
       return true;
     } else {

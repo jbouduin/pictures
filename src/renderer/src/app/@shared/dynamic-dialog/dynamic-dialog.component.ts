@@ -4,6 +4,7 @@ import { MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { BaseItem } from '../thumb/base-item';
 import { DynamicDialogParamsData } from './dynamic-dialog.params';
 import { DynamicDialogController } from './dynamic-dialog.types';
+import { BaseTreeItem } from '@shared/thumb/thumb-tree/base.tree-item';
 
 @Component({
   selector: 'app-dynamic-dialog',
@@ -34,6 +35,7 @@ export class DynamicDialogComponent implements OnInit {
       parent: this.inj,
       providers: [
         { provide: BaseItem, useValue: this.params.item },
+        { provide: BaseTreeItem, useValue: this.params.parent },
         { provide: DynamicDialogController, useValue: controller}
       ]
     });
