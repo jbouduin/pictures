@@ -17,8 +17,8 @@
       ],
       "lib": ["es2018", "dom"],
       "paths" : {
-        "@ipc": ["../ipc"],
-        "@ipc/*": ["../ipc*"],
+        "@ipc": ["../shared/ipc"],
+        "@ipc/*": ["../shared/ipc*"],
       }
     }
   }

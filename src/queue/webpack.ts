@@ -26,7 +26,7 @@ module.exports = env => {
     resolve: {
       extensions: ['.js', '.ts', '.tsx', '.jsx', '.json'],
       plugins: [
-        new TsconfigPathsPlugin({ configFile: './src/main/tsconfig.json' })
+        new TsconfigPathsPlugin({ configFile: './src/queue/tsconfig.json' })
       ],
       alias: { }
     },

@@ -140,7 +140,6 @@ export class TagService implements ITagService {
     const paginationTake = request.queryParams.pageSize || 20;
     let paginationSkip = ((request.queryParams.page || 1) - 1) * paginationTake;
     const parent = request.queryParams.tag;
-    console.log('getTagListItems: tag =', request.queryParams.tag);
     try {
 
       const repository = this.databaseService.getTagRepository();
