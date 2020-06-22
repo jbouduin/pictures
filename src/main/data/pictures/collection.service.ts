@@ -329,7 +329,8 @@ export class CollectionService implements ICollectionService {
       .getPictureRepository()
       .createQueryBuilder('picture')
       .select('DISTINCT picture.path', 'path')
-      .where("picture.collectionId = :id", { id: Number.parseInt(request.params.collection) });
+      .where("picture.collectionId = :id", { id: Number.parseInt(request.params.collection) })
+      .andWhere('picture.path <> ""');
     this.logService.debug(LogSource.Main, qryBuilder.getQueryAndParameters());
     const segmentedPaths = await qryBuilder
       .getRawMany()
