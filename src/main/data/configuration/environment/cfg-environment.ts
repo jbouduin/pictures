@@ -1,4 +1,4 @@
-import { TargetType, DtoEnvironment } from '@ipc';
+import { DtoEnvironment } from '@ipc';
 
 import { LogLevel } from '@ipc';
 import { CfgDatabase } from '../database/cfg-database';
@@ -18,9 +18,9 @@ export class CfgEnvironment implements DtoEnvironment {
   public constructor() {
     this.database = new CfgDatabase();
     this.thumbBaseDirectory = 'C:/temp/pictures/thumbs';
-    this.mainLogLevel = LogLevel.Info;
-    this.rendererLogLevel = LogLevel.Error;
-    this.queueLogLevel = LogLevel.Error;
+    this.mainLogLevel = LogLevel.Verbose;
+    this.rendererLogLevel = LogLevel.Verbose;
+    this.queueLogLevel = LogLevel.Verbose;
   }
   // </editor-fold>
 }

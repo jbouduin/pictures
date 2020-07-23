@@ -30,7 +30,8 @@ function createWindow() {
     .initialize(app.getAppPath())
     .then( _configuration => {
       logService = container.get<ILogService>(SERVICETYPES.LogService);
-      container.get<IDataRouterService>(SERVICETYPES.DataRouterService).initialize();
+      const dataRouterService = container.get<IDataRouterService>(SERVICETYPES.DataRouterService)
+      dataRouterService.initialize();
       container.get<IDatabaseService>(SERVICETYPES.DatabaseService)
         .initialize()
         .then( _connection => {
@@ -58,7 +59,8 @@ function createWindow() {
             win = null;
           });
           container.get<IQueueService>(SERVICETYPES.QueueService).initialize(
-            path.join(app.getAppPath(), 'dist/queue', 'queue.js')
+            path.join(app.getAppPath(), 'dist/queue', 'queue.js'),
+            dataRouterService
           );
       });
   });

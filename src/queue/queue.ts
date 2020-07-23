@@ -25,7 +25,7 @@ class QueueService {
       const task: DtoTaskRequest<any> = JSON.parse(message);
       this.queue.push(task);
     } catch (error) {
-      console.error(error);
+      console.error('error pushing task', error);
     }
   }
 
@@ -38,7 +38,8 @@ class QueueService {
           break;
         }
         case TaskType.CreateThumb: {
-          await new ThumbCreator().createThumbIm(next.data);
+          const response = await new ThumbCreator().createThumbIm(next.data);
+          process.send(response);
           break;
         }
         case TaskType.ReadMetaData: {
@@ -51,7 +52,7 @@ class QueueService {
       }
       setTimeout(this.next.bind(this), 100);
     } else {
-      console.log('queue is empty');
+      console.debug('queue is empty');
       setTimeout(this.next.bind(this), 5000);
     }
   }

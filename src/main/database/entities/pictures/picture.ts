@@ -1,8 +1,7 @@
-import { Column, Entity, Index, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, Index, ManyToOne } from 'typeorm';
 
 import { BaseEntity } from '../base-entity';
 import { Collection } from './collection';
-
 
 @Entity()
 export class Picture extends BaseEntity {
@@ -11,9 +10,12 @@ export class Picture extends BaseEntity {
   @Column('nvarchar', { length: 256, nullable: false })
   public path: string;
 
+  @Column('blob', { nullable: true })
+  public thumb: string;
+
   @Index()
   @ManyToOne(
-    type => Collection,
+    _type => Collection,
     collection => collection.pictures,
     { nullable: false, onDelete: 'CASCADE'})
   public collection: Collection;

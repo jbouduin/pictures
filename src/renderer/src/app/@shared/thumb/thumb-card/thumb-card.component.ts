@@ -1,9 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { DtoGetBase, DtoSetBase } from '@ipc';
-import { ConfigurationService } from '@core';
+import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
+
+import { DtoGetBase, DtoSetBase, DataVerb, DtoImage } from '@ipc';
 import { BaseItem } from '../base-item';
 import { ListItem } from '../thumb-list/list-item';
 import { BaseCardController } from './base.card-controller';
+import { IpcService, DataRequestFactory, ConfigurationService } from '@core';
 
 @Component({
   selector: 'app-thumb-card',
@@ -17,34 +19,62 @@ export class ThumbCardComponent implements OnInit {
   @Input() public controller: BaseCardController<BaseItem, DtoGetBase, DtoSetBase>;
   // </editor-fold>
 
-  // <editor-fold desc='Public properties'>
-  public thumbnailStyle: Object;
+  // <editor-fold desc='Private properties'>
+  private imageUrl: string;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor(private configurationService: ConfigurationService) { }
+  public constructor(
+    private sanitization: DomSanitizer,
+    private configurationService: ConfigurationService,
+    private dataRequestFactory: DataRequestFactory,
+    private ipcService: IpcService) { }
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methods'>
   public ngOnInit(): void {
-    // TODO move this to main
-    const imageSrc = (this.item.thumbPath ?
-      `file:${this.item.thumbPath}` :
-      `file:${this.configurationService.configuration.appPath}/dist/renderer/assets/thumb.png`).replace(/\\/g, '/')
-    this.thumbnailStyle = {
-      'background-image': `url(${encodeURI(imageSrc)})`,
-      'width': '180px',
-      'height': '180px',
-      'background-position': 'center center',
-      'background-size': 'cover',
-      'margin-left': '-5px'
-    };
+    this.imageUrl = this.item.image ?
+      'data:image/jpeg;base64,' + this.item.image :
+      this.configurationService.genericThumbUrl;
+    if (this.item.thumbId) {
+      const request = this.dataRequestFactory.createUntypedDataRequest(DataVerb.GET, `/thumbnail/${this.item.thumbId}`);
+      this.ipcService.dataRequest<DtoImage>(request).then(response => {
+        this.imageUrl = response.data.image ?
+          'data:image/jpeg;base64,' + response.data.image :
+          this.configurationService.genericThumbUrl;
+      });
+    }
+    // else {
+    //   this.imageUrl = undefined; //this.configurationService.genericThumbUrl;
+    // }
+
   }
   // </editor-fold>
 
   // <editor-fold desc='UI Triggered method'>
   public trackByIcon(_i: number, obj: any) {
     return obj.icon;
+  }
+
+  public getThumbNail(): SafeStyle {
+    // if (!this.imageUrl) {
+    //   if (this.item.thumbId) {
+    //     const request = this.dataRequestFactory.createUntypedDataRequest(DataVerb.GET, `/thumbnail/${this.item.thumbId}`);
+    //     const response = this.ipcService.dataRequestSync<DtoImage>(request);
+    //
+    //     this.imageUrl = response.data.image ?
+    //       'data:image/jpeg;base64,' + response.data.image :
+    //       undefined;
+    //       // this.configurationService.genericThumbUrl;
+    //     console.log(this.item.thumbId, 'thumbnail set', this.imageUrl ? true : false);
+    //   } else {
+    //     this.imageUrl = undefined; //this.configurationService.genericThumbUrl;
+    //   }
+    // }
+
+    return this.imageUrl ?
+      this.sanitization.bypassSecurityTrustStyle(`url(${this.imageUrl})`) :
+      undefined;
   }
   // </editor-fold>
 

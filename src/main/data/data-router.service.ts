@@ -6,11 +6,12 @@ import 'reflect-metadata';
 
 import { DataStatus, DataVerb, DtoDataRequest, DtoDataResponse, DtoUntypedDataResponse, LogSource } from '@ipc';
 
-import { ILogService } from '../system';
-import { IConfigurationService } from './configuration';
+import { ILogService } from '../system/log.service';
+import { IConfigurationService } from './configuration/configuration.service';
 import { ICollectionService } from './pictures/collection.service';
-import { RoutedRequest } from './routed-request';
+import { IPictureService } from './pictures/picture.service';
 import { ITagService } from './tags/tag.service';
+import { RoutedRequest } from './routed-request';
 
 import SERVICETYPES from '../di/service.types';
 
@@ -41,6 +42,7 @@ export class DataRouterService implements IDataRouterService {
     @inject(SERVICETYPES.LogService) private logService: ILogService,
     @inject(SERVICETYPES.ConfigurationService) private configurationService: IConfigurationService,
     @inject(SERVICETYPES.CollectionService) private collectionService: ICollectionService,
+    @inject(SERVICETYPES.PictureService) private pictureService: IPictureService,
     @inject(SERVICETYPES.TagService) private tagService: ITagService) {
     this.deleteRoutes = new Collections.Dictionary<string, RouteCallback>();
     this.getRoutes = new Collections.Dictionary<string, RouteCallback>();
@@ -54,6 +56,7 @@ export class DataRouterService implements IDataRouterService {
     this.logService.verbose(LogSource.Main, 'in initialize DataRouterService');
     this.configurationService.setRoutes(this);
     this.collectionService.setRoutes(this);
+    this.pictureService.setRoutes(this);
     this.tagService.setRoutes(this);
     this.logService.verbose(LogSource.Main, 'registered DELETE routes:');
     this.deleteRoutes.keys().forEach(route => this.logService.verbose(LogSource.Main, route));

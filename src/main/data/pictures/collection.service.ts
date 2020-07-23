@@ -1,6 +1,7 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import '../../../shared/extensions/array';
+
 import { DataStatus, DtoDataResponse, DtoListDataResponse, DtoUntypedDataResponse, DtoTreeBase } from '@ipc';
 import { DtoGetCollection, DtoListCollection } from '@ipc';
 import { DtoListPicture, DtoListPictureCollection } from '@ipc';
@@ -12,7 +13,7 @@ import { IFileService, ILogService } from '../../system';
 
 import { IConfigurationService } from '../configuration';
 import { IDataRouterService } from '../data-router.service';
-import { IDataService } from '../data-service';
+import { IDataService, DataService } from '../data-service';
 import { RoutedRequest } from '../routed-request';
 
 import { IPictureService } from './picture.service';
@@ -23,18 +24,20 @@ import { Like } from 'typeorm';
 export interface ICollectionService extends IDataService { }
 
 @injectable()
-export class CollectionService implements ICollectionService {
+export class CollectionService extends DataService implements ICollectionService {
 
   // TODO this should come from configuration
   private readonly fileTypes = [ 'jpg', 'jpeg', 'bmp', 'tiff', 'png', 'svg' ];
 
   // <editor-fold desc='Constructor & C°'>
   public constructor(
-    @inject(SERVICETYPES.LogService) private logService: ILogService,
-    @inject(SERVICETYPES.ConfigurationService) private configurationService: IConfigurationService,
-    @inject(SERVICETYPES.DatabaseService) private databaseService: IDatabaseService,
+    @inject(SERVICETYPES.LogService) logService: ILogService,
+    @inject(SERVICETYPES.ConfigurationService) configurationService: IConfigurationService,
+    @inject(SERVICETYPES.DatabaseService) databaseService: IDatabaseService,
     @inject(SERVICETYPES.PictureService) private pictureService: IPictureService,
-    @inject(SERVICETYPES.FileService) private fileService: IFileService) { }
+    @inject(SERVICETYPES.FileService) private fileService: IFileService) {
+    super(logService, configurationService, databaseService);
+  }
   // </editor-fold>
 
   // <editor-fold desc='IDataService interface methods'>
@@ -138,7 +141,9 @@ export class CollectionService implements ICollectionService {
         name: collection.name,
         path: collection.path,
         pictures: collection.count || 0,
-        thumbPath: thumbnailPath
+        thumbPath: thumbnailPath,
+        thumbId: collection.thumbId,
+        image: this.readFileToBase64(thumbnailPath)
       };
       const response: DtoDataResponse<DtoListCollection> = {
         status: DataStatus.Ok,
@@ -212,7 +217,9 @@ export class CollectionService implements ICollectionService {
             name: collection.name,
             path: collection.path,
             pictures: collection.count || 0,
-            thumbPath: thumbnailPath
+            thumbPath: thumbnailPath,
+            thumbId: collection.thumbId,
+            image: this.readFileToBase64(thumbnailPath)
           };
           return result;
         });
@@ -298,7 +305,9 @@ export class CollectionService implements ICollectionService {
           name: picture.name,
           path: picture.path,
           thumbPath: thumbnailPath,
-          collection: dtoListPictureCollection
+          thumbId: picture.id,
+          collection: dtoListPictureCollection,
+          image: this.readFileToBase64(thumbnailPath)
         };
         return dtoListPicture;
       });
@@ -384,6 +393,8 @@ export class CollectionService implements ICollectionService {
         path: collection.path,
         pictures: 0,
         thumbPath: undefined,
+        thumbId: undefined,
+        image: undefined
       };
       const errorResult: DtoDataResponse<DtoListCollection> = {
         status: DataStatus.Ok,
@@ -433,7 +444,9 @@ export class CollectionService implements ICollectionService {
           name: savedCollection.name,
           path: savedCollection.path,
           pictures: 0,
-          thumbPath: undefined
+          thumbPath: undefined,
+          thumbId: undefined,
+          image: undefined
         };
         const result: DtoDataResponse<DtoListCollection> = {
           status: DataStatus.Ok,

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { DataVerb, DtoConfiguration } from '@ipc';
+import { DataVerb, DtoConfiguration, DtoImage } from '@ipc';
 import { IpcService } from './ipc/ipc.service';
 import { DataRequestFactory } from './ipc/data-request-factory';
 import { LogService } from './log.service';
@@ -12,9 +12,14 @@ import { IpcDataRequest } from './ipc/ipc-data-request';
 export class ConfigurationService {
 
   private _configuration: DtoConfiguration;
+  private _genericThumbUrl: string;
 
   public get configuration(): DtoConfiguration {
-    return this._configuration || this.getConfiguration();
+    return this._configuration ? this._configuration : this.getConfiguration();
+  }
+
+  public get genericThumbUrl(): string {
+    return this._genericThumbUrl ? this._genericThumbUrl : this.getGenericThumbUrl();
   }
 
   // <editor-fold desc='Constructor & C°'>
@@ -31,5 +36,11 @@ export class ConfigurationService {
       .dataRequestSync<DtoConfiguration>(request).data;
     this.logService.injectConfiguraton(this._configuration);
     return this._configuration;
+  }
+
+  private getGenericThumbUrl(): string {
+    const request = this.dataRequestFactory.createUntypedDataRequest(DataVerb.GET, `/thumbnail/generic`);
+    this._genericThumbUrl = 'data:image/png;base64,' + this.ipcService.dataRequestSync<DtoImage>(request).data.image;
+    return this._genericThumbUrl;
   }
 }

@@ -1,5 +1,7 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+// import { Router } from '@angular/router';
+import { ConfigurationService } from '@core';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -8,7 +10,9 @@ import { Router } from '@angular/router';
 export class AppComponent implements OnInit {
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor(private router: Router) { }
+  public constructor(configurationService: ConfigurationService) {
+    configurationService.configuration;
+  }
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methods'>

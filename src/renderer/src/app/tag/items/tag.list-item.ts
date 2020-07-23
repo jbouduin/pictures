@@ -15,6 +15,7 @@ export class TagListItem extends ListItem {
     super(dtoListTag.id, dtoListTag.name);
     this.canAssign = dtoListTag.canAssign;
     this.thumbPath = dtoListTag.thumbPath;
+    this.thumbId = dtoListTag.thumbId;
     this.footerText = dtoListTag.pictures.toString();
     this.routerLink = [ `/picture/tag/${dtoListTag.id}` ];
   }

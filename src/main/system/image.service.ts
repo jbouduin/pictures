@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 
-import { DtoTaskRequest, DtoTaskCreateThumb, LogSource, TaskType, DtoTaskReadMetaData } from '@ipc';
+import { DtoTaskRequest, DtoRequestCreateThumb, LogSource, TaskType, DtoRequestReadMetaData } from '@ipc';
 import { IConfigurationService } from '../data/configuration';
 import { Collection, Picture } from '../database';
 
@@ -10,12 +10,12 @@ import { IQueueService } from './queue.service';
 
 import SERVICETYPES from '../di/service.types';
 
-export interface IImageService {
+export interface IXImageService {
   checkThumbnail(collection: Collection, picture: Picture): Promise<Picture>;
 }
 
 @injectable()
-export class ImageService implements IImageService {
+export class XImageService implements IXImageService {
 
   // <editor-fold desc='Constructor & C°'>
   public constructor(
@@ -37,14 +37,13 @@ export class ImageService implements IImageService {
     if (this.fileService.fileOrDirectoryExistsSync(thumbnailPath)) {
       this.logService.verbose(LogSource.Main, `thumb alread exists for ${picturePath}`);
     } else {
-      const request: DtoTaskRequest<DtoTaskCreateThumb> = {
+      const request: DtoTaskRequest<DtoRequestCreateThumb> = {
         taskType: TaskType.CreateThumb,
         data: {
-          source: picturePath,
-          target: thumbnailPath
+          id: picture.id,
+          source: picturePath
         }
       };
-      // this.createThumbIm(request.data);
       this.queueService.push(request);
     }
     // const metaDataRequest: DtoTaskRequest<DtoTaskReadMetaData> = {

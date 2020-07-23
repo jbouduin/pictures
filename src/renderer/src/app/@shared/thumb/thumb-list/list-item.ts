@@ -6,6 +6,8 @@ export abstract class ListItem extends BaseItem {
   public footerText: string;
   public routerLink: Array<string>
   public thumbPath: string;
+  public thumbId: number;
+  public image: string;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>

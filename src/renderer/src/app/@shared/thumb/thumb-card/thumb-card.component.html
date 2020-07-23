@@ -1,4 +1,3 @@
-<!-- TODO get css dynamically (from controller ?) -->
 <div class="thumb-card-wrapper">
   <mat-card class="thumb-card">
     <mat-card-content >
@@ -8,7 +7,7 @@
             <div fxLayout="row" fxFlex="50px" fxLayoutAlign="center center">
               {{item.name}}
             </div>
-            <div [ngStyle]="thumbnailStyle">
+            <div class="thumb-background" [style.background-image]="getThumbNail()">
             </div>
           </div>
         </a>

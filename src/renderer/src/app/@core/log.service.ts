@@ -20,7 +20,7 @@ export class LogService {
   public injectConfiguraton(configuration: DtoConfiguration): void {
     this.configuration = configuration;
     window.api.electronIpcRemoveAllListeners('log');
-    window.api.electronIpcOn('log', (event, arg) => {
+    window.api.electronIpcOn('log', (_event, arg) => {
       try {
         const message: DtoLogMessage = JSON.parse(arg);
         this.log(message.logSource, message.logLevel, message.object, message.args);

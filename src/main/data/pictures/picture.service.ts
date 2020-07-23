@@ -1,15 +1,16 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 
-import { LogSource } from '@ipc';
+import { LogSource, DtoResponseCreateThumb, DtoDataResponse, DtoImage, DataStatus, DtoTaskRequest, TaskType, DtoRequestCreateThumb } from '@ipc';
 
 import { Collection, Picture } from '../../database';
 import { IDatabaseService } from '../../database';
-import { IImageService, ILogService } from '../../system';
+import { ILogService, IQueueService } from '../../system';
 
 import { IConfigurationService } from '../configuration';
 import { IDataRouterService } from '../data-router.service';
-import { IDataService } from '../data-service';
+import { IDataService, DataService } from '../data-service';
+import { RoutedRequest } from '../routed-request';
 
 import SERVICETYPES from '../../di/service.types';
 
@@ -18,21 +19,26 @@ export interface IPictureService extends IDataService {
 }
 
 @injectable()
-export class PictureService implements IPictureService {
+export class PictureService extends DataService implements IPictureService {
 
   // <editor-fold desc='Private properties'>
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
   public constructor(
-    @inject(SERVICETYPES.LogService) private logService: ILogService,
-    @inject(SERVICETYPES.ConfigurationService) private configurationService: IConfigurationService,
-    @inject(SERVICETYPES.DatabaseService) private databaseService: IDatabaseService,
-    @inject(SERVICETYPES.ImageService) private imageService: IImageService) { }
+    @inject(SERVICETYPES.LogService) logService: ILogService,
+    @inject(SERVICETYPES.ConfigurationService) configurationService: IConfigurationService,
+    @inject(SERVICETYPES.DatabaseService) databaseService: IDatabaseService,
+    @inject(SERVICETYPES.QueueService) private queueService: IQueueService) {
+    super(logService, configurationService, databaseService);
+  }
   // </editor-fold>
 
   // <editor-fold desc='IDataService interface methods'>
-  public setRoutes(_router: IDataRouterService): void { }
+  public setRoutes(router: IDataRouterService): void {
+    router.get('/thumbnail/:id', this.getThumbnail.bind(this));
+    router.put('/thumbnail/:id', this.storeThumbnail.bind(this));
+  }
   // </editor-fold>
 
   // <editor-fold desc='IPictureService interface methods'>
@@ -51,7 +57,7 @@ export class PictureService implements IPictureService {
       })
       .then(
         picture => {
-          this.logService.verbose(LogSource.Main, `picture '${path}/${name}' already in '${collection.name}'`);
+          this.logService.debug(LogSource.Main, `picture '${path}/${name}' already in '${collection.name}'`);
           return picture;
         },
         () => {
@@ -63,7 +69,47 @@ export class PictureService implements IPictureService {
           this.logService.error(LogSource.Main, `adding '${path}/${name}' to '${collection.name}'`);
           return repository.save(newPicture);
         }
-      ).then( picture => { return this.imageService.checkThumbnail(collection, picture); });
+      ).then( picture => {
+        if (!picture.thumb) {
+          const picturePath = `${collection.path}/${picture.path}/${picture.name}`;
+          const request: DtoTaskRequest<DtoRequestCreateThumb> = {
+            taskType: TaskType.CreateThumb,
+            data: {
+              id: picture.id,
+              source: picturePath
+            }
+          };
+          this.queueService.push(request);
+        }
+        return picture }
+      );
   }
   // </editor-fold>
+
+  private async getThumbnail(routedRequest: RoutedRequest): Promise<DtoDataResponse<DtoImage>> {
+    let image: string;
+
+    if (routedRequest.params.id === 'generic') {
+      image = this.readFileToBase64(`${this.configurationService.configuration.appPath}/dist/renderer/assets/thumb.png`)
+    } else {
+      const picture = await this.databaseService
+        .getPictureRepository()
+        .findOne(routedRequest.params.id);
+      image = picture.thumb ? picture.thumb : undefined;
+    }
+
+    const response: DtoDataResponse<DtoImage> = {
+      status: DataStatus.Ok,
+      data: { image: image }
+    };
+
+    return response;
+  }
+
+  private async storeThumbnail(routedRequest: RoutedRequest): Promise<void> {
+    const data = routedRequest.data as DtoResponseCreateThumb;
+    const repository = this.databaseService.getPictureRepository();
+    await repository.update(routedRequest.params.id, { thumb: data.thumb });
+    return;
+  }
 }

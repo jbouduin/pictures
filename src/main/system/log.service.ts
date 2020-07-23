@@ -1,5 +1,5 @@
 import { BrowserWindow } from 'electron';
-import { inject, injectable } from 'inversify';
+import { injectable } from 'inversify';
 
 import { DtoLogMessage, LogLevel, LogSource } from '@ipc';
 import { Configuration } from '../data/configuration';

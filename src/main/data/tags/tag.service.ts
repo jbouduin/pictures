@@ -1,6 +1,6 @@
 import { injectable, inject } from "inversify";
 import '../../../shared/extensions/array';
-import { IDataService } from "../data-service";
+import { IDataService, DataService } from "../data-service";
 import { IDataRouterService } from "../data-router.service";
 
 import { IDatabaseService, Tag } from "../../database";
@@ -9,18 +9,21 @@ import { ILogService } from "../../system";
 import SERVICETYPES from "di/service.types";
 import { DtoUntypedDataResponse, DtoDataResponse, DtoListDataResponse, DtoTreeBase, DataStatus, LogSource, DtoTreeItemData } from "@ipc";
 import { DtoGetTag, DtoListTag } from "@ipc";
-import { RoutedRequest } from "data/routed-request";
-export interface ITagService extends IDataService {
+import { IConfigurationService } from "../configuration/configuration.service";
+import { RoutedRequest } from "../routed-request";
 
-}
+export interface ITagService extends IDataService { }
 
 @injectable()
-export class TagService implements ITagService {
+export class TagService extends DataService implements ITagService {
 
   // <editor-fold desc='Constructor & C°'>
   public constructor(
-    @inject(SERVICETYPES.LogService) private logService: ILogService,
-    @inject(SERVICETYPES.DatabaseService) private databaseService: IDatabaseService) { }
+    @inject(SERVICETYPES.LogService) logService: ILogService,
+    @inject(SERVICETYPES.ConfigurationService) configurationService: IConfigurationService,
+    @inject(SERVICETYPES.DatabaseService) databaseService: IDatabaseService) {
+    super(logService, configurationService, databaseService);
+  }
   // </editor-fold>
 
   // <editor-fold desc='IDataService interface methods'>
@@ -119,7 +122,9 @@ export class TagService implements ITagService {
           name: tag.name,
           canAssign: tag.canAssign,
           pictures: 0,
-          thumbPath: undefined
+          thumbPath: undefined,
+          thumbId: undefined,
+          image: undefined
         };
 
       const response: DtoDataResponse<DtoListTag> = {
@@ -170,7 +175,9 @@ export class TagService implements ITagService {
           name: tag.name,
           canAssign: tag.canAssign,
           pictures: 0,
-          thumbPath: undefined
+          thumbPath: undefined,
+          thumbId: undefined,
+          image: undefined
         };
         return dtoListTag;
       });
@@ -269,6 +276,8 @@ export class TagService implements ITagService {
         canAssign: tag.canAssign,
         pictures: 0,
         thumbPath: undefined,
+        thumbId: undefined,
+        image: undefined
       };
       const response: DtoDataResponse<DtoListTag> = {
         status: DataStatus.Ok,
@@ -300,7 +309,9 @@ export class TagService implements ITagService {
           name: savedTag.name,
           canAssign: savedTag.canAssign,
           pictures: 0,
-          thumbPath: undefined
+          thumbPath: undefined,
+          thumbId: undefined,
+          image: undefined
         };
         const response: DtoDataResponse<DtoListTag> = {
           status: DataStatus.Ok,
