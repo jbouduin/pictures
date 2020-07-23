@@ -33,9 +33,6 @@ export class ThumbCardComponent implements OnInit {
 
   // <editor-fold desc='Angular interface methods'>
   public ngOnInit(): void {
-    this.imageUrl = this.item.image ?
-      'data:image/jpeg;base64,' + this.item.image :
-      this.configurationService.genericThumbUrl;
     if (this.item.thumbId) {
       const request = this.dataRequestFactory.createUntypedDataRequest(DataVerb.GET, `/thumbnail/${this.item.thumbId}`);
       this.ipcService.dataRequest<DtoImage>(request).then(response => {
@@ -43,10 +40,9 @@ export class ThumbCardComponent implements OnInit {
           'data:image/jpeg;base64,' + response.data.image :
           this.configurationService.genericThumbUrl;
       });
+    } else {
+       this.imageUrl = this.configurationService.genericThumbUrl;
     }
-    // else {
-    //   this.imageUrl = undefined; //this.configurationService.genericThumbUrl;
-    // }
 
   }
   // </editor-fold>

@@ -122,9 +122,7 @@ export class TagService extends DataService implements ITagService {
           name: tag.name,
           canAssign: tag.canAssign,
           pictures: 0,
-          thumbPath: undefined,
-          thumbId: undefined,
-          image: undefined
+          thumbId: undefined
         };
 
       const response: DtoDataResponse<DtoListTag> = {
@@ -175,9 +173,7 @@ export class TagService extends DataService implements ITagService {
           name: tag.name,
           canAssign: tag.canAssign,
           pictures: 0,
-          thumbPath: undefined,
-          thumbId: undefined,
-          image: undefined
+          thumbId: undefined
         };
         return dtoListTag;
       });
@@ -275,9 +271,7 @@ export class TagService extends DataService implements ITagService {
         name: tag.name,
         canAssign: tag.canAssign,
         pictures: 0,
-        thumbPath: undefined,
-        thumbId: undefined,
-        image: undefined
+        thumbId: undefined
       };
       const response: DtoDataResponse<DtoListTag> = {
         status: DataStatus.Ok,
@@ -309,9 +303,7 @@ export class TagService extends DataService implements ITagService {
           name: savedTag.name,
           canAssign: savedTag.canAssign,
           pictures: 0,
-          thumbPath: undefined,
-          thumbId: undefined,
-          image: undefined
+          thumbId: undefined
         };
         const response: DtoDataResponse<DtoListTag> = {
           status: DataStatus.Ok,

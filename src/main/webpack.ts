@@ -1,5 +1,5 @@
 import * as path from 'path';
-const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin';
 
 module.exports = env => {
   if (!env) { env = 'development'; }

@@ -1,7 +1,5 @@
-import { Inject, Injectable } from '@angular/core';
-
+import { Injectable } from '@angular/core';
 import { DtoConfiguration, DtoLogMessage, LogLevel, LogSource } from '@ipc';
-import { ConfigurationService } from './configuration.service';
 
 @Injectable({
   providedIn: 'root'

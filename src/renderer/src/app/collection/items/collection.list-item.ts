@@ -12,9 +12,7 @@ export class CollectionListItem extends ListItem {
   // <editor-fold desc='Constructor & C°'>
   public constructor(dtoListCollection: DtoListCollection) {
     super(dtoListCollection.id, dtoListCollection.name);
-    this.thumbPath = dtoListCollection.thumbPath;
     this.thumbId = dtoListCollection.thumbId;
-    this.image = dtoListCollection.image;
     this.path = dtoListCollection.path;
     this.footerText = dtoListCollection.pictures.toString();
     this.routerLink = [ `/picture/collection/${dtoListCollection.id}` ];

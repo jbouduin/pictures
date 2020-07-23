@@ -24,7 +24,7 @@ export class PictureListItemFactory extends BaseListItemFactory<PictureListItem,
     return new PictureListItem(dto);
   }
 
-  public newItemToNewDto(item: PictureNewItem): DtoNewPicture {
+  public newItemToNewDto(_item: PictureNewItem): DtoNewPicture {
     return undefined;
   }
   // </editor-fold>

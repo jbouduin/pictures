@@ -26,7 +26,7 @@ export interface ICollectionService extends IDataService { }
 @injectable()
 export class CollectionService extends DataService implements ICollectionService {
 
-  // TODO this should come from configuration
+  // TODO this should come from configuration, although the file types are restricted by imagemick
   private readonly fileTypes = [ 'jpg', 'jpeg', 'bmp', 'tiff', 'png', 'svg' ];
 
   // <editor-fold desc='Constructor & C°'>
@@ -62,34 +62,33 @@ export class CollectionService extends DataService implements ICollectionService
   // <editor-fold desc='DELETE route callback'>
   private async deleteCollection(request: RoutedRequest): Promise<DtoUntypedDataResponse> {
     const repository = this.databaseService.getCollectionRepository();
+    let result: DtoUntypedDataResponse;
 
     try {
-      const collection = await repository.findOneOrFail(request.params.collection);
+      await repository.findOneOrFail(request.params.collection);
       try {
         await repository.delete(request.params.collection);
-        this.fileService.emptyAndDeleteDir(`${this.configurationService.environment.thumbBaseDirectory}/${collection.id}`);
-        const result: DtoUntypedDataResponse = {
+        result = {
           status: DataStatus.Ok
         };
-        return result;
       }
       catch (error) {
         this.logService.error(LogSource.Main, error);
-        const result_1: DtoUntypedDataResponse = {
+        result = {
           status: DataStatus.Error,
           message: `${error.name}: ${error.message}`
         };
-        return result_1;
       }
     }
-    catch (error_1) {
-      this.logService.error(LogSource.Main, error_1);
-      const result_2: DtoUntypedDataResponse = {
+    catch (notFoundError) {
+      this.logService.error(LogSource.Main, notFoundError);
+      result = {
         status: DataStatus.NotFound,
-        message: `${error_1.name}: ${error_1.message}`
+        message: `${notFoundError.name}: ${notFoundError.message}`
       };
-      return result_2;
     }
+
+    return result;
   }
   // </editor-fold>
 
@@ -107,12 +106,8 @@ export class CollectionService extends DataService implements ICollectionService
         return cntQry
           .select('collectionId')
           .addSelect("id as thumbId")
-          .addSelect("path as thumbPath")
-          .addSelect("name as thumbName")
           .addSelect("COUNT(*) AS count")
           .from('picture', null)
-          .orderBy("path", "DESC")
-          .addOrderBy("thumbName", "DESC")
           .groupBy("picture.collectionId")
         },
         'cnt',
@@ -120,30 +115,17 @@ export class CollectionService extends DataService implements ICollectionService
       )
       .addSelect('cnt.count')
       .addSelect('cnt.thumbId')
-      .addSelect('cnt.thumbPath')
-      .addSelect('cnt.thumbName')
       .orderBy('collection.name');
     this.logService.debug(LogSource.Main, collectionQry.getQuery());
 
     try {
       const collection = await collectionQry.getRawOne();
-      let thumbnailPath: string = undefined;
-      if (collection.thumbName) {
-        const collectionThumbnailPath = `${this.configurationService.environment.thumbBaseDirectory}/${collection.id}`;
-        const thumbnailExtension = collection.thumbName.split('.').pop();
-        thumbnailPath = `${collectionThumbnailPath}/${collection.thumbId}.${thumbnailExtension}`;
-        if (!this.fileService.fileOrDirectoryExistsSync(thumbnailPath)) {
-          thumbnailPath = `${collection.path}/${collection.thumbPath}/${collection.thumbName}`;
-        }
-      }
       const result: DtoListCollection = {
         id: collection.id,
         name: collection.name,
         path: collection.path,
         pictures: collection.count || 0,
-        thumbPath: thumbnailPath,
-        thumbId: collection.thumbId,
-        image: this.readFileToBase64(thumbnailPath)
+        thumbId: collection.thumbId
       };
       const response: DtoDataResponse<DtoListCollection> = {
         status: DataStatus.Ok,
@@ -175,12 +157,8 @@ export class CollectionService extends DataService implements ICollectionService
         return cntQry
           .select('collectionId')
           .addSelect("id as thumbId")
-          .addSelect("path as thumbPath")
-          .addSelect("name as thumbName")
           .addSelect("COUNT(*) AS count")
           .from('picture', null)
-          .orderBy("path", "DESC")
-          .addOrderBy("thumbName", "DESC")
           .groupBy("picture.collectionId")
         },
         'cnt',
@@ -188,8 +166,6 @@ export class CollectionService extends DataService implements ICollectionService
       )
       .addSelect('cnt.count')
       .addSelect('cnt.thumbId')
-      .addSelect('cnt.thumbPath')
-      .addSelect('cnt.thumbName')
       .offset(paginationSkip)
       .limit(paginationTake)
       .orderBy('lower(collection.name)');
@@ -201,25 +177,13 @@ export class CollectionService extends DataService implements ICollectionService
     try {
       const collections = await collectionQry.getRawMany();
       const dtoCollections: Array<DtoListCollection> = collections
-        // .sortBy( collection => collection.name, false)
-        .map(collection => {
-          let thumbnailPath: string = undefined;
-          if (collection.thumbName) {
-            const collectionThumbnailPath = `${this.configurationService.environment.thumbBaseDirectory}/${collection.id}`;
-            const thumbnailExtension = collection.thumbName.split('.').pop();
-            thumbnailPath = `${collectionThumbnailPath}/${collection.thumbId}.${thumbnailExtension}`;
-            if (!this.fileService.fileOrDirectoryExistsSync(thumbnailPath)) {
-              thumbnailPath = `${collection.path}/${collection.thumbPath}/${collection.thumbName}`;
-            }
-          }
+        .map( collection => {
           const result: DtoListCollection = {
             id: collection.id,
             name: collection.name,
             path: collection.path,
             pictures: collection.count || 0,
-            thumbPath: thumbnailPath,
-            thumbId: collection.thumbId,
-            image: this.readFileToBase64(thumbnailPath)
+            thumbId: collection.thumbId
           };
           return result;
         });
@@ -293,21 +257,14 @@ export class CollectionService extends DataService implements ICollectionService
           skip: paginationSkip,
           take: paginationTake
         });
-      const collectionThumbnailPath = `${this.configurationService.environment.thumbBaseDirectory}/${collection.id}`;
+
       const dtoListPictures = qryResult[0].map(picture => {
-        const thumbnailExtension = picture.name.split('.').pop();
-        let thumbnailPath = `${collectionThumbnailPath}/${picture.id}.${thumbnailExtension}`;
-        if (!this.fileService.fileOrDirectoryExistsSync(thumbnailPath)) {
-          thumbnailPath = `${collection.path}/${picture.path}/${picture.name}`;
-        }
         const dtoListPicture: DtoListPicture = {
           id: picture.id,
           name: picture.name,
           path: picture.path,
-          thumbPath: thumbnailPath,
           thumbId: picture.id,
-          collection: dtoListPictureCollection,
-          image: this.readFileToBase64(thumbnailPath)
+          collection: dtoListPictureCollection
         };
         return dtoListPicture;
       });
@@ -392,9 +349,7 @@ export class CollectionService extends DataService implements ICollectionService
         name: collection.name,
         path: collection.path,
         pictures: 0,
-        thumbPath: undefined,
-        thumbId: undefined,
-        image: undefined
+        thumbId: undefined
       };
       const errorResult: DtoDataResponse<DtoListCollection> = {
         status: DataStatus.Ok,
@@ -444,9 +399,7 @@ export class CollectionService extends DataService implements ICollectionService
           name: savedCollection.name,
           path: savedCollection.path,
           pictures: 0,
-          thumbPath: undefined,
-          thumbId: undefined,
-          image: undefined
+          thumbId: undefined
         };
         const result: DtoDataResponse<DtoListCollection> = {
           status: DataStatus.Ok,
