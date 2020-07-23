@@ -56,6 +56,7 @@ export class CollectionService extends DataService implements ICollectionService
     router.post('/collection/:collection/scan', this.scanCollection.bind(this));
     // PUT
     router.put('/collection/:collection', this.updateCollection.bind(this));
+    router.put('/collection/:collection/thumbnail', this.setThumbNail.bind(this));
   }
   // </editor-fold>
 
@@ -102,10 +103,11 @@ export class CollectionService extends DataService implements ICollectionService
       .where ('id = :id', { id: Number.parseInt(request.params.collection) })
       .addSelect('name')
       .addSelect('path')
+      .addSelect('thumbId as myThumbId')
       .leftJoin( (cntQry) => {
         return cntQry
           .select('collectionId')
-          .addSelect("id as thumbId")
+          .addSelect("id as cntThumbId")
           .addSelect("COUNT(*) AS count")
           .from('picture', null)
           .groupBy("picture.collectionId")
@@ -114,7 +116,7 @@ export class CollectionService extends DataService implements ICollectionService
         'cnt.collectionId = collection.Id',
       )
       .addSelect('cnt.count')
-      .addSelect('cnt.thumbId')
+      .addSelect('cnt.cntThumbId')
       .orderBy('collection.name');
     this.logService.debug(LogSource.Main, collectionQry.getQuery());
 
@@ -125,7 +127,7 @@ export class CollectionService extends DataService implements ICollectionService
         name: collection.name,
         path: collection.path,
         pictures: collection.count || 0,
-        thumbId: collection.thumbId
+        thumbId: collection.myThumbId || collection.cntThumbId
       };
       const response: DtoDataResponse<DtoListCollection> = {
         status: DataStatus.Ok,
@@ -153,10 +155,11 @@ export class CollectionService extends DataService implements ICollectionService
       .select('id')
       .addSelect('name')
       .addSelect('path')
+      .addSelect('thumbId as myThumbId')
       .leftJoin( (cntQry) => {
         return cntQry
           .select('collectionId')
-          .addSelect("id as thumbId")
+          .addSelect("id AS cntThumbId")
           .addSelect("COUNT(*) AS count")
           .from('picture', null)
           .groupBy("picture.collectionId")
@@ -165,7 +168,7 @@ export class CollectionService extends DataService implements ICollectionService
         'cnt.collectionId = collection.Id',
       )
       .addSelect('cnt.count')
-      .addSelect('cnt.thumbId')
+      .addSelect('cnt.cntThumbId')
       .offset(paginationSkip)
       .limit(paginationTake)
       .orderBy('lower(collection.name)');
@@ -183,7 +186,7 @@ export class CollectionService extends DataService implements ICollectionService
             name: collection.name,
             path: collection.path,
             pictures: collection.count || 0,
-            thumbId: collection.thumbId
+            thumbId: collection.myThumbId || collection.cntThumbId
           };
           return result;
         });
@@ -254,6 +257,7 @@ export class CollectionService extends DataService implements ICollectionService
       const qryResult = await this.databaseService.getPictureRepository()
         .findAndCount({
           where,
+          order: { path: 'ASC', name: 'ASC'},
           skip: paginationSkip,
           take: paginationTake
         });
@@ -400,6 +404,44 @@ export class CollectionService extends DataService implements ICollectionService
           path: savedCollection.path,
           pictures: 0,
           thumbId: undefined
+        };
+        const result: DtoDataResponse<DtoListCollection> = {
+          status: DataStatus.Ok,
+          data: dtoListCollection,
+        };
+        return result;
+      }
+      catch (e) {
+        const errorResult: DtoDataResponse<DtoListCollection> = {
+          status: DataStatus.Conflict,
+          data: undefined
+        };
+        return errorResult;
+      }
+    }
+    catch (e) {
+      const errorResult: DtoDataResponse<DtoListCollection> = {
+        status: DataStatus.Conflict,
+        data: undefined
+      };
+      return errorResult;
+    }
+  }
+
+  private async setThumbNail(request: RoutedRequest): Promise<DtoDataResponse<DtoListCollection>> {
+    const picture = await this.databaseService.getPictureRepository().findOneOrFail(request.data);
+    const repository = this.databaseService.getCollectionRepository();
+    try {
+      const collection = await repository.findOneOrFail(request.params.collection);
+      collection.thumb = picture;
+      try {
+        const savedCollection = await repository.save(collection);
+        const dtoListCollection: DtoListCollection = {
+          id: savedCollection.id,
+          name: savedCollection.name,
+          path: savedCollection.path,
+          pictures: 0,
+          thumbId: request.data
         };
         const result: DtoDataResponse<DtoListCollection> = {
           status: DataStatus.Ok,

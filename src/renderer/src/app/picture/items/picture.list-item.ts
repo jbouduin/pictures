@@ -1,10 +1,11 @@
-import { DtoListPicture } from '@ipc';
+import { DtoListPicture, DtoListPictureCollection } from '@ipc';
 import { ListItem } from '@shared';
 
 export class PictureListItem extends ListItem {
 
   // <editor-fold desc='Public properties'>
   public path: string;
+  public collection: DtoListPictureCollection;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
@@ -13,6 +14,7 @@ export class PictureListItem extends ListItem {
     this.thumbId = dtoListPicture.thumbId;
     this.footerText = '0';
     this.path = dtoListPicture.path;
+    this.collection = dtoListPicture.collection;
   }
   // </editor-fold>
 }

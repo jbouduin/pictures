@@ -2,19 +2,19 @@ import { Injectable } from '@angular/core';
 import { ComponentType } from '@angular/cdk/portal';
 import { MatDialog } from '@angular/material/dialog';
 
-import { DtoGetPicture, DtoSetPicture } from '@ipc';
+import { DtoGetPicture, DtoSetPicture, DataVerb } from '@ipc';
 
-import { IpcService, DataRequestFactory } from '@core';
+import { IpcService, DataRequestFactory, IpcDataRequest } from '@core';
 import { BaseCardController, ThumbCardFooterParams } from '@shared';
 import { PictureEditItem } from '../items/picture.edit-item';
 import { PictureCardItemFactory } from '../factories/picture.card-item-factory';
 import { PictureDialogComponent } from '../picture-dialog/picture-dialog.component';
+import { PictureListItem } from '../items/picture.list-item';
 
 @Injectable()
 export class PictureCardController extends BaseCardController<PictureEditItem, DtoGetPicture, DtoSetPicture> {
 
   // <editor-fold desc='Private properties'>
-  private currentRoot: string;
   // </editor-fold>
 
   // <editor-fold desc='Implementation of protected abstract getters'>
@@ -38,6 +38,7 @@ export class PictureCardController extends BaseCardController<PictureEditItem, D
 
   public get thumbCardFooterParams(): Array<ThumbCardFooterParams> {
     return [
+      new ThumbCardFooterParams(undefined, 'icon-button hover green', 'bookmark', this.setAsThumb.bind(this)),
       new ThumbCardFooterParams(undefined, 'icon-button hover green', 'edit', this.edit.bind(this))
     ];
   }
@@ -50,6 +51,16 @@ export class PictureCardController extends BaseCardController<PictureEditItem, D
     dataRequestFactory: DataRequestFactory,
     itemFactory: PictureCardItemFactory) {
     super(dialog, ipcService, dataRequestFactory, itemFactory);
+  }
+  // </editor-fold>
+
+  // <editor-fold desc='Private methods'>
+  public setAsThumb(listItem: PictureListItem): void {
+    const request: IpcDataRequest = this.dataRequestFactory.createDataRequest<number>(
+      DataVerb.PUT,
+      `/collection/${listItem.collection.id}/thumbnail`,
+      listItem.id);
+    this.ipcService.dataRequest<any>(request);
   }
   // </editor-fold>
 }
