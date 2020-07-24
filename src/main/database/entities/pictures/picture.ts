@@ -1,7 +1,8 @@
-import { Column, Entity, Index, ManyToOne } from 'typeorm';
+import { Column, Entity, Index, ManyToOne, OneToMany } from 'typeorm';
 
 import { BaseEntity } from '../base-entity';
 import { Collection } from './collection';
+import { MetadataPictureMap } from '../metadata/metadata-picture-map';
 
 @Entity()
 export class Picture extends BaseEntity {
@@ -20,6 +21,6 @@ export class Picture extends BaseEntity {
     { nullable: false, onDelete: 'CASCADE'})
   public collection: Collection;
 
-  // @OneToMany(type => Exif, exif => exif.picture)
-  // public exifs: Promise<Array<Exif>>;
+  @OneToMany(_type => MetadataPictureMap, metaDataPictureMap => metaDataPictureMap.picture)
+  public metadata: Promise<Array<MetadataPictureMap>>;
 }

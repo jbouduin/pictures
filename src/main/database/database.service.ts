@@ -9,13 +9,16 @@ import { DtoConnection } from '@ipc';
 import { IConfigurationService } from '../data';
 import { ILogService } from '../system';
 
-import { Collection, Picture, Tag } from './entities';
+import { MetadataKey, MetadataPictureMap } from './entities/metadata';
+import { Collection, Picture } from './entities/pictures';
+import { Tag } from './entities/tags';
 import SERVICETYPES from '../di/service.types';
 
 
 export interface IDatabaseService {
   getCollectionRepository(): Repository<Collection>;
   getDeleteQueryBuilder(): DeleteQueryBuilder<any>;
+  getMetaDataPictureMapRepository(): Repository<MetadataPictureMap>;
   getPictureRepository(): Repository<Picture>;
   getTagRepository(): TreeRepository<Tag>;
   initialize(): Promise<TypeOrmConnection>
@@ -41,6 +44,12 @@ export class DatabaseService implements IDatabaseService {
     return this.getConnectionByTargetType(TargetType.PICTURES).createQueryBuilder().delete();
   }
 
+  public getMetaDataPictureMapRepository(): Repository<MetadataPictureMap> {
+    return this
+      .getConnectionByTargetType(TargetType.PICTURES)
+      .getRepository(MetadataPictureMap);
+  }
+
   public getPictureRepository(): Repository<Picture> {
     return this
       .getConnectionByTargetType(TargetType.PICTURES)
@@ -57,7 +66,7 @@ export class DatabaseService implements IDatabaseService {
     this.logService.debug(LogSource.Main, 'in initialize DatabaseService');
     return this.connectByName(
           this.getConnectionNameForTargetType(TargetType.PICTURES),
-          [Collection, Picture, Tag]);
+          [Collection, MetadataKey, MetadataPictureMap, Picture, Tag]);
   }
   // </editor-fold>
 

@@ -1,12 +1,9 @@
 import { Column, CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn, VersionColumn } from 'typeorm';
 
-export abstract class BaseEntity {
+export abstract class TraceableEntity {
 
   @PrimaryGeneratedColumn()
   public id: number;
-
-  @Column('nvarchar', { length: 256, nullable: false })
-  public name: string;
 
   @CreateDateColumn()
   public created: Date;
@@ -16,5 +13,9 @@ export abstract class BaseEntity {
 
   @VersionColumn()
   public version: number;
+}
 
+export abstract class BaseEntity extends TraceableEntity {
+  @Column('nvarchar', { length: 256, nullable: false })
+  public name: string;
 }

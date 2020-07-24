@@ -23,6 +23,7 @@ export interface IPictureService extends IDataService {
 export class PictureService extends DataService implements IPictureService {
 
   // <editor-fold desc='Private properties'>
+  private exifKeysToSkip = [ 'makerNote', 'userComment' ];
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
@@ -98,9 +99,12 @@ export class PictureService extends DataService implements IPictureService {
   private async storeMetaData (routedRequest: RoutedRequest): Promise<void> {
     const data = routedRequest.data as DtoResponseReadMetadata;
     if (data.metadata.exif) {
+      console.log(`metadata for ${routedRequest.params.id}`);
       for (let key of Object.keys(data.metadata.exif)) {
-        let value = data.metadata.exif[key];
-        console.log(`${key}: ${value}`);
+        if (this.exifKeysToSkip.indexOf(key) < 0) {
+          let value = data.metadata.exif[key];
+          console.log(`${key}: ${value}`);
+        }
       }
     }
   }
