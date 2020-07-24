@@ -1,7 +1,8 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 
-import { LogSource, DtoResponseCreateThumb, DtoDataResponse, DtoImage, DataStatus, DtoTaskRequest, TaskType, DtoRequestCreateThumb } from '@ipc';
+import { DtoTaskRequest, TaskType, DtoRequestCreateThumb, DtoRequestReadMetaData, DtoResponseReadMetadata } from '@ipc';
+import { LogSource } from '@ipc';
 
 import { Collection, Picture } from '../../database';
 import { IDatabaseService } from '../../database';
@@ -36,8 +37,7 @@ export class PictureService extends DataService implements IPictureService {
 
   // <editor-fold desc='IDataService interface methods'>
   public setRoutes(router: IDataRouterService): void {
-    router.get('/thumbnail/:id', this.getThumbnail.bind(this));
-    router.put('/thumbnail/:id', this.storeThumbnail.bind(this));
+    router.put('/picture/:id/metadata', this.storeMetaData.bind(this));
   }
   // </editor-fold>
 
@@ -70,46 +70,40 @@ export class PictureService extends DataService implements IPictureService {
           return repository.save(newPicture);
         }
       ).then( picture => {
+        const picturePath = `${collection.path}/${picture.path}/${picture.name}`;
         if (!picture.thumb) {
-          const picturePath = `${collection.path}/${picture.path}/${picture.name}`;
-          const request: DtoTaskRequest<DtoRequestCreateThumb> = {
+          const thumbRequest: DtoTaskRequest<DtoRequestCreateThumb> = {
             taskType: TaskType.CreateThumb,
             data: {
               id: picture.id,
               source: picturePath
             }
           };
-          this.queueService.push(request);
+          this.queueService.push(thumbRequest);
         }
-        return picture }
-      );
+        const metaDataRequest : DtoTaskRequest<DtoRequestReadMetaData> =  {
+          taskType: TaskType.ReadMetaData,
+          data: {
+            id: picture.id,
+            source: picturePath
+          }
+        };
+        this.queueService.push(metaDataRequest);
+        return picture
+      });
   }
   // </editor-fold>
 
-  private async getThumbnail(routedRequest: RoutedRequest): Promise<DtoDataResponse<DtoImage>> {
-    let image: string;
-
-    if (routedRequest.params.id === 'generic') {
-      image = this.readFileToBase64(`${this.configurationService.configuration.appPath}/dist/renderer/assets/thumb.png`)
-    } else {
-      const picture = await this.databaseService
-        .getPictureRepository()
-        .findOne(routedRequest.params.id);
-      image = picture.thumb ? picture.thumb : undefined;
+  // <editor-fold desc='PUT methods'>
+  private async storeMetaData (routedRequest: RoutedRequest): Promise<void> {
+    const data = routedRequest.data as DtoResponseReadMetadata;
+    if (data.metadata.exif) {
+      for (let key of Object.keys(data.metadata.exif)) {
+        let value = data.metadata.exif[key];
+        console.log(`${key}: ${value}`);
+      }
     }
-
-    const response: DtoDataResponse<DtoImage> = {
-      status: DataStatus.Ok,
-      data: { image: image }
-    };
-
-    return response;
   }
+  // </editor-fold>
 
-  private async storeThumbnail(routedRequest: RoutedRequest): Promise<void> {
-    const data = routedRequest.data as DtoResponseCreateThumb;
-    const repository = this.databaseService.getPictureRepository();
-    await repository.update(routedRequest.params.id, { thumb: data.thumb });
-    return;
-  }
 }

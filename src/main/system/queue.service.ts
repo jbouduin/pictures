@@ -1,7 +1,7 @@
 import { ChildProcess, fork } from 'child_process';
 import { inject, injectable } from 'inversify';
 
-import { DtoTaskRequest, LogSource, DtoTaskResponse, TaskType, DtoResponseCreateThumb, DtoDataRequest, DataVerb } from '@ipc';
+import { DtoTaskRequest, LogSource, DtoTaskResponse, TaskType, DtoDataRequest, DataVerb } from '@ipc';
 import { ILogService } from './log.service';
 
 import SERVICETYPES from '../di/service.types';
@@ -60,24 +60,34 @@ export class QueueService implements IQueueService {
 
   private processResponse(response: DtoTaskResponse<any>): void {
     this.logService.debug(LogSource.Main, 'received response from queue: ' + JSON.stringify(response, null, 2));
+    let dataRequest: DtoDataRequest<any>;
     if (response.success) {
       switch(response.taskType) {
         case TaskType.CreateThumb: {
-          const dataRequest: DtoDataRequest<DtoResponseCreateThumb> = {
+          dataRequest = {
             id: 0,
             verb: DataVerb.PUT,
             path: `/thumbnail/${response.data.id}`,
             data: response.data
           };
-          this.dataRouterService.routeRequest(dataRequest);
           break;
         }
         case TaskType.ReadMetaData: {
+          dataRequest = {
+            id: 0,
+            verb: DataVerb.PUT,
+            path: `/picture/${response.data.id}/metadata`,
+            data: response.data
+          };
           break;
         }
+      }
+      if (dataRequest) {
+        this.dataRouterService.routeRequest(dataRequest);
       }
     } else {
       this.logService.error(LogSource.Queue, response.error);
     }
+
   }
 }

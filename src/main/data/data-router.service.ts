@@ -10,6 +10,7 @@ import { ILogService } from '../system/log.service';
 import { IConfigurationService } from './configuration/configuration.service';
 import { ICollectionService } from './pictures/collection.service';
 import { IPictureService } from './pictures/picture.service';
+import { IThumbnailService } from './pictures/thumbnail.service';
 import { ITagService } from './tags/tag.service';
 import { RoutedRequest } from './routed-request';
 
@@ -43,7 +44,8 @@ export class DataRouterService implements IDataRouterService {
     @inject(SERVICETYPES.ConfigurationService) private configurationService: IConfigurationService,
     @inject(SERVICETYPES.CollectionService) private collectionService: ICollectionService,
     @inject(SERVICETYPES.PictureService) private pictureService: IPictureService,
-    @inject(SERVICETYPES.TagService) private tagService: ITagService) {
+    @inject(SERVICETYPES.TagService) private tagService: ITagService,
+    @inject(SERVICETYPES.ThumbnailService) private thumbnailService: IThumbnailService) {
     this.deleteRoutes = new Collections.Dictionary<string, RouteCallback>();
     this.getRoutes = new Collections.Dictionary<string, RouteCallback>();
     this.postRoutes = new Collections.Dictionary<string, RouteCallback>();
@@ -58,6 +60,7 @@ export class DataRouterService implements IDataRouterService {
     this.collectionService.setRoutes(this);
     this.pictureService.setRoutes(this);
     this.tagService.setRoutes(this);
+    this.thumbnailService.setRoutes(this);
     this.logService.verbose(LogSource.Main, 'registered DELETE routes:');
     this.deleteRoutes.keys().forEach(route => this.logService.verbose(LogSource.Main, route));
     this.logService.verbose(LogSource.Main, 'registered GET routes:');

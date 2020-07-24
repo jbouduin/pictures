@@ -1,4 +1,4 @@
-import { DtoRequestCreateThumb, DtoResponseCreateThumb, DtoRequestReadMetaData } from '@ipc';
+import { DtoRequestCreateThumb, DtoResponseCreateThumb } from '@ipc';
 import { DtoTaskResponse, TaskType } from '@ipc';
 import im from  'imagemagick';
 import { promisify } from 'util';
@@ -6,17 +6,10 @@ import { promisify } from 'util';
 export class ThumbCreator {
 
   private resize = promisify(im.resize);
-  private read = promisify(im.readMetadata);
-  public async readMetaData(params: DtoRequestReadMetaData): Promise<boolean> {
-    await this.read(params.source).then(
-      result => console.error('metadata', params.source, result)
-    )
-    return Promise.resolve(true);
-  }
 
   public async createThumbIm(params: DtoRequestCreateThumb): Promise<DtoTaskResponse<DtoResponseCreateThumb>> {
 
-    const response = await this.resize({
+    return await this.resize({
       srcPath: params.source,
       quality: 0.8,
       format: 'jpg',
@@ -25,8 +18,6 @@ export class ThumbCreator {
       height: 240
     })
     .then( resized => {
-
-      console.log(resized.constructor);
       const responseData: DtoResponseCreateThumb = {
         id: params.id,
         thumb: Buffer.from(resized, 'binary').toString('base64')
@@ -40,15 +31,14 @@ export class ThumbCreator {
       return response;
     })
     .catch( error => {
-        const errorResponse: DtoTaskResponse<DtoResponseCreateThumb> = {
-          taskType: TaskType.CreateThumb,
-          success: false,
-          error: [ `Error resizing ${params.source}`, error ],
-          data: undefined
-        }
-        return errorResponse;
+      const errorResponse: DtoTaskResponse<DtoResponseCreateThumb> = {
+        taskType: TaskType.CreateThumb,
+        success: false,
+        error: [ `Error resizing ${params.source}`, error ],
+        data: undefined
       }
-    );
-    return response;
+      return errorResponse;
+    });
+
   }
 }

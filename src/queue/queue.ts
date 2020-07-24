@@ -1,6 +1,7 @@
 import { DtoTaskRequest, TaskType } from '@ipc';
 
 import { ThumbCreator } from './thumb-creator';
+import { MetadataReader } from './metadata-reader';
 
 process.on('message', (m) => {
   console.log('Got message:', m);
@@ -38,12 +39,13 @@ class QueueService {
           break;
         }
         case TaskType.CreateThumb: {
-          const response = await new ThumbCreator().createThumbIm(next.data);
-          process.send(response);
+          const thumbResponse = await new ThumbCreator().createThumbIm(next.data);
+          process.send(thumbResponse);
           break;
         }
         case TaskType.ReadMetaData: {
-          await new ThumbCreator().readMetaData(next.data);
+          const metaResponse = await new MetadataReader().readMetaData(next.data);
+          process.send(metaResponse);
           break;
         }
         default: {
