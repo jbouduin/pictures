@@ -18,6 +18,7 @@ import SERVICETYPES from '../di/service.types';
 export interface IDatabaseService {
   getCollectionRepository(): Repository<Collection>;
   getDeleteQueryBuilder(): DeleteQueryBuilder<any>;
+  getMetaDataKeyRepository(): Repository<MetadataKey>;
   getMetaDataPictureMapRepository(): Repository<MetadataPictureMap>;
   getPictureRepository(): Repository<Picture>;
   getTagRepository(): TreeRepository<Tag>;
@@ -42,6 +43,12 @@ export class DatabaseService implements IDatabaseService {
 
   public getDeleteQueryBuilder(): DeleteQueryBuilder<any> {
     return this.getConnectionByTargetType(TargetType.PICTURES).createQueryBuilder().delete();
+  }
+
+  public getMetaDataKeyRepository(): Repository<MetadataKey> {
+    return this
+      .getConnectionByTargetType(TargetType.PICTURES)
+      .getRepository(MetadataKey);
   }
 
   public getMetaDataPictureMapRepository(): Repository<MetadataPictureMap> {

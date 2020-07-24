@@ -4,7 +4,7 @@ import 'reflect-metadata';
 import { DtoTaskRequest, TaskType, DtoRequestCreateThumb, DtoRequestReadMetaData, DtoResponseReadMetadata } from '@ipc';
 import { LogSource } from '@ipc';
 
-import { Collection, Picture } from '../../database';
+import { Collection, Picture, MetadataPictureMap } from '../../database';
 import { IDatabaseService } from '../../database';
 import { ILogService, IQueueService } from '../../system';
 
@@ -98,14 +98,44 @@ export class PictureService extends DataService implements IPictureService {
   // <editor-fold desc='PUT methods'>
   private async storeMetaData (routedRequest: RoutedRequest): Promise<void> {
     const data = routedRequest.data as DtoResponseReadMetadata;
+    const metaDataKeyRepository = this.databaseService.getMetaDataKeyRepository();
+    const metaDataPictureMapRepository = this.databaseService.getMetaDataPictureMapRepository();
     if (data.metadata.exif) {
-      console.log(`metadata for ${routedRequest.params.id}`);
+      const toSave = new Array<MetadataPictureMap>();
+      const picture = await this.databaseService.getPictureRepository().findOneOrFail(routedRequest.params.id);
+      this.logService.verbose(LogSource.Main, `storing metadata for ${routedRequest.params.id}`);
       for (let key of Object.keys(data.metadata.exif)) {
         if (this.exifKeysToSkip.indexOf(key) < 0) {
-          let value = data.metadata.exif[key];
-          console.log(`${key}: ${value}`);
+          let metadataPictureMap: MetadataPictureMap;
+          const metaDataKey = await metaDataKeyRepository
+            .findOneOrFail({ where: { name: key } })
+            .then(
+              async found => {
+                this.logService.debug(LogSource.Main, `found existing metadata key: ${found.name}`);
+                metadataPictureMap = await metaDataPictureMapRepository.findOne( { where: { picture: picture, metadataKey: found } });
+                return found;
+              },
+              () => {
+                this.logService.debug(LogSource.Main, `creating new metadata key: ${key}`);
+                return metaDataKeyRepository.create({ name: key });
+              }
+            );
+
+          if (metadataPictureMap) {
+            this.logService.debug(LogSource.Main, `updating existing value: ${data.metadata.exif[key]}`);
+            metadataPictureMap.value = data.metadata.exif[key];
+          } else {
+            this.logService.debug(LogSource.Main, `creating new value: ${data.metadata.exif[key]}`);
+            metadataPictureMap = metaDataPictureMapRepository.create({
+              picture: picture,
+              metadataKey: metaDataKey,
+              value: data.metadata.exif[key]
+            });
+          }
+          toSave.push(metadataPictureMap);
         }
       }
+      await metaDataPictureMapRepository.save(toSave);
     }
   }
   // </editor-fold>
