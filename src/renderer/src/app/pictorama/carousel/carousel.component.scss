@@ -6,6 +6,10 @@
   flex: 1;
 }
 
+.carousel-container {
+  padding: 0;
+}
+
 .carousel {
   position: relative;
   height: 100%;
@@ -41,7 +45,7 @@
   flex-direction: column;
   justify-content: center;
   padding: 0.5em;
-  color: white;
+  color: black;
   font-weight: bold;
   font-size: 3em;
   user-select: none;
@@ -57,17 +61,19 @@
   /* Position the buttons */
   &.next {
     right: 0;
+    margin-right: -18px;
   }
   &.prev {
     left: 0;
+    margin-left: -18px;
   }
 }
 
 /* style the arrows */
 .arrow {
   display: block;
-  border-left: 0.1em solid white;
-  border-bottom: 0.1em solid white;
+  border-left: 0.1em solid rgba(0, 0, 0, 0.5);
+  border-bottom: 0.1em solid rgba(0, 0, 0, 0.5);
   width: 0.5em;
   height: 0.5em;
 

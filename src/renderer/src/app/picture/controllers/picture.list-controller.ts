@@ -87,6 +87,8 @@ export class PictureListController extends BaseListController<
     this.dialog.open(CarouselComponent, {
       width: '100%',
       height: '100%',
+      maxWidth: '100%',
+      panelClass: 'carousel-container',
       data: params
     })
   }
