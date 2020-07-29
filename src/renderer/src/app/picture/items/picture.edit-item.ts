@@ -1,4 +1,4 @@
-import { DtoGetPicture } from '@ipc';
+import { DtoGetPicture, DtoGetMetadata } from '@ipc';
 import { BaseItem } from '@shared';
 
 import { Injectable } from '@angular/core';
@@ -12,6 +12,7 @@ export class PictureEditItem extends BaseItem {
   public version: number;
   public collectionName: string;
   public path: string;
+  public metadata: Array<DtoGetMetadata>;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
@@ -22,6 +23,7 @@ export class PictureEditItem extends BaseItem {
     this.version = dtoGetPicture.version;
     this.collectionName = dtoGetPicture.collection.name;
     this.path = `${dtoGetPicture.collection.path}/${dtoGetPicture.path}/${dtoGetPicture.name}`;
+    this.metadata = dtoGetPicture.metadata;
   }
   // </editor-fold>
 }

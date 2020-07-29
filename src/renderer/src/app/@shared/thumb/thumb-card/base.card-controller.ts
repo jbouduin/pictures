@@ -80,7 +80,8 @@ export abstract class BaseCardController<E extends BaseItem, DtoGet extends DtoG
             cancelDialog: this.cancelDialog.bind(this),
             commitDialog: this.commitEdit.bind(this)
           },
-          width: '600px'
+          width: '600px',
+          maxHeight: '100%'
         };
         this.dialogRef = this.dialog.open(DynamicDialogComponent, params);
         this.dialogRef.afterClosed().subscribe( () => this.dialogRef = undefined);

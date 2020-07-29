@@ -13,10 +13,12 @@ export class PictureDialogComponent implements OnInit {
   private controller: DynamicDialogController;
 
   public picture: PictureEditItem;
+  public displayedColumns: Array<string>;
 
   public constructor(controller: DynamicDialogController, baseItem: BaseItem) {
     this.controller = controller;
     this.picture = (baseItem as any) as PictureEditItem;
+    this.displayedColumns = [ 'key', 'value' ];
   }
 
   // <editor-fold desc='Angular interface methods'>

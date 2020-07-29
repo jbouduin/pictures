@@ -39,6 +39,22 @@
     </div>
   </mat-tab>
   <mat-tab label="File properties">
+    <div>
+      <table mat-table [dataSource]="picture.metadata" class="full-width">
+        <ng-container matColumnDef="key">
+          <mat-header-cell *matHeaderCellDef> Key </mat-header-cell>
+          <mat-cell *matCellDef="let entry"> {{entry.key}} </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="value">
+          <mat-header-cell *matHeaderCellDef> Value </mat-header-cell>
+          <mat-cell *matCellDef="let entry"> {{entry.value}} </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+      </table>
+    </div>
   </mat-tab>
 </mat-tab-group>
 <div mat-dialog-actions>

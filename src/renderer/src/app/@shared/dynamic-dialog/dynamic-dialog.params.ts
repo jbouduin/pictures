@@ -14,4 +14,5 @@ export interface DynamicDialogParamsData<T extends BaseItem> {
 export interface DynamicDialogParams<T extends BaseItem> {
   data: DynamicDialogParamsData<T>;
   width: string;
+  maxHeight: string;
 }

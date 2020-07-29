@@ -110,8 +110,8 @@ export abstract class BaseListController<
         cancelDialog: this.cancelDialog.bind(this),
         commitDialog: this.commitCreate.bind(this)
       },
-      width: '600px'
-
+      width: '600px',
+      maxHeight: '100%'
     }
     this.dialogRef = this.dialog.open(DynamicDialogComponent, params);
     this.dialogRef.afterClosed().subscribe( () => this.dialogRef = undefined);

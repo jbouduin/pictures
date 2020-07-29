@@ -109,6 +109,13 @@ export class PictureService extends DataService implements IPictureService {
         name: picture.collection.name,
         path: picture.collection.path
       };
+      const metadata = await this.databaseService
+        .getMetaDataPictureMapRepository()
+        .find({
+          where: { picture: picture},
+          relations: [ 'metadataKey']
+        });
+
       const dtoPicture: DtoGetPicture = {
         id: picture.id,
         created: picture.created,
@@ -116,7 +123,8 @@ export class PictureService extends DataService implements IPictureService {
         version: picture.version,
         name: picture.name,
         path: picture.path,
-        collection: dtoCollection
+        collection: dtoCollection,
+        metadata: metadata.map(md => { return { key: md.metadataKey.name, value: md.value}; })
       };
       const result: DtoDataResponse<DtoGetPicture> = {
         status: DataStatus.Ok,
@@ -149,7 +157,7 @@ export class PictureService extends DataService implements IPictureService {
     return response;
   }
   // </editor-fold>
-  //
+
   // <editor-fold desc='PUT methods'>
   private async storeMetaData (routedRequest: RoutedRequest): Promise<void> {
     const data = routedRequest.data as DtoResponseReadMetadata;

@@ -1,3 +1,4 @@
+export * from './dto-get-metadata';
 export * from './dto-get-picture-collection';
 export * from './dto-get-picture';
 export * from './dto-list-picture-collection';
