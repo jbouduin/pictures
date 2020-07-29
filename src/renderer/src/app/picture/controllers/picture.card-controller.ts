@@ -27,7 +27,7 @@ export class PictureCardController extends BaseCardController<PictureEditItem, D
   }
 
   protected get root(): string {
-    return '/';
+    return '/picture';
   }
   // </editor-fold>
 

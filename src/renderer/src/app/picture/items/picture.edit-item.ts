@@ -10,6 +10,8 @@ export class PictureEditItem extends BaseItem {
   public created: Date;
   public modified: Date;
   public version: number;
+  public collectionName: string;
+  public path: string;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
@@ -18,6 +20,8 @@ export class PictureEditItem extends BaseItem {
     this.created = dtoGetPicture.created;
     this.modified = dtoGetPicture.modified;
     this.version = dtoGetPicture.version;
+    this.collectionName = dtoGetPicture.collection.name;
+    this.path = `${dtoGetPicture.collection.path}/${dtoGetPicture.path}/${dtoGetPicture.name}`;
   }
   // </editor-fold>
 }

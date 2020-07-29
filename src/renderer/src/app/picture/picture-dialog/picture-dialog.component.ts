@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { DynamicDialogController } from '@shared/dynamic-dialog/dynamic-dialog.types';
+import { BaseItem } from '@shared/thumb/base-item';
+import { PictureEditItem } from '../items/picture.edit-item';
 
 @Component({
   selector: 'app-picture-dialog',
@@ -7,9 +10,23 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PictureDialogComponent implements OnInit {
 
-  constructor() { }
+  private controller: DynamicDialogController;
 
-  ngOnInit(): void {
+  public picture: PictureEditItem;
+
+  public constructor(controller: DynamicDialogController, baseItem: BaseItem) {
+    this.controller = controller;
+    this.picture = (baseItem as any) as PictureEditItem;
   }
+
+  // <editor-fold desc='Angular interface methods'>
+  public ngOnInit(): void { }
+  // </editor-fold>
+
+  // <editor-fold desc='UI triggered methods'>
+  public cancel(): void {
+    this.controller.cancelDialog();
+  }
+  // </editor-fold>
 
 }

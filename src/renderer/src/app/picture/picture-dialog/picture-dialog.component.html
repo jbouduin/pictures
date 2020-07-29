@@ -1,1 +1,46 @@
-<p>picture-dialog works!</p>
+<h1 mat-dialog-title>Picture</h1>
+<mat-tab-group>
+  <mat-tab label="Basic data">
+    <div fxLayout="row" fxLayoutAlign="space-between center">
+      <mat-form-field >
+        <mat-label>Id</mat-label>
+        <input matInput [value]="picture.id" [disabled]="true"/>
+      </mat-form-field>
+      <mat-form-field >
+        <mat-label>Version</mat-label>
+        <input matInput [value]="picture.version" [disabled]="true"/>
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field class="full-width">
+        <mat-label>Collection</mat-label>
+        <input matInput [value]="picture.collectionName" [disabled]="true"/>
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field class="full-width">
+        <mat-label>Name</mat-label>
+        <input matInput [value]="picture.name" [disabled]="true"/>
+      </mat-form-field>
+    </div>
+    <mat-form-field class="full-width">
+      <mat-label>Full path</mat-label>
+      <input matInput [value]="picture.path" [disabled]="true"/>
+    </mat-form-field>
+    <div fxLayout="row" fxLayoutAlign="space-between center">
+      <mat-form-field >
+        <mat-label>Created</mat-label>
+        <input matInput [value]="picture.created | date:'d.M.yyyy HH:mm:SS'" [disabled]="true"/>
+      </mat-form-field>
+      <mat-form-field >
+        <mat-label>Updated</mat-label>
+        <input matInput [value]="picture.modified | date:'d.M.yyyy HH:mm:SS'" [disabled]="true"/>
+      </mat-form-field>
+    </div>
+  </mat-tab>
+  <mat-tab label="File properties">
+  </mat-tab>
+</mat-tab-group>
+<div mat-dialog-actions>
+  <button mat-button (click)="cancel()">Close</button>
+</div>

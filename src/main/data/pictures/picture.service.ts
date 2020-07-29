@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import * as path from 'path';
 
-import { DtoTaskRequest, TaskType, DtoRequestCreateThumb, DtoRequestReadMetaData, DtoResponseReadMetadata, DtoDataResponse, DtoImage, DataStatus } from '@ipc';
+import { DtoTaskRequest, TaskType, DtoRequestCreateThumb, DtoRequestReadMetaData, DtoResponseReadMetadata, DtoDataResponse, DtoImage, DataStatus, DtoGetPicture, DtoGetPictureCollection } from '@ipc';
 import { LogSource } from '@ipc';
 
 import { Collection, Picture, MetadataPictureMap } from '../../database';
@@ -40,6 +40,7 @@ export class PictureService extends DataService implements IPictureService {
   // <editor-fold desc='IDataService interface methods'>
   public setRoutes(router: IDataRouterService): void {
     router.get('/picture/:id/raw', this.getRawImage.bind(this));
+    router.get('/picture/:id', this.getPicture.bind(this));
     router.put('/picture/:id/metadata', this.storeMetaData.bind(this));
   }
   // </editor-fold>
@@ -98,6 +99,40 @@ export class PictureService extends DataService implements IPictureService {
   // </editor-fold>
 
   // <editor-fold desc='GET methods'>
+  private async getPicture(request: RoutedRequest): Promise<DtoDataResponse<DtoGetPicture>> {
+    try {
+      const picture = await this.databaseService
+        .getPictureRepository()
+        .findOneOrFail(request.params.id, { relations: [ 'collection' ] });
+      const dtoCollection: DtoGetPictureCollection = {
+        id: picture.collection.id,
+        name: picture.collection.name,
+        path: picture.collection.path
+      };
+      const dtoPicture: DtoGetPicture = {
+        id: picture.id,
+        created: picture.created,
+        modified: picture.modified,
+        version: picture.version,
+        name: picture.name,
+        path: picture.path,
+        collection: dtoCollection
+      };
+      const result: DtoDataResponse<DtoGetPicture> = {
+        status: DataStatus.Ok,
+        data: dtoPicture
+      };
+      return result;
+    }
+    catch (error) {
+      const errorResult: DtoDataResponse<DtoGetPicture> = {
+        status: DataStatus.Conflict,
+        message: `${error.name}: ${error.message}`
+      };
+      return errorResult;
+    }
+  }
+
   private async getRawImage(routedRequest: RoutedRequest): Promise<DtoDataResponse<DtoImage>> {
 
     const picture = await this.databaseService
