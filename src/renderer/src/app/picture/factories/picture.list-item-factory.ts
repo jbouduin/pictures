@@ -9,6 +9,8 @@ import { PictureNewItem } from '../items/picture.new-item';
 })
 export class PictureListItemFactory extends BaseListItemFactory<PictureListItem, PictureNewItem, DtoListPicture, DtoNewPicture> {
 
+  public dtoToListItemCallBack?: (list: PictureListItem) => void;
+
   // <editor-fold desc='Constructor & C°'>
   public constructor() {
     super();
@@ -21,7 +23,9 @@ export class PictureListItemFactory extends BaseListItemFactory<PictureListItem,
   }
 
   public listDtoToListItem(dto: DtoListPicture): PictureListItem {
-    return new PictureListItem(dto);
+    const result =  new PictureListItem(dto);
+    result.onClick = this.dtoToListItemCallBack;
+    return result;
   }
 
   public newItemToNewDto(_item: PictureNewItem): DtoNewPicture {

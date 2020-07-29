@@ -2,6 +2,7 @@
   "name": "angular-electron-boilerplate",
   "version": "0.0.0",
   "main": "./dist/main/electron-main.js",
+  "styleIncludePaths": ["./src/renderer/src/theme"],
   "scripts": {
     "start": "electron . --allow-file-access-from-files",
     "dev": "nodemon",

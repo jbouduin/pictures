@@ -7,6 +7,7 @@ import { NgxResizableModule } from '@3dgenomes/ngx-resizable';
 import { CoreModule } from '@core';
 import { SharedModule } from '@shared';
 import { CollectionModule } from './collection';
+import { PictoramaModule } from './pictorama';
 import { PictureModule } from './picture';
 import { ShellModule } from './shell';
 
@@ -27,6 +28,7 @@ import { TagModule } from './tag';
     SharedModule,
     ShellModule,
     CollectionModule,
+    PictoramaModule,
     PictureModule,
     TagModule,
     AppRoutingModule // must be imported as the last module as it contains the fallback route

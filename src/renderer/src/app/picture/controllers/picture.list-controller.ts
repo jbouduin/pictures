@@ -8,6 +8,7 @@ import { DtoListPicture, DtoNewPicture } from '@ipc';
 import { IpcService, DataRequestFactory } from '@core';
 import { PaginationController, BaseListController } from '@shared';
 import { FloatingButtonParams } from '@shared';
+import { CarouselComponent } from '../../pictorama/carousel/carousel.component';
 import { PictureNewItem } from '../items/picture.new-item';
 import { PictureListItem } from '../items/picture.list-item';
 import { PictureListItemFactory } from '../factories/picture.list-item-factory';
@@ -50,6 +51,7 @@ export class PictureListController extends BaseListController<
     paginationController: PaginationController,
     itemFactory: PictureListItemFactory) {
     super(dialog, ipcService, dataRequestFactory, paginationController, itemFactory);
+    itemFactory.dtoToListItemCallBack = this.openPicturama.bind(this);
   }
   // </editor-fold>
 
@@ -75,4 +77,11 @@ export class PictureListController extends BaseListController<
     }
   }
   // </editor-fold>
+
+  private openPicturama(item: PictureListItem): void {
+    // alert('current: ' + item.name + '; ' + this.currentRoot);
+    this.dialog.open(CarouselComponent, {
+      width: '100%', height: '100%'
+    })
+  }
 }
