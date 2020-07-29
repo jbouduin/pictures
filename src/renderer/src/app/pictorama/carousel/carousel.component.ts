@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from "@angular/core";
+import { Component, Inject, OnInit, HostListener } from "@angular/core";
 import { trigger, transition, useAnimation } from '@angular/animations';
 import { fadeIn, fadeOut } from './carousel.animations';
 import { CarouselParams } from './carousel.params';
@@ -7,6 +7,12 @@ import { IpcService, DataRequestFactory } from '@core';
 import { DataVerb, DtoListData, DtoListPicture, DtoImage } from '@ipc';
 import { Slide } from './slide';
 import { DomSanitizer } from '@angular/platform-browser';
+
+enum KEY_CODE {
+  RIGHT_ARROW = 39,
+  LEFT_ARROW = 37
+}
+
 
 @Component({
   selector: "carousel",
@@ -75,6 +81,17 @@ export class CarouselComponent implements OnInit {
   // </editor-fold>
 
   // <editor-fold desc='UI Triggered methods'>
+  @HostListener('keyup', ['$event'])
+  public onKeyUp(event: KeyboardEvent): void {
+    if (event.keyCode === KEY_CODE.RIGHT_ARROW) {
+      this.onNextClick();
+    }
+
+    if (event.keyCode === KEY_CODE.LEFT_ARROW) {
+      this.onPreviousClick();
+    }
+  }
+
   public onPreviousClick() {
     this.currentSlide = this.previous();
   }
