@@ -1,4 +1,4 @@
-import { style, animate, animation, keyframes } from "@angular/animations";
+import { style, animate, animation } from "@angular/animations";
 
 // =========================
 // Scale

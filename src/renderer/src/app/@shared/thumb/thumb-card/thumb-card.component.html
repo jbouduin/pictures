@@ -2,7 +2,7 @@
   <mat-card class="thumb-card">
     <mat-card-content >
       <div fxLayout="column">
-        <a [routerLink]="item.routerLink" class="thumb-card-header" (click)="item.onClick(item)">
+        <a [routerLink]="item.routerLink" class="thumb-card-header" (click)="item.onClick ? item.onClick(item) : false">
           <div fxLayout="column">
             <div fxLayout="row" fxFlex="50px" fxLayoutAlign="center center">
               {{item.name}}

@@ -1,7 +1,8 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
+import * as path from 'path';
 
-import { DtoTaskRequest, TaskType, DtoRequestCreateThumb, DtoRequestReadMetaData, DtoResponseReadMetadata } from '@ipc';
+import { DtoTaskRequest, TaskType, DtoRequestCreateThumb, DtoRequestReadMetaData, DtoResponseReadMetadata, DtoDataResponse, DtoImage, DataStatus } from '@ipc';
 import { LogSource } from '@ipc';
 
 import { Collection, Picture, MetadataPictureMap } from '../../database';
@@ -38,6 +39,7 @@ export class PictureService extends DataService implements IPictureService {
 
   // <editor-fold desc='IDataService interface methods'>
   public setRoutes(router: IDataRouterService): void {
+    router.get('/picture/:id/raw', this.getRawImage.bind(this));
     router.put('/picture/:id/metadata', this.storeMetaData.bind(this));
   }
   // </editor-fold>
@@ -95,6 +97,24 @@ export class PictureService extends DataService implements IPictureService {
   }
   // </editor-fold>
 
+  // <editor-fold desc='GET methods'>
+  private async getRawImage(routedRequest: RoutedRequest): Promise<DtoDataResponse<DtoImage>> {
+
+    const picture = await this.databaseService
+      .getPictureRepository()
+      .findOne(routedRequest.params.id, { relations: [ 'collection' ]});
+
+    const filePath = path.join(picture.collection.path, picture.path, picture.name);
+    const image = this.readFileToBase64(filePath);
+    const response: DtoDataResponse<DtoImage> = {
+      status: DataStatus.Ok,
+      data: { image: image }
+    };
+
+    return response;
+  }
+  // </editor-fold>
+  //
   // <editor-fold desc='PUT methods'>
   private async storeMetaData (routedRequest: RoutedRequest): Promise<void> {
     const data = routedRequest.data as DtoResponseReadMetadata;

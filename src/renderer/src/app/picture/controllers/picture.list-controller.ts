@@ -13,6 +13,7 @@ import { PictureNewItem } from '../items/picture.new-item';
 import { PictureListItem } from '../items/picture.list-item';
 import { PictureListItemFactory } from '../factories/picture.list-item-factory';
 import { PictureDialogComponent } from '../picture-dialog/picture-dialog.component';
+import { CarouselParams } from 'src/app/pictorama/carousel/carousel.params';
 
 @Injectable()
 export class PictureListController extends BaseListController<
@@ -79,9 +80,14 @@ export class PictureListController extends BaseListController<
   // </editor-fold>
 
   private openPicturama(item: PictureListItem): void {
-    // alert('current: ' + item.name + '; ' + this.currentRoot);
+    const params: CarouselParams = {
+      currentRoot: this.currentRoot,
+      currentId: item.id
+    };
     this.dialog.open(CarouselComponent, {
-      width: '100%', height: '100%'
+      width: '100%',
+      height: '100%',
+      data: params
     })
   }
 }
