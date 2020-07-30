@@ -29,7 +29,8 @@ export class CollectionListItemFactory extends BaseListItemFactory<
   public newItemToNewDto(item: CollectionNewItem): DtoNewCollection {
     const result: DtoNewCollection = {
       name: item.name,
-      path: item.path
+      path: item.path,
+      secret: item.secret
     };
     return result;
   }

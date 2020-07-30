@@ -103,6 +103,7 @@ export class CollectionService extends DataService implements ICollectionService
       .where ('id = :id', { id: Number.parseInt(request.params.collection) })
       .addSelect('name')
       .addSelect('path')
+      .addSelect('secret')
       .addSelect('thumbId as myThumbId')
       .leftJoin( (cntQry) => {
         return cntQry
@@ -126,6 +127,7 @@ export class CollectionService extends DataService implements ICollectionService
         id: collection.id,
         name: collection.name,
         path: collection.path,
+        secret: collection.secret,
         pictures: collection.count || 0,
         thumbId: collection.myThumbId || collection.cntThumbId
       };
@@ -155,6 +157,7 @@ export class CollectionService extends DataService implements ICollectionService
       .select('id')
       .addSelect('name')
       .addSelect('path')
+      .addSelect('secret')
       .addSelect('thumbId as myThumbId')
       .leftJoin( (cntQry) => {
         return cntQry
@@ -185,6 +188,7 @@ export class CollectionService extends DataService implements ICollectionService
             id: collection.id,
             name: collection.name,
             path: collection.path,
+            secret: collection.secret,
             pictures: collection.count || 0,
             thumbId: collection.myThumbId || collection.cntThumbId
           };
@@ -220,7 +224,8 @@ export class CollectionService extends DataService implements ICollectionService
         modified: collection.modified,
         version: collection.version,
         name: collection.name,
-        path: collection.path
+        path: collection.path,
+        secret: collection.secret
       };
       const result: DtoDataResponse<DtoGetCollection> = {
         status: DataStatus.Ok,
@@ -342,7 +347,8 @@ export class CollectionService extends DataService implements ICollectionService
 
     const newCollection = repository.create({
       name: request.data.name,
-      path: request.data.path
+      path: request.data.path,
+      secret: request.data.secret
     });
 
     try {
@@ -352,6 +358,7 @@ export class CollectionService extends DataService implements ICollectionService
         id: collection.id,
         name: collection.name,
         path: collection.path,
+        secret: collection.secret,
         pictures: 0,
         thumbId: undefined
       };
@@ -402,6 +409,7 @@ export class CollectionService extends DataService implements ICollectionService
           id: savedCollection.id,
           name: savedCollection.name,
           path: savedCollection.path,
+          secret: savedCollection.secret,
           pictures: 0,
           thumbId: undefined
         };
@@ -441,7 +449,8 @@ export class CollectionService extends DataService implements ICollectionService
           name: savedCollection.name,
           path: savedCollection.path,
           pictures: 0,
-          thumbId: request.data
+          thumbId: request.data,
+          secret: savedCollection.secret
         };
         const result: DtoDataResponse<DtoListCollection> = {
           status: DataStatus.Ok,

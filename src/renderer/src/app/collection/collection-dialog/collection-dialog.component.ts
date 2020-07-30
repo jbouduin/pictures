@@ -67,16 +67,19 @@ export class CollectionDialogComponent implements OnInit {
       this.dialogTitle = 'Edit collection';
     }
 
-    const nameControl = new FormControl( '', [Validators.required]);
-    const pathControl = new FormControl( { value: '', disabled: !this.collection.isNew }, [Validators.required]);
+    const nameControl = new FormControl('', [Validators.required]);
+    const pathControl = new FormControl({ value: '', disabled: !this.collection.isNew }, [Validators.required]);
+    const secretControl = new FormControl({ value: false, disabled: !this.collection.isNew } );
     this.collectionData = this.formBuilder.group({
       name: nameControl,
-      path: pathControl
+      path: pathControl,
+      secret: secretControl
     });
 
     if (!this.collection.isNew) {
       nameControl.patchValue(this.collection.name);
       pathControl.patchValue(this.collection.path);
+      secretControl.patchValue(this.collection.secret);
     }
   }
   // </editor-fold>
@@ -113,6 +116,7 @@ export class CollectionDialogComponent implements OnInit {
   private commitForm(): void {
     this.collection.name = this.collectionData.get('name').value;
     this.collection.path = this.collectionData.get('path').value;
+    this.collection.secret = this.collectionData.get('secret').value;
   }
   // </editor-fold>
 }

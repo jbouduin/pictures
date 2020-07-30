@@ -26,9 +26,7 @@
     </mat-form-field>
   </div>
   <div>
-    <!-- <mat-form-field class="full-width"> -->
-      <mat-slide-toggle formControlName="canAssign" color=primary>Tag can be assigned</mat-slide-toggle>
-    <!-- </mat-form-field> -->
+    <mat-slide-toggle formControlName="canAssign" color=primary>Tag can be assigned</mat-slide-toggle>
   </div>
   <div *ngIf="!tag.isNew" fxLayout="row" fxLayoutAlign="space-between center">
     <mat-form-field >

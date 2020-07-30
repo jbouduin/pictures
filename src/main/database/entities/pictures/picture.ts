@@ -5,6 +5,7 @@ import { Collection } from './collection';
 import { MetadataPictureMap } from '../metadata/metadata-picture-map';
 
 @Entity()
+@Index(['collection', 'path', 'name'], { unique: true })
 export class Picture extends BaseEntity {
 
   // TODO unique index on filename + pathname

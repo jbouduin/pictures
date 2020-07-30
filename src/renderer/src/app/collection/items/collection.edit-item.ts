@@ -8,6 +8,7 @@ export class CollectionEditItem extends BaseItem {
 
   // <editor-fold desc='Public properties'>
   public path: string;
+  public secret: boolean;
   public created: Date;
   public modified: Date;
   public version: number;
@@ -17,6 +18,7 @@ export class CollectionEditItem extends BaseItem {
   public constructor(dtoCollection: DtoGetCollection) {
     super(dtoCollection.id, dtoCollection.name);
     this.path = dtoCollection.path;
+    this.secret = dtoCollection.secret;
     this.created = dtoCollection.created;
     this.modified = dtoCollection.modified;
     this.version = dtoCollection.version;

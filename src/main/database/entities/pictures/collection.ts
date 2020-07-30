@@ -9,6 +9,9 @@ export class Collection extends BaseEntity {
   @Column('nvarchar', { length: 256, nullable: false })
   public path: string;
 
+  @Column('boolean', { default: false, nullable: false })
+  public secret: boolean;
+
   @OneToMany(_type => Picture, picture => picture.collection)
   public pictures: Promise<Array<Picture>>;
 

@@ -28,6 +28,9 @@
       <mat-error>{{ getErrorMessage('path') }}</mat-error>
     </mat-form-field>
   </div>
+  <div>
+    <mat-slide-toggle formControlName="secret" color=primary>Secret collection</mat-slide-toggle>
+  </div>
   <div *ngIf="!collection.isNew" fxLayout="row" fxLayoutAlign="space-between center">
     <mat-form-field >
       <mat-label>Created</mat-label>

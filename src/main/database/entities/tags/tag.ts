@@ -6,8 +6,11 @@ import { BaseEntity } from '../base-entity';
 @Tree("closure-table")
 export class Tag extends BaseEntity {
 
-  @Column()
+  @Column('boolean', { default: true, nullable: false })
   canAssign: boolean;
+
+  @Column('boolean', { default: false, nullable: false })
+  public secret: string;
 
   @TreeChildren()
   children: Array<Tag>;

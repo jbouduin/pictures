@@ -20,7 +20,7 @@ export class CollectionTreeItemFactory extends BaseTreeItemFactory<BaseTreeItem,
     return undefined;
   }
 
-  public createTreeItem(dto: DtoTreeBase): BaseTreeItem {
+  public createTreeItem(_dto: DtoTreeBase): BaseTreeItem {
     return undefined;
   }
   // </editor-fold>

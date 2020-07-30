@@ -7,6 +7,7 @@ export class CollectionListItem extends ListItem {
 
   // <editor-fold desc='Public properties'>
   public path: string;
+  public secret: boolean;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
@@ -14,6 +15,7 @@ export class CollectionListItem extends ListItem {
     super(dtoListCollection.id, dtoListCollection.name);
     this.thumbId = dtoListCollection.thumbId;
     this.path = dtoListCollection.path;
+    this.secret = dtoListCollection.secret;
     this.footerText = dtoListCollection.pictures.toString();
     this.routerLink = [ `/picture/collection/${dtoListCollection.id}` ];
   }

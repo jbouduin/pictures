@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn, VersionColumn } from 'typeorm';
+import { Column, CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn, VersionColumn, DeleteDateColumn } from 'typeorm';
 
 export abstract class TraceableEntity {
 
@@ -10,6 +10,9 @@ export abstract class TraceableEntity {
 
   @UpdateDateColumn()
   public modified: Date;
+
+  @DeleteDateColumn()
+  public deleted: Date;
 
   @VersionColumn()
   public version: number;
