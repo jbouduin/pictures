@@ -10,7 +10,7 @@
             <div class="thumb-background" [style.background-image]="getThumbNail()">
               <ng-container *ngIf="item.overlay">
                 <div class="lock-wrapper">
-                  <mat-icon class="lock">{{item.overlay}}</mat-icon>
+                  <mat-icon class="{{item.overlay}}">{{item.overlay}}</mat-icon>
                 </div>
               </ng-container>
             </div>

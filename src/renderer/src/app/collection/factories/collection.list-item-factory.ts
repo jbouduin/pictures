@@ -4,6 +4,7 @@ import { DtoListCollection, DtoNewCollection } from '@ipc';
 import { BaseListItemFactory } from '@shared';
 import { CollectionListItem } from '../items/collection.list-item';
 import { CollectionNewItem } from '../items/collection.new-item';
+import { SecretService } from '@core/secret.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,9 +12,14 @@ import { CollectionNewItem } from '../items/collection.new-item';
 export class CollectionListItemFactory extends BaseListItemFactory<
   CollectionListItem, CollectionNewItem, DtoListCollection, DtoNewCollection> {
 
+  // <editor-fold desc='Private properties'>
+  private secretService: SecretService;
+  // </editor-fold>
+
   // <editor-fold desc='Constructor & C°'>
-  public constructor() {
+  public constructor(secretService: SecretService) {
     super();
+    this.secretService = secretService;
   }
   // </editor-fold>
 
@@ -23,7 +29,7 @@ export class CollectionListItemFactory extends BaseListItemFactory<
   }
 
   public listDtoToListItem(dto: DtoListCollection): CollectionListItem {
-    return new CollectionListItem(dto);
+    return new CollectionListItem(dto, this.secretService);
   }
 
   public newItemToNewDto(item: CollectionNewItem): DtoNewCollection {

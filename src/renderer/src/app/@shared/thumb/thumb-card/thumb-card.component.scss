@@ -26,6 +26,7 @@ a.thumb-card-header {
   height: 180px;
   width: 180px;
 }
+
 .lock {
   font-size: 60px;
   color: red;
@@ -33,4 +34,8 @@ a.thumb-card-header {
   width: auto;
   top: 60px;
   position: relative;
+}
+
+.lock_open {
+  color: green;
 }

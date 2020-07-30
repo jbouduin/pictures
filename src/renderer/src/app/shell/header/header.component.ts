@@ -1,8 +1,6 @@
-import { Title } from '@angular/platform-browser';
-import { Component, OnInit, Input } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
 
-import { IpcService } from '@core';
+import { IpcService, SecretService } from '@core';
 
 @Component({
   selector: 'app-header',
@@ -11,8 +9,22 @@ import { IpcService } from '@core';
 })
 export class HeaderComponent implements OnInit {
 
+  // <editor-fold desc='Private properties'>
+  private ipcService: IpcService
+  private secretService: SecretService;
+  // </editor-fold>
+
+  // <editor-fold desc='Public getters'>
+  public get currentLockStatus(): 'lock' | 'lock_open' {
+    return this.secretService.currentLockStatus;
+  }
+  // </editor-fold>
+
   // <editor-fold desc='Constructor & C°'>
-  public constructor(private ipcService: IpcService) { }
+  public constructor(ipcService: IpcService, secretService: SecretService) {
+    this.ipcService = ipcService;
+    this.secretService = secretService;
+  }
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methods'>
@@ -22,6 +34,10 @@ export class HeaderComponent implements OnInit {
   // <editor-fold desc='UI Triggered methods'>
   public notifications(): void {
     this.ipcService.openDevTools();
+  }
+
+  public toggleLock(): void {
+    this.secretService.toggleLock();
   }
   // </editor-fold>
 }

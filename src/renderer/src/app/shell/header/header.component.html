@@ -12,7 +12,9 @@
     <span translate>Tags</span>
   </button>
   <span fxFlex></span>
-  <!-- app-language-selector icon="true"></app-language-selector -->
+  <button mat-button (click)="toggleLock()">
+    <mat-icon>{{currentLockStatus}}</mat-icon>
+  </button>
   <button mat-button (click)="notifications()">
     <mat-icon>notifications_none</mat-icon>
   </button>
