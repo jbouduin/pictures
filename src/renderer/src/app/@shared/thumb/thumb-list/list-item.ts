@@ -7,6 +7,7 @@ export abstract class ListItem extends BaseItem {
   public routerLink: Array<string>;
   public onClick: (item: ListItem) => void;
   public thumbId: number;
+  public overlay: string;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>

@@ -18,6 +18,7 @@ export class CollectionListItem extends ListItem {
     this.secret = dtoListCollection.secret;
     this.footerText = dtoListCollection.pictures.toString();
     this.routerLink = [ `/picture/collection/${dtoListCollection.id}` ];
+    this.overlay = this.secret ? 'lock' : undefined;
   }
   // </editor-fold>
 }

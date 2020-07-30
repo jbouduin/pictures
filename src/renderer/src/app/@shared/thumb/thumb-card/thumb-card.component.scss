@@ -21,3 +21,16 @@ a.thumb-card-header {
   text-decoration: none;
   color: inherit;
 }
+
+.lock-wrapper {
+  height: 180px;
+  width: 180px;
+}
+.lock {
+  font-size: 60px;
+  color: red;
+  height: auto;
+  width: auto;
+  top: 60px;
+  position: relative;
+}

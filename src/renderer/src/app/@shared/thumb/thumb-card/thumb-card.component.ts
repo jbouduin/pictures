@@ -53,21 +53,6 @@ export class ThumbCardComponent implements OnInit {
   }
 
   public getThumbNail(): SafeStyle {
-    // if (!this.imageUrl) {
-    //   if (this.item.thumbId) {
-    //     const request = this.dataRequestFactory.createUntypedDataRequest(DataVerb.GET, `/thumbnail/${this.item.thumbId}`);
-    //     const response = this.ipcService.dataRequestSync<DtoImage>(request);
-    //
-    //     this.imageUrl = response.data.image ?
-    //       'data:image/jpeg;base64,' + response.data.image :
-    //       undefined;
-    //       // this.configurationService.genericThumbUrl;
-    //     console.log(this.item.thumbId, 'thumbnail set', this.imageUrl ? true : false);
-    //   } else {
-    //     this.imageUrl = undefined; //this.configurationService.genericThumbUrl;
-    //   }
-    // }
-
     return this.imageUrl ?
       this.sanitization.bypassSecurityTrustStyle(`url(${this.imageUrl})`) :
       undefined;
