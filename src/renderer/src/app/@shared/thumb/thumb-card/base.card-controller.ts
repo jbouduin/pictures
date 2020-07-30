@@ -1,7 +1,7 @@
 import { ComponentType } from '@angular/cdk/portal';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
-import { IpcService, IpcDataRequest, DataRequestFactory } from '@core';
+import { IpcService, IpcDataRequest, DataRequestFactory, SecretService } from '@core';
 import { DataVerb } from '@ipc';
 import { DtoGetBase, DtoSetBase } from '@ipc';
 
@@ -26,6 +26,7 @@ export abstract class BaseCardController<E extends BaseItem, DtoGet extends DtoG
   // <editor-fold desc='Protected properties'>
   protected dialog: MatDialog;
   protected ipcService: IpcService;
+  protected secretService: SecretService;
   protected dataRequestFactory: DataRequestFactory;
   protected itemFactory: BaseCardItemFactory<E, DtoGet, DtoSet>;
   // </editor-fold>
@@ -37,7 +38,6 @@ export abstract class BaseCardController<E extends BaseItem, DtoGet extends DtoG
   // </editor-fold>
 
   // <editor-fold desc='Abstract public getters'>
-  public abstract get thumbCardFooterParams(): Array<ThumbCardFooterParams>;
   public abstract get cardFooterIcon(): string;
   // </editor-fold>
 
@@ -46,16 +46,22 @@ export abstract class BaseCardController<E extends BaseItem, DtoGet extends DtoG
   public afterDelete: EventEmitter<number>;
   // </editor-fold>
 
+  // <editor-fold desc='Abstract public methods'>
+  public abstract thumbCardFooterParams(listItem: BaseItem): Array<ThumbCardFooterParams>;
+  // </editor-fold>
+
   // <editor-fold desc='Constructor & C°'>
   constructor(
     dialog: MatDialog,
     ipcService: IpcService,
+    secretService: SecretService,
     dataRequestFactory: DataRequestFactory,
     itemFactory: BaseCardItemFactory<E, DtoGet, DtoSet>) {
 
     this.currentTreeItem = undefined;
     this.dialog = dialog;
     this.ipcService = ipcService;
+    this.secretService = secretService;
     this.dataRequestFactory = dataRequestFactory;
     this.itemFactory = itemFactory;
     this.dialogRef = undefined;

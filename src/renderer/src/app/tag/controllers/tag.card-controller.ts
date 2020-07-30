@@ -5,7 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DataVerb } from '@ipc';
 import { DtoGetTag, DtoSetTag } from '@ipc';
 
-import { IpcService, DataRequestFactory, IpcDataRequest } from '@core';
+import { IpcService, DataRequestFactory, IpcDataRequest, SecretService } from '@core';
 import { BaseCardController } from '@shared';
 import { ThumbCardFooterParams } from '@shared';
 import { TagEditItem } from '../items/tag.edit-item';
@@ -32,11 +32,13 @@ export class TagCardController extends BaseCardController<TagEditItem, DtoGetTag
   public get cardFooterIcon(): string {
     return "camera_alt";
   }
+  // </editor-fold>
 
-  public get thumbCardFooterParams(): Array<ThumbCardFooterParams> {
+  // <editor-fold desc='Implementation of abstract methods'>
+  public thumbCardFooterParams(_item: TagListItem): Array<ThumbCardFooterParams> {
     return [
-      new ThumbCardFooterParams(undefined, 'icon-button hover green', 'edit', this.edit.bind(this)),
-      new ThumbCardFooterParams(undefined, 'icon-button hover red', 'delete', this.remove.bind(this))
+      new ThumbCardFooterParams(undefined, 'icon-button hover green', 'edit', this.edit.bind(this), undefined),
+      new ThumbCardFooterParams(undefined, 'icon-button hover red', 'delete', this.remove.bind(this), undefined)
     ]
   }
   // </editor-fold>
@@ -45,9 +47,10 @@ export class TagCardController extends BaseCardController<TagEditItem, DtoGetTag
   constructor(
     dialog: MatDialog,
     ipcService: IpcService,
+    secretService: SecretService,
     dataRequestFactory: DataRequestFactory,
     itemFactory: TagCardItemFactory) {
-    super(dialog, ipcService, dataRequestFactory, itemFactory);
+    super(dialog, ipcService, secretService, dataRequestFactory, itemFactory);
   }
   // </editor-fold>
 

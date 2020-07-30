@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 
 import { DtoGetPicture, DtoSetPicture, DataVerb } from '@ipc';
 
-import { IpcService, DataRequestFactory, IpcDataRequest } from '@core';
+import { IpcService, DataRequestFactory, IpcDataRequest, SecretService } from '@core';
 import { BaseCardController, ThumbCardFooterParams } from '@shared';
 import { PictureEditItem } from '../items/picture.edit-item';
 import { PictureCardItemFactory } from '../factories/picture.card-item-factory';
@@ -35,11 +35,13 @@ export class PictureCardController extends BaseCardController<PictureEditItem, D
   public get cardFooterIcon(): string {
     return "local_offer";
   }
+  // </editor-fold>
 
-  public get thumbCardFooterParams(): Array<ThumbCardFooterParams> {
+  // <editor-fold desc='Implementation of abstract methods'>
+  public thumbCardFooterParams(_item: PictureListItem): Array<ThumbCardFooterParams> {
     return [
-      new ThumbCardFooterParams(undefined, 'icon-button hover green', 'bookmark', this.setAsThumb.bind(this)),
-      new ThumbCardFooterParams(undefined, 'icon-button hover green', 'edit', this.edit.bind(this))
+      new ThumbCardFooterParams(undefined, 'icon-button hover green', 'bookmark', this.setAsThumb.bind(this), undefined),
+      new ThumbCardFooterParams(undefined, 'icon-button hover green', 'edit', this.edit.bind(this), undefined)
     ];
   }
   // </editor-fold>
@@ -48,9 +50,10 @@ export class PictureCardController extends BaseCardController<PictureEditItem, D
   constructor(
     dialog: MatDialog,
     ipcService: IpcService,
+    secretService: SecretService,
     dataRequestFactory: DataRequestFactory,
     itemFactory: PictureCardItemFactory) {
-    super(dialog, ipcService, dataRequestFactory, itemFactory);
+    super(dialog, ipcService, secretService, dataRequestFactory, itemFactory);
   }
   // </editor-fold>
 

@@ -5,7 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DataVerb } from '@ipc';
 import { DtoGetCollection, DtoSetCollection } from '@ipc';
 
-import { IpcService, DataRequestFactory, IpcDataRequest } from '@core';
+import { IpcService, DataRequestFactory, IpcDataRequest, SecretService } from '@core';
 import { BaseCardController } from '@shared';
 import { ThumbCardFooterParams } from '@shared';
 import { CollectionEditItem } from '../items/collection.edit-item';
@@ -32,12 +32,14 @@ export class CollectionCardController extends BaseCardController<CollectionEditI
   public get cardFooterIcon(): string {
     return "camera_alt";
   }
+  // </editor-fold>
 
-  public get thumbCardFooterParams(): Array<ThumbCardFooterParams> {
+  // <editor-fold desc='Implementation of abstract methods'>
+  public thumbCardFooterParams(item: CollectionListItem): Array<ThumbCardFooterParams> {
     return [
-      new ThumbCardFooterParams(undefined, 'icon-button hover green', 'refresh', this.scan.bind(this)),
-      new ThumbCardFooterParams(undefined, 'icon-button hover green', 'edit', this.edit.bind(this)),
-      new ThumbCardFooterParams(undefined, 'icon-button hover red', 'delete', this.remove.bind(this))
+      new ThumbCardFooterParams(undefined, 'icon-button hover green', 'refresh', this.scan.bind(this), item.secret ? this.secretService : undefined),
+      new ThumbCardFooterParams(undefined, 'icon-button hover green', 'edit', this.edit.bind(this), item.secret ? this.secretService : undefined),
+      new ThumbCardFooterParams(undefined, 'icon-button hover red', 'delete', this.remove.bind(this), item.secret ? this.secretService : undefined)
     ]
   }
   // </editor-fold>
@@ -46,9 +48,10 @@ export class CollectionCardController extends BaseCardController<CollectionEditI
   constructor(
     dialog: MatDialog,
     ipcService: IpcService,
+    secretService: SecretService,
     dataRequestFactory: DataRequestFactory,
     itemFactory: CollectionCardItemFactory) {
-    super(dialog, ipcService, dataRequestFactory, itemFactory);
+    super(dialog, ipcService, secretService, dataRequestFactory, itemFactory);
   }
   // </editor-fold>
 

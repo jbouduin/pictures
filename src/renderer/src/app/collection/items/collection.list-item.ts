@@ -18,14 +18,18 @@ export class CollectionListItem extends ListItem {
     this.path = dtoListCollection.path;
     this.secret = dtoListCollection.secret;
     this.footerText = dtoListCollection.pictures.toString();
-    this.routerLink = [ `/picture/collection/${dtoListCollection.id}` ];
-    secretService.lockStatus.subscribe(status => { this.setOverlay(status); });
+    secretService.lockStatus.subscribe(status => { this.setLockStatus(status); });
   }
   // </editor-fold>
 
   // <editor-fold desc='Private methods'>
-  private setOverlay(currentLock: 'lock' | 'lock_open'): void {
+  private setLockStatus(currentLock: 'lock' | 'lock_open'): void {
     this.overlay = this.secret ? currentLock : undefined;
+    if (this.secret) {
+      this.routerLink = currentLock === 'lock' ? undefined : [ `/picture/collection/${this.id}` ];
+    } else {
+      this.routerLink = [ `/picture/collection/${this.id}` ];
+    }
   }
   // </editor-fold>
 
