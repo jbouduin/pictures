@@ -8,14 +8,14 @@ export class ThumbCreator {
   private resize = promisify(im.resize);
 
   public async createThumbIm(params: DtoRequestCreateThumb): Promise<DtoTaskResponse<DtoResponseCreateThumb>> {
-
     return await this.resize({
       srcPath: params.source,
       quality: 0.8,
       format: 'jpg',
       progressive: true,
       width: 240,
-      height: 240
+      height: 240,
+      customArgs: params.secret ? [ '-blur', '0x8'] : []
     })
     .then( resized => {
       const responseData: DtoResponseCreateThumb = {

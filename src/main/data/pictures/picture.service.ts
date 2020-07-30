@@ -80,7 +80,8 @@ export class PictureService extends DataService implements IPictureService {
             taskType: TaskType.CreateThumb,
             data: {
               id: picture.id,
-              source: picturePath
+              source: picturePath,
+              secret: collection.secret
             }
           };
           this.queueService.push(thumbRequest);
@@ -89,7 +90,8 @@ export class PictureService extends DataService implements IPictureService {
           taskType: TaskType.ReadMetaData,
           data: {
             id: picture.id,
-            source: picturePath
+            source: picturePath,
+            secret: undefined
           }
         };
         this.queueService.push(metaDataRequest);
