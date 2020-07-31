@@ -1,31 +1,32 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
+export type LockStatus = 'lock' | 'lock_open';
+
 @Injectable({
   providedIn: 'root'
 })
 export class SecretService {
 
   // <editor-fold desc='Public properties'>
-  public lockStatus: BehaviorSubject<'lock' | 'lock_open'>;
-  public currentLockStatus: 'lock' | 'lock_open';
+  public lockStatus: BehaviorSubject<LockStatus>;
+  // public currentLockStatus: LockStatus;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
   public constructor() {
-    this.currentLockStatus = 'lock';
-    this.lockStatus = new BehaviorSubject<'lock' | 'lock_open'>('lock');
+    // this.currentLockStatus = 'lock';
+    this.lockStatus = new BehaviorSubject<LockStatus>('lock');
   }
   // </editor-fold>
 
   // <editor-fold desc='Public methods'>
   public toggleLock(): void {
-    if (this.currentLockStatus === 'lock') {
-      this.currentLockStatus = 'lock_open';
+    if (this.lockStatus.value === 'lock') {
+      this.lockStatus.next('lock_open');
     } else {
-      this.currentLockStatus = 'lock';
+      this.lockStatus.next('lock');
     }
-    this.lockStatus.next(this.currentLockStatus);
   }
   // </editor-fold>
 }

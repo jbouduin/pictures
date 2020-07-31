@@ -5,7 +5,7 @@ import { DtoGetBase, DtoSetBase, DataVerb, DtoImage } from '@ipc';
 import { BaseItem } from '../base-item';
 import { ListItem } from '../thumb-list/list-item';
 import { BaseCardController } from './base.card-controller';
-import { IpcService, DataRequestFactory, ConfigurationService, SecretService } from '@core';
+import { IpcService, DataRequestFactory, ConfigurationService, SecretService, LockStatus } from '@core';
 
 @Component({
   selector: 'app-thumb-card',
@@ -50,7 +50,7 @@ export class ThumbCardComponent implements OnInit {
   }
   // </editor-fold>
 
-  private loadThumbNail(lockStatus: 'lock' | 'lock_open') {
+  private loadThumbNail(lockStatus: LockStatus) {
     if (this.item.thumbId) {
       const url = lockStatus === 'lock' ?
         `/thumbnail/${this.item.thumbId}` :

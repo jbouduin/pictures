@@ -1,7 +1,7 @@
 import { DtoListCollection } from '@ipc';
 import { Injectable } from '@angular/core';
 import { ListItem } from '@shared';
-import { SecretService } from '@core';
+import { SecretService, LockStatus } from '@core';
 
 @Injectable()
 export class CollectionListItem extends ListItem {
@@ -23,7 +23,7 @@ export class CollectionListItem extends ListItem {
   // </editor-fold>
 
   // <editor-fold desc='Private methods'>
-  private setLockStatus(currentLock: 'lock' | 'lock_open'): void {
+  private setLockStatus(currentLock: LockStatus): void {
     this.overlay = this.secret ? currentLock : undefined;
     if (this.secret) {
       this.routerLink = currentLock === 'lock' ? undefined : [ `/picture/collection/${this.id}` ];

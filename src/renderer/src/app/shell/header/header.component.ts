@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { IpcService, SecretService } from '@core';
+import { IpcService, SecretService, LockStatus } from '@core';
 
 @Component({
   selector: 'app-header',
@@ -15,8 +15,8 @@ export class HeaderComponent implements OnInit {
   // </editor-fold>
 
   // <editor-fold desc='Public getters'>
-  public get currentLockStatus(): 'lock' | 'lock_open' {
-    return this.secretService.currentLockStatus;
+  public get currentLockStatus(): LockStatus {
+    return this.secretService.lockStatus.value;
   }
   // </editor-fold>
 
