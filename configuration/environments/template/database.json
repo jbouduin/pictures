@@ -5,7 +5,7 @@
       "targetType": "pictures"
     }, {
       "connectionName": "mysql_local",
-      "targetType": "temp"
+      "targetType": "secret"
     }
   ],
   "connections": [

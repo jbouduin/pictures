@@ -7,7 +7,7 @@ export class ThumbCreator {
 
   private resize = promisify(im.resize);
 
-  public async createThumbIm(params: DtoRequestCreateThumb): Promise<DtoTaskResponse<DtoResponseCreateThumb>> {
+  public async createThumbIm(taskType: TaskType, params: DtoRequestCreateThumb): Promise<DtoTaskResponse<DtoResponseCreateThumb>> {
     return await this.resize({
       srcPath: params.source,
       quality: 0.8,
@@ -15,7 +15,7 @@ export class ThumbCreator {
       progressive: true,
       width: 240,
       height: 240,
-      customArgs: params.secret ? [ '-blur', '0x8'] : []
+      customArgs: params.secret && taskType === TaskType.CreateThumb ? [ '-blur', '0x8'] : []
     })
     .then( resized => {
       const responseData: DtoResponseCreateThumb = {
@@ -23,7 +23,7 @@ export class ThumbCreator {
         thumb: Buffer.from(resized, 'binary').toString('base64')
       }
       const response: DtoTaskResponse<DtoResponseCreateThumb> = {
-        taskType: TaskType.CreateThumb,
+        taskType: taskType,
         success: true,
         error: undefined,
         data: responseData

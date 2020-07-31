@@ -50,8 +50,8 @@ export class PictureService extends DataService implements IPictureService {
     const splitted = relativePath.split('/');
     const name = splitted.pop();
     const path = splitted.join('/');
-    const repository = this.databaseService.getPictureRepository();
-    return repository
+    const pictureRepository = this.databaseService.getPictureRepository();
+    return pictureRepository
       .findOneOrFail({
           where: {
             path: path,
@@ -65,13 +65,13 @@ export class PictureService extends DataService implements IPictureService {
           return picture;
         },
         () => {
-          const newPicture = repository.create({
+          const newPicture = pictureRepository.create({
             name: name,
             path: path,
             collection: collection
           });
           this.logService.error(LogSource.Main, `adding '${path}/${name}' to '${collection.name}'`);
-          return repository.save(newPicture);
+          return pictureRepository.save(newPicture);
         }
       ).then( picture => {
         const picturePath = `${collection.path}/${picture.path}/${picture.name}`;
@@ -95,6 +95,24 @@ export class PictureService extends DataService implements IPictureService {
           }
         };
         this.queueService.push(metaDataRequest);
+        if (collection.secret) {
+          this.databaseService.getSecretThumbRepository()
+            .findOne({ where: { pictureId: picture.id} })
+            .then( secretThumb =>
+            {
+              if (!secretThumb) {
+                const secretThumbDataRequest : DtoTaskRequest<DtoRequestReadMetaData> = {
+                  taskType: TaskType.CreateSecretThumb,
+                  data: {
+                    id: picture.id,
+                    source: picturePath,
+                    secret: undefined
+                  }
+                };
+                this.queueService.push(secretThumbDataRequest);
+              }
+            });
+        }
         return picture
       });
   }

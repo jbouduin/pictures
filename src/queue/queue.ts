@@ -38,8 +38,9 @@ class QueueService {
           process.send('Pong');
           break;
         }
-        case TaskType.CreateThumb: {
-          const thumbResponse = await new ThumbCreator().createThumbIm(next.data);
+        case TaskType.CreateThumb:
+        case TaskType.CreateSecretThumb: {
+          const thumbResponse = await new ThumbCreator().createThumbIm(next.taskType, next.data);
           process.send(thumbResponse);
           break;
         }

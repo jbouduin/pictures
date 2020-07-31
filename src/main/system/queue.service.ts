@@ -72,6 +72,15 @@ export class QueueService implements IQueueService {
           };
           break;
         }
+        case TaskType.CreateSecretThumb: {
+          dataRequest = {
+            id: 0,
+            verb: DataVerb.POST,
+            path: `/secret/thumb`,
+            data: response.data
+          };
+          break;
+        }
         case TaskType.ReadMetaData: {
           dataRequest = {
             id: 0,

@@ -11,6 +11,7 @@ import { ILogService } from '../system';
 
 import { MetadataKey, MetadataPictureMap } from './entities/metadata';
 import { Collection, Picture } from './entities/pictures';
+import { SecretImage, SecretThumb } from './entities/secret';
 import { Tag } from './entities/tags';
 import SERVICETYPES from '../di/service.types';
 
@@ -21,8 +22,10 @@ export interface IDatabaseService {
   getMetaDataKeyRepository(): Repository<MetadataKey>;
   getMetaDataPictureMapRepository(): Repository<MetadataPictureMap>;
   getPictureRepository(): Repository<Picture>;
+  getSecretImageRepository(): Repository<SecretImage>;
+  getSecretThumbRepository(): Repository<SecretThumb>;
   getTagRepository(): TreeRepository<Tag>;
-  initialize(): Promise<TypeOrmConnection>
+  initialize(): Promise<[TypeOrmConnection, TypeOrmConnection]>
 }
 
 @injectable()
@@ -63,17 +66,34 @@ export class DatabaseService implements IDatabaseService {
       .getRepository(Picture);
   }
 
+  public getSecretImageRepository(): Repository<SecretImage> {
+    return this
+      .getConnectionByTargetType(TargetType.SECRET)
+      .getRepository(SecretImage);
+  }
+
+  public getSecretThumbRepository(): Repository<SecretThumb> {
+    return this
+      .getConnectionByTargetType(TargetType.SECRET)
+      .getRepository(SecretThumb);
+  }
+
   public getTagRepository(): TreeRepository<Tag> {
     return this
       .getConnectionByTargetType(TargetType.PICTURES)
       .getTreeRepository(Tag);
   }
 
-  public initialize(): Promise<TypeOrmConnection> {
+  public initialize(): Promise<[TypeOrmConnection, TypeOrmConnection]> {
     this.logService.debug(LogSource.Main, 'in initialize DatabaseService');
-    return this.connectByName(
+    return Promise.all([
+      this.connectByName(
+          this.getConnectionNameForTargetType(TargetType.SECRET),
+          [SecretImage, SecretThumb]),
+      this.connectByName(
           this.getConnectionNameForTargetType(TargetType.PICTURES),
-          [Collection, MetadataKey, MetadataPictureMap, Picture, Tag]);
+          [Collection, MetadataKey, MetadataPictureMap, Picture, Tag])
+    ]);
   }
   // </editor-fold>
 

@@ -15,6 +15,8 @@ import { ITagService } from './tags/tag.service';
 import { RoutedRequest } from './routed-request';
 
 import SERVICETYPES from '../di/service.types';
+import { ISecretImageService } from './secret/secret-image.service';
+import { ISecretThumbService } from './secret/secret-thumb.service';
 
 export interface IDataRouterService {
   delete(path: string, callback: (request: RoutedRequest) => Promise<DtoDataResponse<any>>): void;
@@ -44,6 +46,8 @@ export class DataRouterService implements IDataRouterService {
     @inject(SERVICETYPES.ConfigurationService) private configurationService: IConfigurationService,
     @inject(SERVICETYPES.CollectionService) private collectionService: ICollectionService,
     @inject(SERVICETYPES.PictureService) private pictureService: IPictureService,
+    @inject(SERVICETYPES.SecretImageService) private secretImageService: ISecretImageService,
+    @inject(SERVICETYPES.SecretThumbService) private secretThumbService: ISecretThumbService,
     @inject(SERVICETYPES.TagService) private tagService: ITagService,
     @inject(SERVICETYPES.ThumbnailService) private thumbnailService: IThumbnailService) {
     this.deleteRoutes = new Collections.Dictionary<string, RouteCallback>();
@@ -59,6 +63,8 @@ export class DataRouterService implements IDataRouterService {
     this.configurationService.setRoutes(this);
     this.collectionService.setRoutes(this);
     this.pictureService.setRoutes(this);
+    this.secretImageService.setRoutes(this);
+    this.secretThumbService.setRoutes(this);
     this.tagService.setRoutes(this);
     this.thumbnailService.setRoutes(this);
     this.logService.verbose(LogSource.Main, 'registered DELETE routes:');

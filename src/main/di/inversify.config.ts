@@ -8,6 +8,8 @@ import { IFileService, FileService } from '../system';
 import { ILogService, LogService } from '../system';
 import { IPictureService, PictureService } from '../data';
 import { IQueueService, QueueService } from '../system';
+import { ISecretImageService, SecretImageService } from '../data';
+import { ISecretThumbService, SecretThumbService } from '../data';
 import { ITagService, TagService } from '../data';
 import { IThumbnailService, ThumbnailService } from '../data';
 
@@ -24,6 +26,8 @@ container.bind<IFileService>(SERVICETYPES.FileService).to(FileService);
 container.bind<ILogService>(SERVICETYPES.LogService).to(LogService).inSingletonScope();
 container.bind<IPictureService>(SERVICETYPES.PictureService).to(PictureService);
 container.bind<IQueueService>(SERVICETYPES.QueueService).to(QueueService).inSingletonScope();
+container.bind<ISecretImageService>(SERVICETYPES.SecretImageService).to(SecretImageService);
+container.bind<ISecretThumbService>(SERVICETYPES.SecretThumbService).to(SecretThumbService);
 container.bind<ITagService>(SERVICETYPES.TagService).to(TagService);
 container.bind<IThumbnailService>(SERVICETYPES.ThumbnailService).to(ThumbnailService);
 // </editor-fold>
