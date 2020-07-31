@@ -5,7 +5,7 @@ import { DtoGetBase, DtoSetBase, DataVerb, DtoImage } from '@ipc';
 import { BaseItem } from '../base-item';
 import { ListItem } from '../thumb-list/list-item';
 import { BaseCardController } from './base.card-controller';
-import { IpcService, DataRequestFactory, ConfigurationService } from '@core';
+import { IpcService, DataRequestFactory, ConfigurationService, SecretService } from '@core';
 
 @Component({
   selector: 'app-thumb-card',
@@ -28,22 +28,13 @@ export class ThumbCardComponent implements OnInit {
     private sanitization: DomSanitizer,
     private configurationService: ConfigurationService,
     private dataRequestFactory: DataRequestFactory,
+    private secretService: SecretService,
     private ipcService: IpcService) { }
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methods'>
   public ngOnInit(): void {
-    if (this.item.thumbId) {
-      const request = this.dataRequestFactory.createUntypedDataRequest(DataVerb.GET, `/thumbnail/${this.item.thumbId}`);
-      this.ipcService.dataRequest<DtoImage>(request).then(response => {
-        this.imageUrl = response.data.image ?
-          'data:image/jpeg;base64,' + response.data.image :
-          this.configurationService.genericThumbUrl;
-      });
-    } else {
-       this.imageUrl = this.configurationService.genericThumbUrl;
-    }
-
+    this.secretService.lockStatus.subscribe(status => this.loadThumbNail(status));
   }
   // </editor-fold>
 
@@ -59,4 +50,19 @@ export class ThumbCardComponent implements OnInit {
   }
   // </editor-fold>
 
+  private loadThumbNail(lockStatus: 'lock' | 'lock_open') {
+    if (this.item.thumbId) {
+      const url = lockStatus === 'lock' ?
+        `/thumbnail/${this.item.thumbId}` :
+        `/secret/thumb/${this.item.thumbId}`;
+      const request = this.dataRequestFactory.createUntypedDataRequest(DataVerb.GET, url);
+      this.ipcService.dataRequest<DtoImage>(request).then(response => {
+        this.imageUrl = response.data.image ?
+          'data:image/jpeg;base64,' + response.data.image :
+          this.configurationService.genericThumbUrl;
+      });
+    } else {
+       this.imageUrl = this.configurationService.genericThumbUrl;
+    }
+  }
 }
