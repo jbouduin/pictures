@@ -12,10 +12,17 @@ export class Collection extends BaseEntity {
   @Column('boolean', { default: false, nullable: false })
   public secret: boolean;
 
-  @OneToMany(_type => Picture, picture => picture.collection)
+  @OneToMany(
+    _type => Picture,
+    picture => picture.collection,
+    { onDelete: 'CASCADE'}
+  )
   public pictures: Promise<Array<Picture>>;
 
-  @OneToOne(_type => Picture, { nullable: true, onDelete: 'SET NULL'})
+  @OneToOne(
+    _type => Picture,
+    { nullable: true, onDelete: 'CASCADE'}
+  )
   @JoinColumn()
   public thumb: Picture;
 }

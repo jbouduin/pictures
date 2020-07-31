@@ -13,14 +13,14 @@ export class MetadataPictureMap extends TraceableEntity {
   @ManyToOne(
     _type => Picture,
     picture => picture.metadata,
-    { nullable: false, onDelete: 'NO ACTION'}
+    { nullable: false, onDelete: 'CASCADE'}
   )
   public picture: Picture;
 
   @ManyToOne(
     _type => MetadataKey,
     key => key.values,
-    { nullable: false, cascade: true, onDelete: 'NO ACTION'}
+    { nullable: false, cascade: true, onDelete: 'CASCADE'}
   )
   public metadataKey: MetadataKey;
 }

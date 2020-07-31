@@ -19,9 +19,14 @@ export class Picture extends BaseEntity {
   @ManyToOne(
     _type => Collection,
     collection => collection.pictures,
-    { nullable: false, onDelete: 'CASCADE'})
+    { nullable: false, onDelete: 'CASCADE'}
+  )
   public collection: Collection;
 
-  @OneToMany(_type => MetadataPictureMap, metaDataPictureMap => metaDataPictureMap.picture)
+  @OneToMany(
+    _type => MetadataPictureMap,
+    metaDataPictureMap => metaDataPictureMap.picture,
+    { nullable: false, onDelete: 'CASCADE'}
+  )
   public metadata: Promise<Array<MetadataPictureMap>>;
 }
