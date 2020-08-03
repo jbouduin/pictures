@@ -6,6 +6,7 @@ import { BaseItem } from '../base-item';
 import { ListItem } from '../thumb-list/list-item';
 import { BaseCardController } from './base.card-controller';
 import { IpcService, DataRequestFactory, ConfigurationService, SecretService, LockStatus } from '@core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-thumb-card',
@@ -21,15 +22,29 @@ export class ThumbCardComponent implements OnInit {
 
   // <editor-fold desc='Private properties'>
   private imageUrl: string;
+  private sanitization: DomSanitizer;
+  private router: Router;
+  private configurationService: ConfigurationService;
+  private dataRequestFactory: DataRequestFactory;
+  private secretService: SecretService;
+  private ipcService: IpcService;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
   public constructor(
-    private sanitization: DomSanitizer,
-    private configurationService: ConfigurationService,
-    private dataRequestFactory: DataRequestFactory,
-    private secretService: SecretService,
-    private ipcService: IpcService) { }
+    sanitization: DomSanitizer,
+    router: Router,
+    configurationService: ConfigurationService,
+    dataRequestFactory: DataRequestFactory,
+    secretService: SecretService,
+    ipcService: IpcService) {
+    this.sanitization = sanitization;
+    this.router = router;
+    this.configurationService = configurationService;
+    this.dataRequestFactory = dataRequestFactory;
+    this.secretService = secretService;
+    this.ipcService = ipcService;
+  }
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methods'>
@@ -48,8 +63,25 @@ export class ThumbCardComponent implements OnInit {
       this.sanitization.bypassSecurityTrustStyle(`url(${this.imageUrl})`) :
       undefined;
   }
+
+  public onLongPress(_event: any): void {
+    alert('long');
+  }
+
+  public onClick(event: any): void {
+    // we are only interested in left-click
+    console.log(event);
+    if(event.which === 1) {
+      if (this.item.routerLink) {
+        this.router.navigate(this.item.routerLink);
+      } else if (this.item.onClick) {
+        this.item.onClick(this.item);
+      }
+    }
+  }
   // </editor-fold>
 
+  // <editor-fold desc='Private methods'>
   private loadThumbNail(lockStatus: LockStatus) {
     if (this.item.thumbId) {
       const url = lockStatus === 'lock' ?
@@ -65,4 +97,5 @@ export class ThumbCardComponent implements OnInit {
        this.imageUrl = this.configurationService.genericThumbUrl;
     }
   }
+  // </editor-fold>
 }

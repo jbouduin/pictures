@@ -1,7 +1,7 @@
 import { NgModule, Optional, SkipSelf } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouteReuseStrategy, RouterModule } from '@angular/router';
-
+import { OnLongPressDirective } from './on-long-press.directive';
 import { RouteReusableStrategy } from './route-reusable-strategy';
 
 @NgModule({
@@ -9,11 +9,17 @@ import { RouteReusableStrategy } from './route-reusable-strategy';
     CommonModule,
     RouterModule
   ],
+  declarations: [
+    OnLongPressDirective
+  ],
   providers: [
     {
       provide: RouteReuseStrategy,
       useClass: RouteReusableStrategy
     }
+  ],
+  exports: [
+    OnLongPressDirective
   ]
 })
 export class CoreModule {

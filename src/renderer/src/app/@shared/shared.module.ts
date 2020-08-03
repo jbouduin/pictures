@@ -12,6 +12,7 @@ import { ThumbListComponent } from './thumb/thumb-list/thumb-list.component';
 import { DynamicDialogComponent } from './dynamic-dialog/dynamic-dialog.component';
 import { PaginationComponent } from './pagination/pagination.component';
 import { ThumbTreeComponent } from './thumb/thumb-tree/thumb-tree.component';
+import { CoreModule } from '@core';
 
 
 @NgModule({
@@ -29,7 +30,8 @@ import { ThumbTreeComponent } from './thumb/thumb-tree/thumb-tree.component';
     RouterModule,
     FlexLayoutModule,
     MaterialModule,
-    NgxResizableModule
+    NgxResizableModule,
+    CoreModule
   ],
   exports: [
     FloatingButtonComponent,

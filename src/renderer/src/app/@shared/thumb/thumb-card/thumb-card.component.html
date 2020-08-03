@@ -2,12 +2,13 @@
   <mat-card class="thumb-card">
     <mat-card-content >
       <div fxLayout="column">
-        <a [routerLink]="item.routerLink" class="thumb-card-header" (click)="item.onClick ? item.onClick(item) : false">
+        <div>
+        <a appLongPress (onLongPressEnd)="onLongPress($event)" (onClick)="onClick($event)" class="thumb-card-header">
           <div fxLayout="column">
             <div fxLayout="row" fxFlex="50px" fxLayoutAlign="center center">
               {{item.name}}
             </div>
-            <div class="thumb-background" [style.background-image]="getThumbNail()">
+            <div  class="thumb-background" [style.background-image]="getThumbNail()">
               <ng-container *ngIf="item.overlay">
                 <div class="lock-wrapper">
                   <mat-icon class="{{item.overlay}}">{{item.overlay}}</mat-icon>
@@ -16,6 +17,7 @@
             </div>
           </div>
         </a>
+        </div>
         <div class="thumb-card-footer" fxLayout="row" fxLayoutAlign="space-between center">
           <div class="thumb-footer-text">
             <div fxLayout="row" fxLayoutAlign="start center">

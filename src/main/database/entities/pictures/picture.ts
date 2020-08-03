@@ -8,7 +8,6 @@ import { MetadataPictureMap } from '../metadata/metadata-picture-map';
 @Index(['collection', 'path', 'name'], { unique: true })
 export class Picture extends BaseEntity {
 
-  // TODO unique index on filename + pathname
   @Column('nvarchar', { length: 256, nullable: false })
   public path: string;
 
