@@ -10,7 +10,7 @@ export class PictureListItem extends ListItem {
 
   // <editor-fold desc='Constructor & C°'>
   public constructor(dtoListPicture: DtoListPicture) {
-    super(dtoListPicture.id, dtoListPicture.name);
+    super(dtoListPicture.id, dtoListPicture.name, dtoListPicture.collection.secret);
     this.thumbId = dtoListPicture.thumbId;
     this.footerText = '0';
     this.path = dtoListPicture.path;

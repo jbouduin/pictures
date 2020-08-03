@@ -11,7 +11,7 @@
   height: 180px;
   background-position: center center;
   background-size: cover;
-  margin-left: -5px
+  // margin-left: -5px
 }
 
 a.thumb-card-header {
@@ -23,19 +23,31 @@ a.thumb-card-header {
 }
 
 .lock-wrapper {
-  height: 180px;
+  height: 260px;
   width: 180px;
+  top: 0px;
+  position: absolute;
 }
 
 .lock {
   font-size: 60px;
   color: red;
-  height: auto;
-  width: auto;
-  top: 60px;
-  position: relative;
+  height: 260px;
+  width: 180px;
+  top: 110px;
+  left: 0;
+  position: absolute;
 }
 
 .lock_open {
   color: green;
+  left: 0;
+  top: 60px;
+  position: absolute;
+}
+
+.selection {
+  top: 0px;
+  left: 78px;
+  position: relative;
 }

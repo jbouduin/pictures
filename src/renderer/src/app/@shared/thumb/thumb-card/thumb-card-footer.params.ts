@@ -22,7 +22,7 @@ export class ThumbCardFooterParams {
     this.icon = icon;
     this.click = click;
     if (secretService) {
-      secretService.lockStatus.subscribe(status => { this.disabled = status === 'lock'});
+      secretService.subscribe(status => { this.disabled = status === 'lock'});
     } else {
       this.disabled = false;
     }

@@ -9,6 +9,12 @@
               {{item.name}}
             </div>
             <div  class="thumb-background" [style.background-image]="getThumbNail()">
+              <ng-container *ngIf="currentSelectionModus === 'multi'" >
+                <mat-checkbox
+                  class="selection"
+                  [checked]="selectionService.isSelected(item)"
+                  (change)="setSelection($event.checked)"></mat-checkbox>
+              </ng-container>
               <ng-container *ngIf="item.overlay">
                 <div class="lock-wrapper">
                   <mat-icon class="{{item.overlay}}">{{item.overlay}}</mat-icon>

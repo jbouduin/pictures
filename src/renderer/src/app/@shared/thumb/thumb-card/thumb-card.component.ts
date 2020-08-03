@@ -2,10 +2,12 @@ import { Component, Input, OnInit } from '@angular/core';
 import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 
 import { DtoGetBase, DtoSetBase, DataVerb, DtoImage } from '@ipc';
+import { SelectionService, SelectionModus } from '@core';
+import { SecretService, LockStatus } from '@core';
+import { IpcService, DataRequestFactory, ConfigurationService } from '@core';
 import { BaseItem } from '../base-item';
 import { ListItem } from '../thumb-list/list-item';
 import { BaseCardController } from './base.card-controller';
-import { IpcService, DataRequestFactory, ConfigurationService, SecretService, LockStatus } from '@core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -27,7 +29,12 @@ export class ThumbCardComponent implements OnInit {
   private configurationService: ConfigurationService;
   private dataRequestFactory: DataRequestFactory;
   private secretService: SecretService;
+  private selectionService: SelectionService;
   private ipcService: IpcService;
+  // </editor-fold>
+
+  // <editor-fold desc='Public properties'>
+  public currentSelectionModus: SelectionModus;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
@@ -37,19 +44,22 @@ export class ThumbCardComponent implements OnInit {
     configurationService: ConfigurationService,
     dataRequestFactory: DataRequestFactory,
     secretService: SecretService,
+    selectionService: SelectionService,
     ipcService: IpcService) {
     this.sanitization = sanitization;
     this.router = router;
     this.configurationService = configurationService;
     this.dataRequestFactory = dataRequestFactory;
     this.secretService = secretService;
+    this.selectionService = selectionService;
     this.ipcService = ipcService;
   }
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methods'>
   public ngOnInit(): void {
-    this.secretService.lockStatus.subscribe(status => this.loadThumbNail(status));
+    this.secretService.subscribe( (status: LockStatus) => this.loadThumbNail(status));
+    this.selectionService.subscribe( (modus: SelectionModus) => this.currentSelectionModus = modus);
   }
   // </editor-fold>
 
@@ -65,18 +75,35 @@ export class ThumbCardComponent implements OnInit {
   }
 
   public onLongPress(_event: any): void {
-    alert('long');
+    if (this.selectionService.currentModus === 'none') {
+      this.selectionService.currentModus = 'multi'
+    } else {
+      this.selectionService.currentModus = 'none'
+    }
   }
 
   public onClick(event: any): void {
     // we are only interested in left-click
-    console.log(event);
+
     if(event.which === 1) {
-      if (this.item.routerLink) {
-        this.router.navigate(this.item.routerLink);
-      } else if (this.item.onClick) {
-        this.item.onClick(this.item);
+      if (this.selectionService.currentModus === 'none') {
+        if (this.item.routerLink) {
+          this.router.navigate(this.item.routerLink);
+        } else if (this.item.onClick) {
+          this.item.onClick(this.item);
+        }
+      } else {
+        this.setSelection(!this.item.selected);
       }
+    }
+  }
+
+  public setSelection(checked: boolean) {
+    this.item.selected = checked;
+    if (checked) {
+      this.selectionService.addToSelection(this.item);
+    } else {
+      this.selectionService.removeFromSelection(this.item);
     }
   }
   // </editor-fold>
@@ -84,7 +111,7 @@ export class ThumbCardComponent implements OnInit {
   // <editor-fold desc='Private methods'>
   private loadThumbNail(lockStatus: LockStatus) {
     if (this.item.thumbId) {
-      const url = lockStatus === 'lock' ?
+      const url = lockStatus === 'lock' || !this.item.secret ?
         `/thumbnail/${this.item.thumbId}` :
         `/secret/thumb/${this.item.thumbId}`;
       const request = this.dataRequestFactory.createUntypedDataRequest(DataVerb.GET, url);

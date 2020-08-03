@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 
 export type LockStatus = 'lock' | 'lock_open';
 
@@ -8,19 +8,31 @@ export type LockStatus = 'lock' | 'lock_open';
 })
 export class SecretService {
 
-  // <editor-fold desc='Public properties'>
-  public lockStatus: BehaviorSubject<LockStatus>;
-  // public currentLockStatus: LockStatus;
+  // <editor-fold desc='Private properties'>
+  private lockStatus: BehaviorSubject<LockStatus>;
   // </editor-fold>
 
+  // <editor-fold desc='Public get/set'>
+  public set currentStatus(value: LockStatus) {
+    this.lockStatus.next(value)
+  }
+
+  public get currentStatus(): LockStatus {
+    return this.lockStatus.value;
+  }
+  // </editor-fold>
+  //
   // <editor-fold desc='Constructor & C°'>
   public constructor() {
-    // this.currentLockStatus = 'lock';
     this.lockStatus = new BehaviorSubject<LockStatus>('lock');
   }
   // </editor-fold>
 
   // <editor-fold desc='Public methods'>
+  public subscribe(next: (value: LockStatus) => void): Subscription {
+    return this.lockStatus.subscribe(next);
+  }
+
   public toggleLock(): void {
     if (this.lockStatus.value === 'lock') {
       this.lockStatus.next('lock_open');
@@ -28,5 +40,6 @@ export class SecretService {
       this.lockStatus.next('lock');
     }
   }
+
   // </editor-fold>
 }

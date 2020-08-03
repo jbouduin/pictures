@@ -8,17 +8,15 @@ export class CollectionListItem extends ListItem {
 
   // <editor-fold desc='Public properties'>
   public path: string;
-  public secret: boolean;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
   public constructor(dtoListCollection: DtoListCollection, secretService: SecretService) {
-    super(dtoListCollection.id, dtoListCollection.name);
+    super(dtoListCollection.id, dtoListCollection.name, dtoListCollection.secret);
     this.thumbId = dtoListCollection.thumbId;
     this.path = dtoListCollection.path;
-    this.secret = dtoListCollection.secret;
     this.footerText = dtoListCollection.pictures.toString();
-    secretService.lockStatus.subscribe(status => { this.setLockStatus(status); });
+    secretService.subscribe(status => { this.setLockStatus(status); });
   }
   // </editor-fold>
 

@@ -1,4 +1,6 @@
-export abstract class BaseItem {
+import { IIdentifiable } from '@core';
+
+export abstract class BaseItem implements IIdentifiable {
   // <editor-fold desc='Public properties'>
   public readonly id: number;
   public name: string;

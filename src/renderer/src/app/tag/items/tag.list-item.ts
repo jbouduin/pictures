@@ -12,7 +12,7 @@ export class TagListItem extends ListItem {
 
   // <editor-fold desc='Constructor & C°'>
   public constructor(dtoListTag: DtoListTag) {
-    super(dtoListTag.id, dtoListTag.name);
+    super(dtoListTag.id, dtoListTag.name, false);
     this.canAssign = dtoListTag.canAssign;
     this.thumbId = dtoListTag.thumbId;
     this.footerText = dtoListTag.pictures.toString();

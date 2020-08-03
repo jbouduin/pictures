@@ -16,7 +16,7 @@ export class HeaderComponent implements OnInit {
 
   // <editor-fold desc='Public getters'>
   public get currentLockStatus(): LockStatus {
-    return this.secretService.lockStatus.value;
+    return this.secretService.currentStatus;
   }
   // </editor-fold>
 

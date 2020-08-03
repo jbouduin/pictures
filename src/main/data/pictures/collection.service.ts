@@ -253,7 +253,8 @@ export class CollectionService extends DataService implements ICollectionService
       const dtoListPictureCollection: DtoListPictureCollection = {
         id: collection.id,
         name: collection.name,
-        path: collection.path
+        path: collection.path,
+        secret: collection.secret
       };
       const where: any = { collection: collection };
       if (picturePath ) {
