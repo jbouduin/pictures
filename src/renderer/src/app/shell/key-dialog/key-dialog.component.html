@@ -1,0 +1,15 @@
+<h1 mat-dialog-title>Secret Key</h1>
+<div mat-dialog-content [formGroup]="keyDataGroup">
+  <mat-form-field  class="full-width">
+    <input matInput placeholder="secret key"
+      [type]="hidden ? 'password' : 'text'"
+      formControlName="key" required>
+    <mat-icon matSuffix (click)="hidden = !hidden">
+      {{hidden ? 'visibility_off' : 'visibility'}}
+    </mat-icon>
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="cancel()">Cancel</button>
+  <button mat-button [disabled]="keyDataGroup.invalid" (click)="commit()">OK</button>
+</div>
