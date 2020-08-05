@@ -115,7 +115,7 @@ export class CollectionDialogComponent implements OnInit {
   }
 
   public secretChange(event: MatSlideToggleChange) {
-    if (this.collection.isNew && event.checked && !this.secretService.key) {
+    if (this.collection.isNew && event.checked && !this.secretService.applicationSecret) {
       this.secretService.toggleLock();
     }
   }
@@ -127,7 +127,7 @@ export class CollectionDialogComponent implements OnInit {
     this.collection.path = this.collectionData.get('path').value;
     this.collection.isSecret = this.collectionData.get('secret').value;
     if (this.collection.isNew && this.collection.isSecret) {
-      (this.collection as CollectionNewItem).key = this.secretService.key
+      (this.collection as CollectionNewItem).key = this.secretService.applicationSecret
     }
   }
   // </editor-fold>

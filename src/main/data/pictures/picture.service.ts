@@ -46,78 +46,78 @@ export class PictureService extends DataService implements IPictureService {
   // </editor-fold>
 
   // <editor-fold desc='IPictureService interface methods'>
-  public upsertPicture(collection: Collection, relativePath: string, key: string): Promise<Picture> {
+  public async upsertPicture(collection: Collection, relativePath: string, applicationSecret: string): Promise<Picture> {
     const splitted = relativePath.split('/');
     const name = splitted.pop();
     const path = splitted.join('/');
     const pictureRepository = this.databaseService.getPictureRepository();
-    return pictureRepository
-      .findOneOrFail({
-          where: {
-            path: path,
-            name: name,
-            collection: collection
-          }
-      })
-      .then(
-        picture => {
-          this.logService.debug(LogSource.Main, `picture '${path}/${name}' already in '${collection.name}'`);
-          return picture;
-        },
-        () => {
-          const newPicture = pictureRepository.create({
-            name: name,
-            path: path,
-            collection: collection
-          });
-          this.logService.error(LogSource.Main, `adding '${path}/${name}' to '${collection.name}'`);
-          return pictureRepository.save(newPicture);
-        }
-      ).then( picture => {
-        const picturePath = `${collection.path}/${picture.path}/${picture.name}`;
-        if (!picture.thumb) {
-          const thumbRequest: DtoTaskRequest<DtoRequestCreateThumb> = {
-            taskType: TaskType.CreateThumb,
-            secretKey: key,
-            data: {
-              id: picture.id,
-              source: picturePath,
-              secret: collection.isSecret
-            }
-          };
-          this.queueService.push(thumbRequest);
-        }
-        const metaDataRequest : DtoTaskRequest<DtoRequestReadMetaData> =  {
-          taskType: TaskType.ReadMetaData,
-          secretKey: key,
-          data: {
-            id: picture.id,
-            source: picturePath,
-            secret: undefined
-          }
-        };
-        this.queueService.push(metaDataRequest);
-        if (collection.isSecret) {
-          this.databaseService.getSecretThumbRepository()
-            .findOne({ where: { pictureId: picture.id} })
-            .then( secretThumb =>
-            {
-              if (!secretThumb) {
-                const secretThumbDataRequest : DtoTaskRequest<DtoRequestReadMetaData> = {
-                  taskType: TaskType.CreateSecretThumb,
-                  secretKey: key,
-                  data: {
-                    id: picture.id,
-                    source: picturePath,
-                    secret: undefined
-                  }
-                };
-                this.queueService.push(secretThumbDataRequest);
-              }
-            });
-        }
-        return picture
+    let picture = await pictureRepository.findOne({
+      where: {
+        path: path,
+        name: name,
+        collection: collection
+      }
+    });
+
+    if (picture) {
+      this.logService.debug(LogSource.Main, `picture '${path}/${name}' already in '${collection.name}'`);
+    } else {
+      this.logService.debug(LogSource.Main, `adding '${path}/${name}' to '${collection.name}'`);
+      const newPicture = pictureRepository.create({
+        name: name,
+        path: path,
+        collection: collection
       });
+
+      picture = await pictureRepository.save(newPicture);
+    }
+
+    const picturePath = `${collection.path}/${picture.path}/${picture.name}`;
+    if (!picture.thumb) {
+      const createThumbRequestData: DtoRequestCreateThumb = {
+        id: picture.id,
+        source: picturePath,
+        secret: collection.isSecret
+      };
+     const thumbRequest: DtoTaskRequest<DtoRequestCreateThumb> = {
+        taskType: TaskType.CreateThumb,
+        applicationSecret,
+        data: createThumbRequestData
+      };
+      this.queueService.push(thumbRequest);
+    }
+    const readMetaDataRequestData: DtoRequestReadMetaData = {
+      id: picture.id,
+      source: picturePath,
+      secret: undefined
+    };
+    const metaDataRequest : DtoTaskRequest<DtoRequestReadMetaData> =  {
+      taskType: TaskType.ReadMetaData,
+      applicationSecret,
+      data: readMetaDataRequestData
+    };
+    this.queueService.push(metaDataRequest);
+
+    if (collection.isSecret) {
+      const secretThumb = await this.databaseService
+        .getSecretThumbRepository()
+        .findOne({ where: { pictureId: picture.id} });
+
+      if (!secretThumb) {
+        const createSecretThumbRequestData: DtoRequestCreateThumb = {
+          id: picture.id,
+          source: picturePath,
+          secret: undefined
+        }
+        const secretThumbDataRequest : DtoTaskRequest<DtoRequestCreateThumb> = {
+          taskType: TaskType.CreateSecretThumb,
+          applicationSecret,
+          data: createSecretThumbRequestData
+        };
+        this.queueService.push(secretThumbDataRequest);
+      }
+    }
+    return picture;
   }
   // </editor-fold>
 

@@ -68,7 +68,7 @@ export class QueueService implements IQueueService {
             id: 0,
             verb: DataVerb.PUT,
             path: `/thumbnail/${response.data.id}`,
-            secretKey: response.secretKey,
+            applicationSecret: response.applicationSecret,
             data: response.data
           };
           break;
@@ -78,7 +78,7 @@ export class QueueService implements IQueueService {
             id: 0,
             verb: DataVerb.POST,
             path: `/secret/thumb`,
-            secretKey: response.secretKey,
+            applicationSecret: response.applicationSecret,
             data: response.data
           };
           break;
@@ -88,7 +88,7 @@ export class QueueService implements IQueueService {
             id: 0,
             verb: DataVerb.PUT,
             path: `/picture/${response.data.id}/metadata`,
-            secretKey: response.secretKey,
+            applicationSecret: response.applicationSecret,
             data: response.data
           };
           break;

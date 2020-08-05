@@ -159,7 +159,7 @@ export class DataRouterService implements IDataRouterService {
         routedRequest.path = (matchResult2 as any).path;
         routedRequest.params = (matchResult2 as any).params;
         routedRequest.data = request.data;
-        routedRequest.secretKey = request.secretKey;
+        routedRequest.applicationSecret = request.applicationSecret;
         routedRequest.queryParams = { };
         if (splittedPath.length > 1) {
           const queryParts = splittedPath[1].split('&');

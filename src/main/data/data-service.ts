@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import { AES, enc } from 'crypto-ts';
 
 import { IDataRouterService } from './data-router.service';
 import { IDatabaseService } from '../database/database.service';
@@ -44,6 +45,15 @@ export abstract class DataService implements IDataService {
     else {
       return undefined;
     }
+  }
+
+  public decryptData(value: string, applicationSecret: string): string {
+    const decrypted = AES.decrypt(value, applicationSecret);
+    return decrypted.toString(enc.Utf8);
+  }
+
+  public encryptData(value: string, applicationSecret: string): string {
+    return AES.encrypt(value, applicationSecret).toString();
   }
   // </editor-fold>
 }

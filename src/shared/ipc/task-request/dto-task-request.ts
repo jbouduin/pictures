@@ -2,6 +2,6 @@ import { TaskType } from './task-type';
 
 export interface DtoTaskRequest<T> {
   taskType: TaskType,
-  secretKey: string,
+  applicationSecret: string,
   data: T
 }

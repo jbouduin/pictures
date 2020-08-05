@@ -353,8 +353,8 @@ export class CollectionService extends DataService implements ICollectionService
     });
 
     try {
-      const collection = await repository.save(newCollection, { data: { key: request.secretKey } });
-      this.scanDirectory(collection, request.secretKey);
+      const collection = await repository.save(newCollection, { data: { key: request.applicationSecret } });
+      this.scanDirectory(collection, request.applicationSecret);
       const listItem: DtoListCollection = {
         id: collection.id,
         name: collection.name,
@@ -383,7 +383,7 @@ export class CollectionService extends DataService implements ICollectionService
     try {
       const collection = await this.databaseService.getCollectionRepository()
         .findOneOrFail(request.params.collection);
-      this.scanDirectory(collection, request.secretKey);
+      this.scanDirectory(collection, request.applicationSecret);
       const result: DtoUntypedDataResponse = {
         status: DataStatus.Accepted
       };

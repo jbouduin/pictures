@@ -7,7 +7,7 @@ import { IDataService, DataService } from "../data-service";
 import { RoutedRequest } from "../routed-request";
 
 import SERVICETYPES from "di/service.types";
-import { DtoImage, DtoDataResponse, DataStatus, DtoResponseCreateThumb } from "@ipc";
+import { DtoImage, DtoDataResponse, DataStatus, DtoResponseCreateThumb, LogSource } from "@ipc";
 
 export interface ISecretThumbService extends IDataService { }
 
@@ -37,12 +37,19 @@ export class SecretThumbService extends DataService implements ISecretThumbServi
       const thumb = await this.databaseService
         .getSecretThumbRepository()
         .findOneOrFail({ where: { pictureId: request.params.id} });
-      const result: DtoImage = { image: thumb.data };
+      const picture = await this.databaseService
+        .getPictureRepository()
+        .findOneOrFail(request.params.id, { relations: [ 'collection' ]});
+
+      picture.collection.decryptedKey = this.decryptData(picture.collection.encryptedKey, request.applicationSecret);
+
+      const result: DtoImage = { image: this.decryptData(thumb.data, picture.collection.decryptedKey) };
       response = {
         status: DataStatus.Ok,
         data: result
       };
     } catch (error) {
+      this.logService.error(LogSource.Main, error);
       response = {
         status: DataStatus.Error,
         message: error.message
@@ -54,14 +61,25 @@ export class SecretThumbService extends DataService implements ISecretThumbServi
 
   // <editor-fold desc='Post methods'>
   private async createSecretThumb(request: RoutedRequest<DtoResponseCreateThumb>): Promise<void> {
-    const repository = this.databaseService.getSecretThumbRepository();
-    let thumb = await repository.findOne({ where: { pictureId: request.params.id} });
-    if (!thumb) {
-      thumb = repository.create();
-      thumb.pictureId = request.params.id;
+    const thumbRepository = this.databaseService.getSecretThumbRepository();
+
+    try {
+      const picture = await this.databaseService
+        .getPictureRepository()
+        .findOneOrFail(request.data.id, { relations: [ 'collection' ]});
+      picture.collection.decryptedKey = this.decryptData(picture.collection.encryptedKey, request.applicationSecret);
+
+      let thumb = await thumbRepository.findOne({ where: { pictureId: request.data.id } });
+      if (!thumb) {
+        thumb = thumbRepository.create();
+        thumb.pictureId = request.data.id;
+      }
+      thumb.data = this.encryptData(request.data.thumb, picture.collection.decryptedKey);
+      await thumbRepository.save(thumb);
+    } catch (error) {
+      console.log(error);
+      this.logService.error(LogSource.Main, error);
     }
-    thumb.data = request.data.thumb;
-    await repository.save(thumb);
     return;
   }
   // </editor-fold>

@@ -17,7 +17,7 @@ export class SecretService {
   private lockStatus: BehaviorSubject<LockStatus>;
   private dialog: MatDialog;
   private dialogRef: MatDialogRef<KeyDialogComponent>;
-  private _key: string | undefined;
+  private _applicationSecret: string | undefined;
   private ipcService: IpcService;
   private dataRequestFactory: DataRequestFactory;
   // </editor-fold>
@@ -31,8 +31,8 @@ export class SecretService {
     return this.lockStatus.value;
   }
 
-  public get key(): string | undefined {
-    return this._key;
+  public get applicationSecret(): string | undefined {
+    return this._applicationSecret;
   }
   // </editor-fold>
 
@@ -45,7 +45,7 @@ export class SecretService {
     this.ipcService = ipcService;
     this.dataRequestFactory = dataRequestFactory;
     this.lockStatus = new BehaviorSubject<LockStatus>('lock');
-    this._key = undefined;
+    this._applicationSecret = undefined;
   }
   // </editor-fold>
 
@@ -70,9 +70,9 @@ export class SecretService {
 
   public toggleLock(): void {
     if (this.lockStatus.value === 'lock_open') {
+      this._applicationSecret = undefined;
+      this.dataRequestFactory.applicationSecret = undefined;
       this.lockStatus.next('lock');
-      this._key = undefined;
-      this.dataRequestFactory.secretKey = undefined;
     } else {
       const params: IKeyDialogParams = {
         isInitial: false,
@@ -91,17 +91,17 @@ export class SecretService {
     this.dialogRef.close();
   }
 
-  private async commitInitialDialog(key: string): Promise<string> {
+  private async commitInitialDialog(applicationSecret: string): Promise<string> {
     const data: DtoSetting = {
       name: 'secret',
-      value: key
+      value: applicationSecret
     };
     const request = this.dataRequestFactory.createDataRequest<DtoSetting>(DataVerb.POST, '/setting/secret/hash', data);
     const response = await this.ipcService.dataRequest<boolean>(request);
     if (response.status === DataStatus.Ok) {
+      this._applicationSecret = applicationSecret;
+      this.dataRequestFactory.applicationSecret = applicationSecret;
       this.lockStatus.next('lock_open');
-      this._key = key;
-      this.dataRequestFactory.secretKey = key;
       this.dialogRef.close();
       return undefined;
     } else {
@@ -109,18 +109,18 @@ export class SecretService {
     }
   }
 
-  private async commitCheckDialog(key: string): Promise<string> {
+  private async commitCheckDialog(applicationSecret: string): Promise<string> {
     const data: DtoSetting = {
       name: 'secret',
-      value: key
+      value: applicationSecret
     };
     const request = this.dataRequestFactory.createDataRequest<DtoSetting>(DataVerb.POST, '/setting/secret/validate', data);
     const response = await this.ipcService.dataRequest<boolean>(request);
     if (response.data) {
-      this.lockStatus.next('lock_open');
-      this._key = key;
-      this.dataRequestFactory.secretKey = key;
+      this._applicationSecret = applicationSecret;
+      this.dataRequestFactory.applicationSecret = applicationSecret;
       this.dialogRef.close();
+      this.lockStatus.next('lock_open');
     } else {
       return 'wrong key';
     }

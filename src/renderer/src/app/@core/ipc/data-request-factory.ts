@@ -13,23 +13,23 @@ export class DataRequestFactory {
   // </editor-fold>
 
   // <editor-fold desc='Public properties'>
-  public secretKey: string;
+  public applicationSecret: string;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
   public constructor() {
     this.requestId = 0;
-    this.secretKey = undefined;
+    this.applicationSecret = undefined;
   }
   // </editor-fold>
 
   // <editor-fold desc='Pubic methods'>
   public createUntypedDataRequest(verb: DataVerb, path: string): IpcDataRequest {
-    return new IpcDataRequest(++this.requestId, verb, path, undefined, this.secretKey);
+    return new IpcDataRequest(++this.requestId, verb, path, this.applicationSecret, undefined);
   }
 
   public createDataRequest<T>(verb: DataVerb, path: string, data: T): IpcDataRequest {
-    return new IpcDataRequest(++this.requestId, verb, path, this.secretKey, data);
+    return new IpcDataRequest(++this.requestId, verb, path, this.applicationSecret, data);
   }
   // </editor-fold>
 }

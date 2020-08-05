@@ -3,6 +3,6 @@ export class RoutedRequest<T> {
   queryParams: any;
   path: string;
   route: string;
-  secretKey: string
+  applicationSecret: string
   data: T;
 }

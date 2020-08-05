@@ -4,6 +4,6 @@ export interface DtoDataRequest<T> {
   id: number;
   verb: DataVerb,
   path: string,
-  secretKey: string | undefined
+  applicationSecret: string | undefined
   data?: T
 }

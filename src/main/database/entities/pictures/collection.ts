@@ -34,4 +34,5 @@ export class Collection extends BaseEntity {
   // <editor-fold desc='Public properties'>
   public decryptedKey: string;
   // </editor-fold>
+
 }
