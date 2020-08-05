@@ -4,8 +4,9 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { BaseItem, DynamicDialogController } from '@shared';
 import { CollectionNewItem } from '../items/collection.new-item';
 import { CollectionEditItem } from '../items/collection.edit-item';
-import { SecretService } from '@core';
+import { SecretService, IpcService, DataRequestFactory } from '@core';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
+import { DataVerb } from '@ipc';
 
 
 @Component({
@@ -59,6 +60,8 @@ export class CollectionDialogComponent implements OnInit {
   public constructor(
     private formBuilder: FormBuilder,
     private secretService: SecretService,
+    private dataRequestFactory: DataRequestFactory,
+    private ipcService: IpcService,
     private controller: DynamicDialogController,
     baseItem: BaseItem) {
 
@@ -112,6 +115,12 @@ export class CollectionDialogComponent implements OnInit {
       return 'You must enter a value';
     }
     return undefined;
+  }
+
+  public async selectDirectory(): Promise<void> {
+    const request = this.dataRequestFactory.createUntypedDataRequest(DataVerb.GET, '/system/select-directory');
+    const response = await this.ipcService.dataRequest<string>(request);
+    this.collectionData.controls['path'].patchValue(response.data);
   }
 
   public secretChange(event: MatSlideToggleChange) {

@@ -5,6 +5,7 @@ export * from './pictures/thumbnail.service';
 export * from './secret/secret-image.service';
 export * from './secret/secret-thumb.service';
 export * from './system/settings.service';
+export * from './system/system.service';
 export * from './tags/tag.service';
 export * from './data-router.service';
 export * from './data-service';

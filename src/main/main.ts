@@ -1,11 +1,9 @@
 import { app, BrowserWindow, ipcMain, Menu } from 'electron';
 import * as path from 'path';
-import { DtoConfiguration, DtoSystemInfo } from '@ipc';
 import { DtoDataRequest, LogSource } from '@ipc';
-import * as os from 'os';
 
 import container from './di/inversify.config';
-import { IConfigurationService } from './data';
+import { IConfigurationService, ISystemService } from './data';
 import { IDataRouterService } from './data';
 import { IDatabaseService } from './database';
 import { ILogService, IQueueService } from './system';
@@ -51,8 +49,8 @@ function createWindow() {
             }
           });
               // https://stackoverflow.com/a/58548866/600559
-         // Menu.setApplicationMenu(null);
-
+          Menu.setApplicationMenu(null);
+          container.get<ISystemService>(SERVICETYPES.SystemService).injectWindow(win);
           win.loadFile(path.join(app.getAppPath(), 'dist/renderer', 'index.html'));
           logService.injectWindow(win);
           win.on('closed', () => {
@@ -72,25 +70,25 @@ ipcMain.on('dev-tools', () => {
   }
 });
 
-ipcMain.on('request-systeminfo', () => {
-  const systemInfo:  DtoSystemInfo = {
-    arch: os.arch(),
-    hostname: os.hostname(),
-    platform: os.platform(),
-    release: os.release()
-  };
-  const serializedString = JSON.stringify(systemInfo);
-  if (win) {
-    win.webContents.send('systeminfo', serializedString);
-  }
-});
+// ipcMain.on('request-systeminfo', () => {
+//   const systemInfo:  DtoSystemInfo = {
+//     arch: os.arch(),
+//     hostname: os.hostname(),
+//     platform: os.platform(),
+//     release: os.release()
+//   };
+//   const serializedString = JSON.stringify(systemInfo);
+//   if (win) {
+//     win.webContents.send('systeminfo', serializedString);
+//   }
+// });
 
-ipcMain.on('request-configuration', () => {
-  const configuration: DtoConfiguration = container.get<IConfigurationService>(SERVICETYPES.ConfigurationService).configuration;
-  if (win) {
-    win.webContents.send('configuration', JSON.stringify(configuration));
-  }
-});
+// ipcMain.on('request-configuration', () => {
+//   const configuration: DtoConfiguration = container.get<IConfigurationService>(SERVICETYPES.ConfigurationService).configuration;
+//   if (win) {
+//     win.webContents.send('configuration', JSON.stringify(configuration));
+//   }
+// });
 
 ipcMain.on('data', async (event, arg) => {
   logService.debug(LogSource.Main, arg);

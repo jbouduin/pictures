@@ -12,6 +12,7 @@ import { ICollectionService } from './pictures/collection.service';
 import { IPictureService } from './pictures/picture.service';
 import { IThumbnailService } from './pictures/thumbnail.service';
 import { ISettingsService } from './system/settings.service';
+import { ISystemService } from './system/system.service';
 import { ITagService } from './tags/tag.service';
 import { RoutedRequest } from './routed-request';
 
@@ -50,6 +51,7 @@ export class DataRouterService implements IDataRouterService {
     @inject(SERVICETYPES.SecretImageService) private secretImageService: ISecretImageService,
     @inject(SERVICETYPES.SecretThumbService) private secretThumbService: ISecretThumbService,
     @inject(SERVICETYPES.SettingsService) private settingsService: ISettingsService,
+    @inject(SERVICETYPES.SystemService) private systemService: ISystemService,
     @inject(SERVICETYPES.TagService) private tagService: ITagService,
     @inject(SERVICETYPES.ThumbnailService) private thumbnailService: IThumbnailService) {
     this.deleteRoutes = new Collections.Dictionary<string, RouteCallback>();
@@ -68,6 +70,7 @@ export class DataRouterService implements IDataRouterService {
     this.secretImageService.setRoutes(this);
     this.secretThumbService.setRoutes(this);
     this.settingsService.setRoutes(this);
+    this.systemService.setRoutes(this);
     this.tagService.setRoutes(this);
     this.thumbnailService.setRoutes(this);
     this.logService.verbose(LogSource.Main, 'registered DELETE routes:');

@@ -9,11 +9,15 @@ export class PictureSubscriber implements EntitySubscriberInterface<Picture> {
   }
 
   public beforeInsert(event: InsertEvent<Picture>): void {
-    event.entity.path = event.entity.path.replace(/\\/g, '/');
+    if (event.entity.path) {
+      event.entity.path = event.entity.path.replace(/\\/g, '/');
+    }
   }
 
   public beforeUpdate(event: UpdateEvent<Picture>) {
-    event.entity.path = event.entity.path.replace(/\\/g, '/');
+    if (event.entity.path) {
+      event.entity.path = event.entity.path.replace(/\\/g, '/');
+    }
   }
 
 }

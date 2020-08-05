@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { DtoSystemInfo } from '@ipc';
 import { DataStatus, DtoDataResponse } from '@ipc';
 
 import { LogService } from '../log.service';
@@ -18,21 +17,6 @@ export class IpcService {
   public openDevTools() {
     window.api.electronIpcSend('dev-tools');
   }
-
-  public getSystemInfoAsync(): Promise<DtoSystemInfo> {
-    return new Promise((resolve, _reject) => {
-      window.api.electronIpcOnce('systeminfo', (_event, arg) => {
-        const systemInfo: DtoSystemInfo = JSON.parse(arg);
-        resolve(systemInfo);
-      });
-      window.api.electronIpcSend('request-systeminfo');
-    });
-  }
-
-  // be carefull when using sync, as errors coming from main are not handled
-  // public untypedDataRequestSync<T>(request: DtoUntypedDataRequest): DtoDataResponse<T> {
-  //   return this.dataRequestSync<any, T>(request);
-  // }
 
   public dataRequestSync<U>(request: IpcDataRequest): DtoDataResponse<U> {
     const json = JSON.stringify(request);

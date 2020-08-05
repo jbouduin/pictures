@@ -11,6 +11,7 @@ import { IQueueService, QueueService } from '../system';
 import { ISecretImageService, SecretImageService } from '../data';
 import { ISecretThumbService, SecretThumbService } from '../data';
 import { ISettingsService, SettingsService } from '../data';
+import { ISystemService, SystemService } from '../data';
 import { ITagService, TagService } from '../data';
 import { IThumbnailService, ThumbnailService } from '../data';
 
@@ -30,6 +31,7 @@ container.bind<IQueueService>(SERVICETYPES.QueueService).to(QueueService).inSing
 container.bind<ISecretImageService>(SERVICETYPES.SecretImageService).to(SecretImageService);
 container.bind<ISecretThumbService>(SERVICETYPES.SecretThumbService).to(SecretThumbService);
 container.bind<ISettingsService>(SERVICETYPES.SettingsService).to(SettingsService);
+container.bind<ISystemService>(SERVICETYPES.SystemService).to(SystemService).inSingletonScope();
 container.bind<ITagService>(SERVICETYPES.TagService).to(TagService);
 container.bind<IThumbnailService>(SERVICETYPES.ThumbnailService).to(ThumbnailService);
 // </editor-fold>

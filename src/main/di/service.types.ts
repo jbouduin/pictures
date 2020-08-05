@@ -10,6 +10,7 @@ const SERVICETYPES = {
   SecretImageService: Symbol('SecretImageService'),
   SecretThumbService: Symbol('SecretThumbService'),
   SettingsService: Symbol('SettingsService'),
+  SystemService: Symbol('SystemService'),
   TagService: Symbol('TagService'),
   ThumbnailService: Symbol('ThumbnailService')
 };
