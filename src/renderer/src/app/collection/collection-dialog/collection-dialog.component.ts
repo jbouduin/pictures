@@ -126,9 +126,6 @@ export class CollectionDialogComponent implements OnInit {
     this.collection.name = this.collectionData.get('name').value;
     this.collection.path = this.collectionData.get('path').value;
     this.collection.isSecret = this.collectionData.get('secret').value;
-    if (this.collection.isNew && this.collection.isSecret) {
-      (this.collection as CollectionNewItem).key = this.secretService.applicationSecret
-    }
   }
   // </editor-fold>
 }

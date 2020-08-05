@@ -14,7 +14,7 @@ import { Collection, Picture } from './entities';
 import { SecretImage, SecretThumb } from './entities';
 import { Setting } from './entities';
 import { Tag } from './entities';
-import { CollectionSubscriber } from './subscribers';
+import { CollectionSubscriber, PictureSubscriber } from './subscribers';
 
 import SERVICETYPES from '../di/service.types';
 
@@ -102,7 +102,7 @@ export class DatabaseService implements IDatabaseService {
       this.connectByName(
         this.getConnectionNameForTargetType(TargetType.PICTURES),
         [ Collection, MetadataKey, MetadataPictureMap, Picture, Setting, Tag ],
-        [ CollectionSubscriber ])
+        [ CollectionSubscriber, PictureSubscriber ])
     ]);
   }
   // </editor-fold>

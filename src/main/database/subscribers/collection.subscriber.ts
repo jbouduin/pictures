@@ -1,5 +1,5 @@
 import { AES, enc } from 'crypto-ts';
-import { EventSubscriber, EntitySubscriberInterface, InsertEvent } from "typeorm";
+import { EventSubscriber, EntitySubscriberInterface, InsertEvent, UpdateEvent } from "typeorm";
 import { v4 as uuidv4 } from 'uuid';
 import { Collection } from "database/entities";
 import { LoadEvent } from 'typeorm/subscriber/event/LoadEvent';
@@ -20,6 +20,11 @@ export class CollectionSubscriber implements EntitySubscriberInterface<Collectio
         event.entity.encryptedKey = AES.encrypt(generatedKeyValue, event.queryRunner.data.key).toString();
       }
     }
+    event.entity.path = event.entity.path.replace(/\\/g, '/');
+  }
+
+  public beforeUpdate(event: UpdateEvent<Collection>) {
+    event.entity.path = event.entity.path.replace(/\\/g, '/');
   }
 
   public afterLoad(_entity: Collection, event?: LoadEvent<Collection>): void {
