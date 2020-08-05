@@ -12,19 +12,24 @@ export class DataRequestFactory {
   private requestId: number;
   // </editor-fold>
 
+  // <editor-fold desc='Public properties'>
+  public secretKey: string;
+  // </editor-fold>
+
   // <editor-fold desc='Constructor & C°'>
   public constructor() {
     this.requestId = 0;
+    this.secretKey = undefined;
   }
   // </editor-fold>
 
   // <editor-fold desc='Pubic methods'>
   public createUntypedDataRequest(verb: DataVerb, path: string): IpcDataRequest {
-    return new IpcDataRequest(++this.requestId, verb, path, undefined);
+    return new IpcDataRequest(++this.requestId, verb, path, undefined, this.secretKey);
   }
 
   public createDataRequest<T>(verb: DataVerb, path: string, data: T): IpcDataRequest {
-    return new IpcDataRequest(++this.requestId, verb, path, data);
+    return new IpcDataRequest(++this.requestId, verb, path, this.secretKey, data);
   }
   // </editor-fold>
 }

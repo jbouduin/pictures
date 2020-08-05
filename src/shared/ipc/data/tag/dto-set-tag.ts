@@ -1,3 +1,5 @@
 import { DtoSetBase } from '../request/dto-set-base';
 
-export interface DtoSetTag extends DtoSetBase { }
+export interface DtoSetTag extends DtoSetBase {
+  canAssign: boolean;
+}

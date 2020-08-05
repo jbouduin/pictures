@@ -1,7 +1,8 @@
-export class RoutedRequest {
+export class RoutedRequest<T> {
   params: any;
   queryParams: any;
   path: string;
   route: string;
-  data: any;
+  secretKey: string
+  data: T;
 }

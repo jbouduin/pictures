@@ -22,7 +22,10 @@ export class TagCardItemFactory extends BaseCardItemFactory<
   }
 
   public editItemToSetDto(item: TagEditItem): DtoSetTag {
-    return { name: item.name }
+    return {
+      name: item.name,
+      canAssign: item.canAssign
+    }
   }
   // </editor-fold>
 }

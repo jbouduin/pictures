@@ -17,7 +17,7 @@ import { RoutedRequest } from '../routed-request';
 import SERVICETYPES from '../../di/service.types';
 
 export interface IPictureService extends IDataService {
-  upsertPicture(collection: Collection, relativePath: string): Promise<Picture>;
+  upsertPicture(collection: Collection, relativePath: string, key: string): Promise<Picture>;
 }
 
 @injectable()
@@ -46,7 +46,7 @@ export class PictureService extends DataService implements IPictureService {
   // </editor-fold>
 
   // <editor-fold desc='IPictureService interface methods'>
-  public upsertPicture(collection: Collection, relativePath: string): Promise<Picture> {
+  public upsertPicture(collection: Collection, relativePath: string, key: string): Promise<Picture> {
     const splitted = relativePath.split('/');
     const name = splitted.pop();
     const path = splitted.join('/');
@@ -78,6 +78,7 @@ export class PictureService extends DataService implements IPictureService {
         if (!picture.thumb) {
           const thumbRequest: DtoTaskRequest<DtoRequestCreateThumb> = {
             taskType: TaskType.CreateThumb,
+            secretKey: key,
             data: {
               id: picture.id,
               source: picturePath,
@@ -88,6 +89,7 @@ export class PictureService extends DataService implements IPictureService {
         }
         const metaDataRequest : DtoTaskRequest<DtoRequestReadMetaData> =  {
           taskType: TaskType.ReadMetaData,
+          secretKey: key,
           data: {
             id: picture.id,
             source: picturePath,
@@ -103,6 +105,7 @@ export class PictureService extends DataService implements IPictureService {
               if (!secretThumb) {
                 const secretThumbDataRequest : DtoTaskRequest<DtoRequestReadMetaData> = {
                   taskType: TaskType.CreateSecretThumb,
+                  secretKey: key,
                   data: {
                     id: picture.id,
                     source: picturePath,
@@ -119,7 +122,7 @@ export class PictureService extends DataService implements IPictureService {
   // </editor-fold>
 
   // <editor-fold desc='GET methods'>
-  private async getPicture(request: RoutedRequest): Promise<DtoDataResponse<DtoGetPicture>> {
+  private async getPicture(request: RoutedRequest<undefined>): Promise<DtoDataResponse<DtoGetPicture>> {
     try {
       const picture = await this.databaseService
         .getPictureRepository()
@@ -161,7 +164,7 @@ export class PictureService extends DataService implements IPictureService {
     }
   }
 
-  private async getRawImage(routedRequest: RoutedRequest): Promise<DtoDataResponse<DtoImage>> {
+  private async getRawImage(routedRequest: RoutedRequest<undefined>): Promise<DtoDataResponse<DtoImage>> {
 
     const picture = await this.databaseService
       .getPictureRepository()
@@ -179,15 +182,14 @@ export class PictureService extends DataService implements IPictureService {
   // </editor-fold>
 
   // <editor-fold desc='PUT methods'>
-  private async storeMetaData (routedRequest: RoutedRequest): Promise<void> {
-    const data = routedRequest.data as DtoResponseReadMetadata;
+  private async storeMetaData (routedRequest: RoutedRequest<DtoResponseReadMetadata>): Promise<void> {
     const metaDataKeyRepository = this.databaseService.getMetaDataKeyRepository();
     const metaDataPictureMapRepository = this.databaseService.getMetaDataPictureMapRepository();
-    if (data.metadata.exif) {
+    if (routedRequest.data.metadata.exif) {
       const toSave = new Array<MetadataPictureMap>();
       const picture = await this.databaseService.getPictureRepository().findOneOrFail(routedRequest.params.id);
       this.logService.verbose(LogSource.Main, `storing metadata for ${routedRequest.params.id}`);
-      for (let key of Object.keys(data.metadata.exif)) {
+      for (let key of Object.keys(routedRequest.data.metadata.exif)) {
         if (this.exifKeysToSkip.indexOf(key) < 0) {
           let metadataPictureMap: MetadataPictureMap;
           const metaDataKey = await metaDataKeyRepository
@@ -205,14 +207,14 @@ export class PictureService extends DataService implements IPictureService {
             );
 
           if (metadataPictureMap) {
-            this.logService.debug(LogSource.Main, `updating existing value: ${data.metadata.exif[key]}`);
-            metadataPictureMap.value = data.metadata.exif[key];
+            this.logService.debug(LogSource.Main, `updating existing value: ${routedRequest.data.metadata.exif[key]}`);
+            metadataPictureMap.value = routedRequest.data.metadata.exif[key];
           } else {
-            this.logService.debug(LogSource.Main, `creating new value: ${data.metadata.exif[key]}`);
+            this.logService.debug(LogSource.Main, `creating new value: ${routedRequest.data.metadata.exif[key]}`);
             metadataPictureMap = metaDataPictureMapRepository.create({
               picture: picture,
               metadataKey: metaDataKey,
-              value: data.metadata.exif[key]
+              value: routedRequest.data.metadata.exif[key]
             });
           }
           toSave.push(metadataPictureMap);

@@ -36,8 +36,7 @@ export class CollectionListItemFactory extends BaseListItemFactory<
     const result: DtoNewCollection = {
       name: item.name,
       path: item.path,
-      secret: item.isSecret,
-      key: item.key
+      isSecret: item.isSecret
     };
     return result;
   }

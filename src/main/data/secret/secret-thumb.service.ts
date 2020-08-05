@@ -31,7 +31,7 @@ export class SecretThumbService extends DataService implements ISecretThumbServi
   // </editor-fold>
 
   // <editor-fold desc='Get methods'>
-  private async getSecretThumb(request: RoutedRequest): Promise<DtoDataResponse<DtoImage>> {
+  private async getSecretThumb(request: RoutedRequest<undefined>): Promise<DtoDataResponse<DtoImage>> {
     let response: DtoDataResponse<DtoImage>;
     try {
       const thumb = await this.databaseService
@@ -53,15 +53,14 @@ export class SecretThumbService extends DataService implements ISecretThumbServi
   // </editor-fold>
 
   // <editor-fold desc='Post methods'>
-  private async createSecretThumb(request: RoutedRequest): Promise<void> {
-    const data = request.data as DtoResponseCreateThumb;
+  private async createSecretThumb(request: RoutedRequest<DtoResponseCreateThumb>): Promise<void> {
     const repository = this.databaseService.getSecretThumbRepository();
     let thumb = await repository.findOne({ where: { pictureId: request.params.id} });
     if (!thumb) {
       thumb = repository.create();
-      thumb.pictureId = data.id;
+      thumb.pictureId = request.params.id;
     }
-    thumb.data = data.thumb;
+    thumb.data = request.data.thumb;
     await repository.save(thumb);
     return;
   }

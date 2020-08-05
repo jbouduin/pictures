@@ -20,16 +20,16 @@ import { ISecretImageService } from './secret/secret-image.service';
 import { ISecretThumbService } from './secret/secret-thumb.service';
 
 export interface IDataRouterService {
-  delete(path: string, callback: (request: RoutedRequest) => Promise<DtoDataResponse<any>>): void;
-  get(path: string, callback: (request: RoutedRequest) => Promise<DtoDataResponse<any>>): void;
+  delete(path: string, callback: (request: RoutedRequest<any>) => Promise<DtoDataResponse<any>>): void;
+  get(path: string, callback: (request: RoutedRequest<any>) => Promise<DtoDataResponse<any>>): void;
   // PATCH is not used
-  post(path: string, callback: (request: RoutedRequest) => Promise<DtoDataResponse<any>>): void;
-  put(path: string, callback: (request: RoutedRequest) => Promise<DtoDataResponse<any>>): void;
+  post(path: string, callback: (request: RoutedRequest<any>) => Promise<DtoDataResponse<any>>): void;
+  put(path: string, callback: (request: RoutedRequest<any>) => Promise<DtoDataResponse<any>>): void;
   initialize(): void;
   routeRequest(request: DtoDataRequest<any>): Promise<DtoDataResponse<any>>;
 }
 
-type RouteCallback = (request: RoutedRequest) => Promise<DtoDataResponse<any>>;
+type RouteCallback = (request: RoutedRequest<any>) => Promise<DtoDataResponse<any>>;
 
 @injectable()
 export class DataRouterService implements IDataRouterService {
@@ -159,6 +159,7 @@ export class DataRouterService implements IDataRouterService {
         routedRequest.path = (matchResult2 as any).path;
         routedRequest.params = (matchResult2 as any).params;
         routedRequest.data = request.data;
+        routedRequest.secretKey = request.secretKey;
         routedRequest.queryParams = { };
         if (splittedPath.length > 1) {
           const queryParts = splittedPath[1].split('&');

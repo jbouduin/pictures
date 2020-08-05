@@ -4,5 +4,6 @@ export interface DtoTaskResponse<T> {
   taskType: TaskType,
   success: boolean,
   error: Array<any>;
+  secretKey: string;
   data: T
 }

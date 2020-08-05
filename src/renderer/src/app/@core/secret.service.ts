@@ -72,6 +72,7 @@ export class SecretService {
     if (this.lockStatus.value === 'lock_open') {
       this.lockStatus.next('lock');
       this._key = undefined;
+      this.dataRequestFactory.secretKey = undefined;
     } else {
       const params: IKeyDialogParams = {
         isInitial: false,
@@ -100,6 +101,7 @@ export class SecretService {
     if (response.status === DataStatus.Ok) {
       this.lockStatus.next('lock_open');
       this._key = key;
+      this.dataRequestFactory.secretKey = key;
       this.dialogRef.close();
       return undefined;
     } else {
@@ -117,6 +119,7 @@ export class SecretService {
     if (response.data) {
       this.lockStatus.next('lock_open');
       this._key = key;
+      this.dataRequestFactory.secretKey = key;
       this.dialogRef.close();
     } else {
       return 'wrong key';

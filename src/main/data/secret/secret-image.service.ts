@@ -31,7 +31,7 @@ export class SecretImageService extends DataService implements ISecretImageServi
   // </editor-fold>
 
   // <editor-fold desc='Get methods'>
-  private async getSecretImage(request: RoutedRequest): Promise<DtoDataResponse<DtoImage>> {
+  private async getSecretImage(request: RoutedRequest<undefined>): Promise<DtoDataResponse<DtoImage>> {
     let response: DtoDataResponse<DtoImage>;
     try {
       const image = await this.databaseService
@@ -53,15 +53,14 @@ export class SecretImageService extends DataService implements ISecretImageServi
   // </editor-fold>
 
   // <editor-fold desc='Post methods'>
-  private async createSecretImage(request: RoutedRequest): Promise<void> {
-    const data = request.data as DtoResponseCreateThumb;
+  private async createSecretImage(request: RoutedRequest<DtoResponseCreateThumb>): Promise<void> {
     const repository = this.databaseService.getSecretImageRepository();
     let image = await repository.findOne({ where: { pictureId: request.params.id} });
     if (!image) {
       image = repository.create();
       image.pictureId = request.params.id;
     }
-    image.data = data.thumb;
+    image.data = request.data.thumb;
     await repository.save(image);
     return;
   }

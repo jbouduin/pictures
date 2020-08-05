@@ -7,7 +7,7 @@ import { IDatabaseService, Tag } from "../../database";
 import { ILogService } from "../../system";
 
 import SERVICETYPES from "di/service.types";
-import { DtoUntypedDataResponse, DtoDataResponse, DtoListDataResponse, DtoTreeBase, DataStatus, LogSource, DtoTreeItemData } from "@ipc";
+import { DtoUntypedDataResponse, DtoDataResponse, DtoListDataResponse, DtoTreeBase, DataStatus, LogSource, DtoTreeItemData, DtoSetTag, DtoNewTag } from "@ipc";
 import { DtoGetTag, DtoListTag } from "@ipc";
 import { IConfigurationService } from "../configuration/configuration.service";
 import { RoutedRequest } from "../routed-request";
@@ -46,7 +46,7 @@ export class TagService extends DataService implements ITagService {
   // </editor-fold>
 
   // <editor-fold desc='DELETE route callback'>
-  private async deleteTag(request: RoutedRequest): Promise<DtoUntypedDataResponse> {
+  private async deleteTag(request: RoutedRequest<undefined>): Promise<DtoUntypedDataResponse> {
     const repository = this.databaseService.getTagRepository();
 
     try {
@@ -85,7 +85,7 @@ export class TagService extends DataService implements ITagService {
   // </editor-fold>
 
   // <editor-fold desc='GET routes callbacks'>
-  private async getTag(request: RoutedRequest): Promise<DtoDataResponse<DtoGetTag>> {
+  private async getTag(request: RoutedRequest<undefined>): Promise<DtoDataResponse<DtoGetTag>> {
     try {
       const tag = await this.databaseService
         .getTagRepository()
@@ -113,7 +113,7 @@ export class TagService extends DataService implements ITagService {
     }
   }
 
-  private async getTagListItem(request: RoutedRequest): Promise<DtoDataResponse<DtoListTag>> {
+  private async getTagListItem(request: RoutedRequest<undefined>): Promise<DtoDataResponse<DtoListTag>> {
     try {
       const tag = await this.databaseService.getTagRepository()
         .findOneOrFail(request.params.tag);
@@ -140,7 +140,7 @@ export class TagService extends DataService implements ITagService {
     }
   }
 
-  private async getTagListItems(request: RoutedRequest): Promise<DtoListDataResponse<DtoListTag>> {
+  private async getTagListItems(request: RoutedRequest<undefined>): Promise<DtoListDataResponse<DtoListTag>> {
     const paginationTake = request.queryParams.pageSize || 20;
     let paginationSkip = ((request.queryParams.page || 1) - 1) * paginationTake;
     const parent = request.queryParams.tag;
@@ -195,7 +195,7 @@ export class TagService extends DataService implements ITagService {
     }
   }
 
-  private async getTagTreeItems(_request: RoutedRequest): Promise<DtoDataResponse<Array<DtoTreeBase>>> {
+  private async getTagTreeItems(_request: RoutedRequest<undefined>): Promise<DtoDataResponse<Array<DtoTreeBase>>> {
     const tags = await this.databaseService
       .getTagRepository()
       .findTrees();
@@ -215,7 +215,7 @@ export class TagService extends DataService implements ITagService {
     return response;
   }
 
-  private async getTagTreeItem(request: RoutedRequest): Promise<DtoDataResponse<DtoTreeItemData<DtoTreeBase>>> {
+  private async getTagTreeItem(request: RoutedRequest<undefined>): Promise<DtoDataResponse<DtoTreeItemData<DtoTreeBase>>> {
     try {
 
       const tag = await this.databaseService
@@ -253,7 +253,7 @@ export class TagService extends DataService implements ITagService {
   // </editor-fold>
 
   // <editor-fold desc='POST routes callbacks'>
-  private async createTag(request: RoutedRequest): Promise<DtoDataResponse<DtoListTag>> {
+  private async createTag(request: RoutedRequest<DtoNewTag>): Promise<DtoDataResponse<DtoListTag>> {
     const repository = this.databaseService
       .getTagRepository();
 
@@ -290,7 +290,7 @@ export class TagService extends DataService implements ITagService {
   // </editor-fold>
 
   // <editor-fold desc='PUT routes callbacks'>
-  private async updateTag(request: RoutedRequest): Promise<DtoDataResponse<DtoListTag>> {
+  private async updateTag(request: RoutedRequest<DtoSetTag>): Promise<DtoDataResponse<DtoListTag>> {
     const repository = this.databaseService.getTagRepository();
     try {
       const tag = await repository.findOneOrFail(request.params.tag);

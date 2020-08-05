@@ -1,5 +1,4 @@
 import { inject, injectable } from 'inversify';
-import * as path from 'path';
 import 'reflect-metadata';
 
 import { DataStatus, DtoConfiguration, DtoEnvironment, DtoDataResponse } from '@ipc';
@@ -58,7 +57,7 @@ export class ConfigurationService implements IConfigurationService {
   // </editor-fold>
 
   // <editor-fold desc='Private methods'>
-  private getConfiguration(request: RoutedRequest): Promise<DtoDataResponse<any>> {
+  private getConfiguration(_request: RoutedRequest<undefined>): Promise<DtoDataResponse<any>> {
     const result: DtoDataResponse<DtoConfiguration> = {
       status: DataStatus.Ok,
       data: this.configuration

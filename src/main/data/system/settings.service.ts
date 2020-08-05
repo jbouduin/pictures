@@ -34,7 +34,7 @@ export class SettingsService extends DataService implements ISettingsService {
   // </editor-fold>
 
   // <editor-fold desc='Get methods'>
-  private async checkKeyExists(request: RoutedRequest): Promise<DtoDataResponse<boolean>> {
+  private async checkKeyExists(request: RoutedRequest<undefined>): Promise<DtoDataResponse<boolean>> {
     let result: DtoDataResponse<boolean>;
 
     try {
@@ -54,7 +54,7 @@ export class SettingsService extends DataService implements ISettingsService {
   // </editor-fold>
 
   // <editor-fold desc='Post methods'>
-  private async createHashedSetting(request: RoutedRequest): Promise<DtoDataResponse<boolean>> {
+  private async createHashedSetting(request: RoutedRequest<DtoSetting>): Promise<DtoDataResponse<boolean>> {
     const hash = crypto.createHash('sha256').update(request.data.value).digest('hex');
     const result = await this.createSetting(request.params.key, hash);
     const response: DtoDataResponse<boolean> = {
@@ -65,11 +65,11 @@ export class SettingsService extends DataService implements ISettingsService {
     return response;
   }
 
-  private createClearTextSetting(request: RoutedRequest): Promise<DtoDataResponse<DtoSetting>> {
+  private createClearTextSetting(request: RoutedRequest<DtoSetting>): Promise<DtoDataResponse<DtoSetting>> {
     return this.createSetting(request.params.key, request.data.value);
   }
 
-  private async validateHashedSetting(request: RoutedRequest): Promise<DtoDataResponse<boolean>> {
+  private async validateHashedSetting(request: RoutedRequest<DtoSetting>): Promise<DtoDataResponse<boolean>> {
     let response: DtoDataResponse<boolean>;
 
     try {

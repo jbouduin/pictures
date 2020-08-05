@@ -38,7 +38,7 @@ export class ThumbnailService extends DataService implements IThumbnailService {
   // </editor-fold>
 
   // <editor-fold desc='GET methods'>
-  private async getThumbnail(routedRequest: RoutedRequest): Promise<DtoDataResponse<DtoImage>> {
+  private async getThumbnail(routedRequest: RoutedRequest<undefined>): Promise<DtoDataResponse<DtoImage>> {
     let image: string;
 
     if (routedRequest.params.id === 'generic') {
@@ -60,10 +60,9 @@ export class ThumbnailService extends DataService implements IThumbnailService {
   // </editor-fold>
 
   // <editor-fold desc='PUT methods'>
-  private async storeThumbnail(routedRequest: RoutedRequest): Promise<void> {
-    const data = routedRequest.data as DtoResponseCreateThumb;
+  private async storeThumbnail(routedRequest: RoutedRequest<DtoResponseCreateThumb>): Promise<void> {
     const repository = this.databaseService.getPictureRepository();
-    await repository.update(routedRequest.params.id, { thumb: data.thumb });
+    await repository.update(routedRequest.params.id, { thumb: routedRequest.data.thumb });
     return;
   }
   // </editor-fold>

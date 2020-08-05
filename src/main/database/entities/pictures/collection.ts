@@ -1,12 +1,11 @@
-import { AES, enc } from 'crypto-ts';
-import { Column, Entity, OneToMany, OneToOne, JoinColumn, BeforeInsert, AfterLoad, BeforeUpdate } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
+import { Column, Entity, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 import { BaseEntity } from '../base-entity';
 import { Picture } from './picture';
 
 @Entity()
 export class Collection extends BaseEntity {
 
+  // <editor-fold desc='Entity columns'>
   @Column('nvarchar', { length: 256, nullable: false })
   public path: string;
 
@@ -30,29 +29,9 @@ export class Collection extends BaseEntity {
 
   @JoinColumn()
   public thumb: Picture;
+  // </editor-fold>
 
-  @BeforeInsert()
-  public beforeInsert(): void {
-    if (this.isSecret) {
-      const generatedKeyValue = uuidv4();
-      console.log('before encryption', generatedKeyValue, 'Configuration.secretKey');
-      this.encryptedKey = AES.encrypt(generatedKeyValue, 'Configuration.secretKey').toString();
-      console.log('after encryption', this.encryptedKey);
-    }
-  }
-
-  @BeforeUpdate()
-  public beforeUpdate(): void {
-    this.encryptedKey = undefined;
-  }
-
-  @AfterLoad()
-  public afterLoad(): void {
-    if (this.isSecret) {
-      console.log('before decryption', this.encryptedKey);
-      const decrypted = AES.decrypt(this.encryptedKey, 'Configuration.secretKey');
-      this.encryptedKey = decrypted.toString(enc.Utf8);
-      console.log('after decryption', this.encryptedKey);
-    }
-  }
+  // <editor-fold desc='Public properties'>
+  public decryptedKey: string;
+  // </editor-fold>
 }

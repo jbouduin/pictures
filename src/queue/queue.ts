@@ -40,12 +40,12 @@ class QueueService {
         }
         case TaskType.CreateThumb:
         case TaskType.CreateSecretThumb: {
-          const thumbResponse = await new ThumbCreator().createThumbIm(next.taskType, next.data);
+          const thumbResponse = await new ThumbCreator().createThumbIm(next.taskType, next.secretKey, next.data);
           process.send(thumbResponse);
           break;
         }
         case TaskType.ReadMetaData: {
-          const metaResponse = await new MetadataReader().readMetaData(next.data);
+          const metaResponse = await new MetadataReader().readMetaData(next.secretKey, next.data);
           process.send(metaResponse);
           break;
         }

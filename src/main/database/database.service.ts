@@ -14,8 +14,9 @@ import { Collection, Picture } from './entities';
 import { SecretImage, SecretThumb } from './entities';
 import { Setting } from './entities';
 import { Tag } from './entities';
-import SERVICETYPES from '../di/service.types';
+import { CollectionSubscriber } from './subscribers';
 
+import SERVICETYPES from '../di/service.types';
 
 export interface IDatabaseService {
   getCollectionRepository(): Repository<Collection>;
@@ -96,11 +97,12 @@ export class DatabaseService implements IDatabaseService {
     this.logService.debug(LogSource.Main, 'in initialize DatabaseService');
     return Promise.all([
       this.connectByName(
-          this.getConnectionNameForTargetType(TargetType.SECRET),
-          [SecretImage, SecretThumb]),
+        this.getConnectionNameForTargetType(TargetType.SECRET),
+        [ SecretImage, SecretThumb ]),
       this.connectByName(
-          this.getConnectionNameForTargetType(TargetType.PICTURES),
-          [Collection, MetadataKey, MetadataPictureMap, Picture, Setting, Tag])
+        this.getConnectionNameForTargetType(TargetType.PICTURES),
+        [ Collection, MetadataKey, MetadataPictureMap, Picture, Setting, Tag ],
+        [ CollectionSubscriber ])
     ]);
   }
   // </editor-fold>
@@ -115,7 +117,7 @@ export class DatabaseService implements IDatabaseService {
     return getConnection(this.getConnectionNameForTargetType(targetType));
   }
 
-  private async connectByName(connectionName: string, entities: Array<any>): Promise<TypeOrmConnection> {
+  private async connectByName(connectionName: string, entities: Array<any>, subscribers?: Array<any>): Promise<TypeOrmConnection> {
     let toConnect = this.configurationService.environment.database.connections.find(
       connection => connection.connectionName === connectionName
     );
@@ -125,38 +127,40 @@ export class DatabaseService implements IDatabaseService {
     if (!toConnect) {
       throw new Error('could not find a database to connect');
     }
-    return this.createConnection(toConnect, entities);
+    return this.createConnection(toConnect, entities, subscribers);
   }
 
-  private async createConnection(connection: DtoConnection, entities: Array<any>): Promise<TypeOrmConnection> {
+  private async createConnection(connection: DtoConnection, entities: Array<any>, subscribers?: Array<any>): Promise<TypeOrmConnection> {
 
     switch (connection.connectionType) {
       case ConnectionType.MYSQL: {
-        return this.createMySqlConnection(connection, entities);
+        return this.createMySqlConnection(connection, entities, subscribers);
       }
       case ConnectionType.POSTGRES: {
-        return this.createPostgresConnection(connection, entities);
+        return this.createPostgresConnection(connection, entities, subscribers);
       }
       case ConnectionType.SQLITE: {
-        return this.createSqliteConnection(connection, entities);
+        return this.createSqliteConnection(connection, entities, subscribers);
       }
     }
   }
 
-  private async createSqliteConnection(connection: DtoConnection, entities: Array<any>): Promise<TypeOrmConnection> {
+  private async createSqliteConnection(connection: DtoConnection, entities: Array<any>, subscribers?: Array<any>): Promise<TypeOrmConnection> {
     return createConnection({
         database: connection.databaseName,
         entities,
+        subscribers,
         name: connection.connectionName,
         synchronize: true,
         type: 'sqlite'
     });
   }
 
-  private async createMySqlConnection(connection: DtoConnection, entities: Array<any>): Promise<TypeOrmConnection> {
+  private async createMySqlConnection(connection: DtoConnection, entities: Array<any>, subscribers?: Array<any>): Promise<TypeOrmConnection> {
     return createConnection({
         database: connection.databaseName,
         entities,
+        subscribers,
         host: connection.hostName,
         name: connection.connectionName,
         password: connection.password,
@@ -167,10 +171,11 @@ export class DatabaseService implements IDatabaseService {
     });
   }
 
-  private async createPostgresConnection(connection: DtoConnection, entities: Array<any>): Promise<TypeOrmConnection> {
+  private async createPostgresConnection(connection: DtoConnection, entities: Array<any>, subscribers?: Array<any>): Promise<TypeOrmConnection> {
     return createConnection({
         database: connection.databaseName,
         entities,
+        subscribers,
         host: connection.hostName,
         name: connection.connectionName,
         password: connection.password,

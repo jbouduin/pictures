@@ -3,7 +3,7 @@ import 'reflect-metadata';
 
 import '../../../shared/extensions/array';
 
-import { DataStatus, DtoDataResponse, DtoListDataResponse, DtoUntypedDataResponse, DtoTreeBase } from '@ipc';
+import { DataStatus, DtoDataResponse, DtoListDataResponse, DtoUntypedDataResponse, DtoTreeBase, DtoNewCollection, DtoSetCollection } from '@ipc';
 import { DtoGetCollection, DtoListCollection } from '@ipc';
 import { DtoListPicture, DtoListPictureCollection } from '@ipc';
 import { LogSource } from '@ipc';
@@ -12,7 +12,7 @@ import { Collection, Picture } from '../../database';
 import { IDatabaseService } from '../../database';
 import { IFileService, ILogService } from '../../system';
 
-import { IConfigurationService, Configuration } from '../configuration';
+import { IConfigurationService } from '../configuration';
 import { IDataRouterService } from '../data-router.service';
 import { IDataService, DataService } from '../data-service';
 import { RoutedRequest } from '../routed-request';
@@ -62,14 +62,14 @@ export class CollectionService extends DataService implements ICollectionService
   // </editor-fold>
 
   // <editor-fold desc='DELETE route callback'>
-  private async deleteCollection(request: RoutedRequest): Promise<DtoUntypedDataResponse> {
+  private async deleteCollection(request: RoutedRequest<undefined>): Promise<DtoUntypedDataResponse> {
     const repository = this.databaseService.getCollectionRepository();
     let result: DtoUntypedDataResponse;
 
     try {
       await repository.findOneOrFail(request.params.collection);
       try {
-        await repository.delete(request.params.collection);
+        await repository.remove(request.params.collection);
         result = {
           status: DataStatus.Ok
         };
@@ -89,13 +89,12 @@ export class CollectionService extends DataService implements ICollectionService
         message: `${notFoundError.name}: ${notFoundError.message}`
       };
     }
-
     return result;
   }
   // </editor-fold>
 
   // <editor-fold desc='GET routes callbacks'>
-  private async getCollectionListItem(request: RoutedRequest): Promise<DtoDataResponse<DtoListCollection>> {
+  private async getCollectionListItem(request: RoutedRequest<undefined>): Promise<DtoDataResponse<DtoListCollection>> {
 
     const collectionQry = this.databaseService
       .getCollectionRepository()
@@ -128,7 +127,7 @@ export class CollectionService extends DataService implements ICollectionService
         id: collection.id,
         name: collection.name,
         path: collection.path,
-        isSecret: collection.secret,
+        isSecret: collection.isSecret,
         pictures: collection.count || 0,
         thumbId: collection.myThumbId || collection.cntThumbId
       };
@@ -148,7 +147,7 @@ export class CollectionService extends DataService implements ICollectionService
     }
   }
 
-  private async getCollectionListItems(request: RoutedRequest): Promise<DtoListDataResponse<DtoListCollection>> {
+  private async getCollectionListItems(request: RoutedRequest<undefined>): Promise<DtoListDataResponse<DtoListCollection>> {
     const paginationTake = request.queryParams.pageSize || 20;
     const paginationSkip = ((request.queryParams.page || 1) - 1) * paginationTake;
 
@@ -189,7 +188,7 @@ export class CollectionService extends DataService implements ICollectionService
             id: collection.id,
             name: collection.name,
             path: collection.path,
-            isSecret: collection.secret,
+            isSecret: collection.isSecret,
             pictures: collection.count || 0,
             thumbId: collection.myThumbId || collection.cntThumbId
           };
@@ -214,7 +213,7 @@ export class CollectionService extends DataService implements ICollectionService
     }
   }
 
-  private async getCollection(request: RoutedRequest): Promise<DtoDataResponse<DtoGetCollection>> {
+  private async getCollection(request: RoutedRequest<undefined>): Promise<DtoDataResponse<DtoGetCollection>> {
     try {
       const collection = await this.databaseService
         .getCollectionRepository()
@@ -243,7 +242,7 @@ export class CollectionService extends DataService implements ICollectionService
     }
   }
 
-  private async getCollectionPictures(request: RoutedRequest): Promise<DtoListDataResponse<DtoListPicture>> {
+  private async getCollectionPictures(request: RoutedRequest<undefined>): Promise<DtoListDataResponse<DtoListPicture>> {
     const paginationTake = request.queryParams.pageSize || 20;
     const paginationSkip = ((request.queryParams.page || 1) - 1) * paginationTake;
     const picturePath = request.queryParams.path;
@@ -297,7 +296,7 @@ export class CollectionService extends DataService implements ICollectionService
     }
   }
 
-  private async getCollectionTree(request: RoutedRequest): Promise<DtoDataResponse<Array<DtoTreeBase>>> {
+  private async getCollectionTree(request: RoutedRequest<undefined>): Promise<DtoDataResponse<Array<DtoTreeBase>>> {
     const collection = await this.databaseService
       .getCollectionRepository()
       .findOneOrFail(request.params.collection);
@@ -335,7 +334,7 @@ export class CollectionService extends DataService implements ICollectionService
   // </editor-fold>
 
   // <editor-fold desc='POST route callbacks'>
-  private async createCollection(request: RoutedRequest): Promise<DtoDataResponse<DtoListCollection>> {
+  private async createCollection(request: RoutedRequest<DtoNewCollection>): Promise<DtoDataResponse<DtoListCollection>> {
     const repository = this.databaseService
       .getCollectionRepository();
 
@@ -347,19 +346,15 @@ export class CollectionService extends DataService implements ICollectionService
       return Promise.resolve(result);
     }
 
-    if (request.data.key) {
-      Configuration.secretKey = request.data.key;
-    }
-
     const newCollection = repository.create({
       name: request.data.name,
       path: request.data.path,
-      isSecret: request.data.secret
+      isSecret: request.data.isSecret
     });
 
     try {
-      const collection = await repository.save(newCollection);
-      this.scanDirectory(collection);
+      const collection = await repository.save(newCollection, { data: { key: request.secretKey } });
+      this.scanDirectory(collection, request.secretKey);
       const listItem: DtoListCollection = {
         id: collection.id,
         name: collection.name,
@@ -375,6 +370,7 @@ export class CollectionService extends DataService implements ICollectionService
       return errorResult;
     }
     catch (error) {
+      console.log(error);
       const errorResult: DtoDataResponse<DtoListCollection> = {
         status: DataStatus.Conflict,
         message: `${error.name}: ${error.message}`
@@ -383,11 +379,11 @@ export class CollectionService extends DataService implements ICollectionService
     }
   }
 
-  private async scanCollection(request: RoutedRequest): Promise<DtoUntypedDataResponse> {
+  private async scanCollection(request: RoutedRequest<number>): Promise<DtoUntypedDataResponse> {
     try {
       const collection = await this.databaseService.getCollectionRepository()
         .findOneOrFail(request.params.collection);
-      this.scanDirectory(collection);
+      this.scanDirectory(collection, request.secretKey);
       const result: DtoUntypedDataResponse = {
         status: DataStatus.Accepted
       };
@@ -404,7 +400,7 @@ export class CollectionService extends DataService implements ICollectionService
   // </editor-fold>
 
   // <editor-fold desc='PUT route callback'>
-  private async updateCollection(request: RoutedRequest): Promise<DtoDataResponse<DtoListCollection>> {
+  private async updateCollection(request: RoutedRequest<DtoSetCollection>): Promise<DtoDataResponse<DtoListCollection>> {
     const repository = this.databaseService.getCollectionRepository();
     try {
       const collection = await repository.findOneOrFail(request.params.collection);
@@ -442,7 +438,7 @@ export class CollectionService extends DataService implements ICollectionService
     }
   }
 
-  private async setThumbNail(request: RoutedRequest): Promise<DtoDataResponse<DtoListCollection>> {
+  private async setThumbNail(request: RoutedRequest<number>): Promise<DtoDataResponse<DtoListCollection>> {
     const picture = await this.databaseService.getPictureRepository().findOneOrFail(request.data);
     const repository = this.databaseService.getCollectionRepository();
     try {
@@ -483,7 +479,7 @@ export class CollectionService extends DataService implements ICollectionService
   // </editor-fold>
 
   // <editor-fold desc='Private helper methods'>
-  private scanDirectory(collection: Collection): void {
+  private scanDirectory(collection: Collection, key: string): void {
     this.fileService
       .scanDirectory(collection.path, this.fileTypes)
       .then(
@@ -495,7 +491,7 @@ export class CollectionService extends DataService implements ICollectionService
           let promises = new Array<Promise<Picture>>();
           files.forEach( (file, index) => {
             // save each file in a separate transaction
-            promises.push(this.pictureService.upsertPicture(collection, file));
+            promises.push(this.pictureService.upsertPicture(collection, file, key));
             if (((index + 1) % 10 === 0) || (index === total - 1)) {
               Promise
                 .all(promises)

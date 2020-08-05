@@ -7,7 +7,7 @@ export class ThumbCreator {
 
   private resize = promisify(im.resize);
 
-  public async createThumbIm(taskType: TaskType, params: DtoRequestCreateThumb): Promise<DtoTaskResponse<DtoResponseCreateThumb>> {
+  public async createThumbIm(taskType: TaskType, key: string, params: DtoRequestCreateThumb): Promise<DtoTaskResponse<DtoResponseCreateThumb>> {
     return await this.resize({
       srcPath: params.source,
       quality: 0.8,
@@ -26,6 +26,7 @@ export class ThumbCreator {
         taskType: taskType,
         success: true,
         error: undefined,
+        secretKey: key,
         data: responseData
       }
       return response;
@@ -35,6 +36,7 @@ export class ThumbCreator {
         taskType: TaskType.CreateThumb,
         success: false,
         error: [ `Error resizing ${params.source}`, error ],
+        secretKey: key,
         data: undefined
       }
       return errorResponse;
