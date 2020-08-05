@@ -1,13 +1,12 @@
-require('devtron').install()
+# This is my sandbox to play with Electron and Angular.
+Nothing serious about it.
 
 # angular-electron-boilerplate
 
 This template provides a starting point of a modern and secure Electron app.
 
-## Screenshots
-![Screenshots](/images/modern-electron-screenshots.png)
 
-## Project gloals
+## Project goals
 
 Use [Angular](https://angular.io/) for the Electron renderer process. Using a modern frontend framework helps you organize your codebase once your Electron app grows in complexity. Use the [Angular CLI](https://cli.angular.io/) to generate components, routes, services and pipes. To give a modern look-and-feel [Angular Material](https://material.angular.io/) is used. This can easily be removed if it is not needed.
 
@@ -17,30 +16,21 @@ Use [webpack](https://webpack.js.org/) to pack *main* and *preload* to produce s
 
 Use most secure Electron security settings: contextIsolation and disabled nodeIntegration and disabled enableRemoteModule. preload uses the contextBridge.
 
-## CI
-![CI](https://github.com/frederiksen/angular-electron-boilerplate/workflows/CI/badge.svg)
-
-[Builds](https://github.com/frederiksen/angular-electron-boilerplate/actions)
-
 ## Dependencies
 
-[![Dependency Status](https://david-dm.org/frederiksen/angular-electron-boilerplate/status.svg)](https://david-dm.org/frederiksen/angular-electron-boilerplate)
-
-[![Dependency Status](https://david-dm.org/frederiksen/angular-electron-boilerplate/dev-status.svg)](https://david-dm.org/frederiksen/angular-electron-boilerplate?type=dev)
-
 All packages are specified under *devDependencies* since, due to the webpack usage, no modules in the */node_modules* folders are needed for production.
-
+You have to install ImageMagic in order to get things running.
 ## Getting started
 
-Try out this [template](https://github.blog/2019-06-06-generate-new-repositories-with-repository-templates/):
 
 ```bash
-$ git clone https://github.com/frederiksen/angular-electron-boilerplate
+$ git clone https://github.com/jbouduin/pictures
 $ cd angular-electron-boilerplate
 $ npm install
 $ npm run build:dev:all
 $ npm start
 ```
+
 
 ## NPM scripts
 
@@ -97,23 +87,6 @@ Commands for updating NPM modules.
 | `npm run package` | Package current */dist* folder into an app in the */release-builds* folder |
 | `npm run release` | First build a production build, then package */dist* folder into an app in the */release-builds* folder |
 
-## Debugging
-
-![Screenshots](/images/debug-electron-main-renderer.PNG)
-
-Use [Code](https://code.visualstudio.com/) to get a super debug environment.
-
-This extension is needed: [Debugger for Chrome](https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-chrome)
-
-First be sure to have build everything:
-
-```bash
-$ npm run build:dev:all
-```
-
-Now set some breakpoints both in the main source code and in the renderer source code.
-
-From Code press **Ctrl+Shift+D** and select **Main + Renderer** and press **F5**
 
 ## Packaging into an app
 
