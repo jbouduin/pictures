@@ -111,7 +111,7 @@ export class ThumbCardComponent implements OnInit {
   // <editor-fold desc='Private methods'>
   private loadThumbNail(lockStatus: LockStatus) {
     if (this.item.thumbId) {
-      const url = lockStatus === 'lock' || !this.item.secret ?
+      const url = lockStatus === 'lock' || !this.item.isSecret ?
         `/thumbnail/${this.item.thumbId}` :
         `/secret/thumb/${this.item.thumbId}`;
       const request = this.dataRequestFactory.createUntypedDataRequest(DataVerb.GET, url);

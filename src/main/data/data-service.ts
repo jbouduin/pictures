@@ -24,6 +24,7 @@ export abstract class DataService implements IDataService {
     logService: ILogService,
     configurationService: IConfigurationService,
     databaseService: IDatabaseService) {
+
     this.logService = logService;
     this.configurationService = configurationService;
     this.databaseService = databaseService;

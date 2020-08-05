@@ -81,7 +81,7 @@ export class PictureService extends DataService implements IPictureService {
             data: {
               id: picture.id,
               source: picturePath,
-              secret: collection.secret
+              secret: collection.isSecret
             }
           };
           this.queueService.push(thumbRequest);
@@ -95,7 +95,7 @@ export class PictureService extends DataService implements IPictureService {
           }
         };
         this.queueService.push(metaDataRequest);
-        if (collection.secret) {
+        if (collection.isSecret) {
           this.databaseService.getSecretThumbRepository()
             .findOne({ where: { pictureId: picture.id} })
             .then( secretThumb =>

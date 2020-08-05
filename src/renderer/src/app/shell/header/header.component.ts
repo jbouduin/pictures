@@ -1,19 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { IpcService, SecretService, LockStatus } from '@core';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { KeyDialogComponent } from '../key-dialog/key-dialog.component';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, AfterViewInit {
 
   // <editor-fold desc='Private properties'>
-  private dialog: MatDialog;
-  private dialogRef: MatDialogRef<any>;
   private ipcService: IpcService
   private secretService: SecretService;
   // </editor-fold>
@@ -25,8 +20,7 @@ export class HeaderComponent implements OnInit {
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor(dialog: MatDialog, ipcService: IpcService, secretService: SecretService) {
-    this.dialog = dialog;
+  public constructor(ipcService: IpcService, secretService: SecretService) {
     this.ipcService = ipcService;
     this.secretService = secretService;
   }
@@ -34,6 +28,10 @@ export class HeaderComponent implements OnInit {
 
   // <editor-fold desc='Angular interface methods'>
   public ngOnInit(): void { }
+
+  public ngAfterViewInit(): void {
+    this.secretService.initialize();
+  }
   // </editor-fold>
 
   // <editor-fold desc='UI Triggered methods'>
@@ -42,17 +40,7 @@ export class HeaderComponent implements OnInit {
   }
 
   public toggleLock(): void {
-    if (this.secretService.currentStatus === 'lock_open') {
-      this.secretService.toggleLock(undefined);
-    } else {
-      this.dialogRef = this.dialog.open(KeyDialogComponent, { width: '600px', maxHeight: '100%' });
-      this.dialogRef.afterClosed().subscribe( (result: string) => {
-        if (result) {
-          this.secretService.toggleLock(result);
-        }
-        this.dialogRef = undefined;
-      });
-    }
+    this.secretService.toggleLock();
   }
   // </editor-fold>
 

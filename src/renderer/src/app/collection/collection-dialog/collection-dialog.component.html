@@ -29,7 +29,7 @@
     </mat-form-field>
   </div>
   <div>
-    <mat-slide-toggle formControlName="secret" color=primary>Secret collection</mat-slide-toggle>
+    <mat-slide-toggle formControlName="secret" color=primary (change)=secretChange($event)>Secret collection</mat-slide-toggle>
   </div>
   <div *ngIf="!collection.isNew" fxLayout="row" fxLayoutAlign="space-between center">
     <mat-form-field >

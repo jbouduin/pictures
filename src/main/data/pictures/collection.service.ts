@@ -1,5 +1,6 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
+
 import '../../../shared/extensions/array';
 
 import { DataStatus, DtoDataResponse, DtoListDataResponse, DtoUntypedDataResponse, DtoTreeBase } from '@ipc';
@@ -11,7 +12,7 @@ import { Collection, Picture } from '../../database';
 import { IDatabaseService } from '../../database';
 import { IFileService, ILogService } from '../../system';
 
-import { IConfigurationService } from '../configuration';
+import { IConfigurationService, Configuration } from '../configuration';
 import { IDataRouterService } from '../data-router.service';
 import { IDataService, DataService } from '../data-service';
 import { RoutedRequest } from '../routed-request';
@@ -103,7 +104,7 @@ export class CollectionService extends DataService implements ICollectionService
       .where ('id = :id', { id: Number.parseInt(request.params.collection) })
       .addSelect('name')
       .addSelect('path')
-      .addSelect('secret')
+      .addSelect('isSecret')
       .addSelect('thumbId as myThumbId')
       .leftJoin( (cntQry) => {
         return cntQry
@@ -127,7 +128,7 @@ export class CollectionService extends DataService implements ICollectionService
         id: collection.id,
         name: collection.name,
         path: collection.path,
-        secret: collection.secret,
+        isSecret: collection.secret,
         pictures: collection.count || 0,
         thumbId: collection.myThumbId || collection.cntThumbId
       };
@@ -157,7 +158,7 @@ export class CollectionService extends DataService implements ICollectionService
       .select('id')
       .addSelect('name')
       .addSelect('path')
-      .addSelect('secret')
+      .addSelect('isSecret')
       .addSelect('thumbId as myThumbId')
       .leftJoin( (cntQry) => {
         return cntQry
@@ -188,7 +189,7 @@ export class CollectionService extends DataService implements ICollectionService
             id: collection.id,
             name: collection.name,
             path: collection.path,
-            secret: collection.secret,
+            isSecret: collection.secret,
             pictures: collection.count || 0,
             thumbId: collection.myThumbId || collection.cntThumbId
           };
@@ -225,7 +226,7 @@ export class CollectionService extends DataService implements ICollectionService
         version: collection.version,
         name: collection.name,
         path: collection.path,
-        secret: collection.secret
+        isSecret: collection.isSecret
       };
       const result: DtoDataResponse<DtoGetCollection> = {
         status: DataStatus.Ok,
@@ -254,7 +255,7 @@ export class CollectionService extends DataService implements ICollectionService
         id: collection.id,
         name: collection.name,
         path: collection.path,
-        secret: collection.secret
+        isSecret: collection.isSecret
       };
       const where: any = { collection: collection };
       if (picturePath ) {
@@ -346,10 +347,14 @@ export class CollectionService extends DataService implements ICollectionService
       return Promise.resolve(result);
     }
 
+    if (request.data.key) {
+      Configuration.secretKey = request.data.key;
+    }
+
     const newCollection = repository.create({
       name: request.data.name,
       path: request.data.path,
-      secret: request.data.secret
+      isSecret: request.data.secret
     });
 
     try {
@@ -359,7 +364,7 @@ export class CollectionService extends DataService implements ICollectionService
         id: collection.id,
         name: collection.name,
         path: collection.path,
-        secret: collection.secret,
+        isSecret: collection.isSecret,
         pictures: 0,
         thumbId: undefined
       };
@@ -410,7 +415,7 @@ export class CollectionService extends DataService implements ICollectionService
           id: savedCollection.id,
           name: savedCollection.name,
           path: savedCollection.path,
-          secret: savedCollection.secret,
+          isSecret: savedCollection.isSecret,
           pictures: 0,
           thumbId: undefined
         };
@@ -451,7 +456,7 @@ export class CollectionService extends DataService implements ICollectionService
           path: savedCollection.path,
           pictures: 0,
           thumbId: request.data,
-          secret: savedCollection.secret
+          isSecret: savedCollection.isSecret
         };
         const result: DtoDataResponse<DtoListCollection> = {
           status: DataStatus.Ok,

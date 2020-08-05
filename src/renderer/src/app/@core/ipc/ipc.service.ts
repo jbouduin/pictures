@@ -42,6 +42,7 @@ export class IpcService {
     try {
       response = JSON.parse(result);
     } catch (error) {
+      this.logService.error(error);
       response = {
         status: DataStatus.RendererError,
         message: `${error.name}: ${error.message}`
@@ -57,12 +58,13 @@ export class IpcService {
   public dataRequest<U>(request: IpcDataRequest): Promise<DtoDataResponse<U>> {
     return new Promise((resolve, reject) => {
       window.api.electronIpcOnce(`data-${request.id}`, (_event, arg) => {
-        this.logService.debug(arg);
         try {
           const result: DtoDataResponse<U> = JSON.parse(arg);
           if (result.status < DataStatus.BadRequest) {
+            this.logService.debug(result);
             resolve(result);
           } else {
+            this.logService.error(result);
             reject(result);
           }
         } catch (error) {
@@ -70,6 +72,7 @@ export class IpcService {
             status: DataStatus.RendererError,
             message: `${error.name}: ${error.message}`
           }
+          this.logService.error(error);
           reject(errorResult);
         }
       });

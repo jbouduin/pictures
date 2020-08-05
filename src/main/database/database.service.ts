@@ -9,10 +9,11 @@ import { DtoConnection } from '@ipc';
 import { IConfigurationService } from '../data';
 import { ILogService } from '../system';
 
-import { MetadataKey, MetadataPictureMap } from './entities/metadata';
-import { Collection, Picture } from './entities/pictures';
-import { SecretImage, SecretThumb } from './entities/secret';
-import { Tag } from './entities/tags';
+import { MetadataKey, MetadataPictureMap } from './entities';
+import { Collection, Picture } from './entities';
+import { SecretImage, SecretThumb } from './entities';
+import { Setting } from './entities';
+import { Tag } from './entities';
 import SERVICETYPES from '../di/service.types';
 
 
@@ -24,6 +25,7 @@ export interface IDatabaseService {
   getPictureRepository(): Repository<Picture>;
   getSecretImageRepository(): Repository<SecretImage>;
   getSecretThumbRepository(): Repository<SecretThumb>;
+  getSettingRepository(): Repository<Setting>;
   getTagRepository(): TreeRepository<Tag>;
   initialize(): Promise<[TypeOrmConnection, TypeOrmConnection]>
 }
@@ -78,6 +80,12 @@ export class DatabaseService implements IDatabaseService {
       .getRepository(SecretThumb);
   }
 
+  public getSettingRepository(): Repository<Setting> {
+    return this
+      .getConnectionByTargetType(TargetType.PICTURES)
+      .getRepository(Setting);
+  }
+
   public getTagRepository(): TreeRepository<Tag> {
     return this
       .getConnectionByTargetType(TargetType.PICTURES)
@@ -92,7 +100,7 @@ export class DatabaseService implements IDatabaseService {
           [SecretImage, SecretThumb]),
       this.connectByName(
           this.getConnectionNameForTargetType(TargetType.PICTURES),
-          [Collection, MetadataKey, MetadataPictureMap, Picture, Tag])
+          [Collection, MetadataKey, MetadataPictureMap, Picture, Setting, Tag])
     ]);
   }
   // </editor-fold>

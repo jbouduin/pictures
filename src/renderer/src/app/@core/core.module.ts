@@ -1,16 +1,26 @@
 import { NgModule, Optional, SkipSelf } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FlexLayoutModule } from '@angular/flex-layout';
 import { RouteReuseStrategy, RouterModule } from '@angular/router';
+import { MaterialModule } from '../material.module';
+
 import { OnLongPressDirective } from './on-long-press.directive';
 import { RouteReusableStrategy } from './route-reusable-strategy';
+import { KeyDialogComponent } from './components/key-dialog/key-dialog.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   imports: [
+    FormsModule,
+    ReactiveFormsModule,
+    FlexLayoutModule,
     CommonModule,
-    RouterModule
+    RouterModule,
+    MaterialModule
   ],
   declarations: [
-    OnLongPressDirective
+    OnLongPressDirective,
+    KeyDialogComponent
   ],
   providers: [
     {

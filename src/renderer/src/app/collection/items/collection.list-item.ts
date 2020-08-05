@@ -12,7 +12,7 @@ export class CollectionListItem extends ListItem {
 
   // <editor-fold desc='Constructor & C°'>
   public constructor(dtoListCollection: DtoListCollection, secretService: SecretService) {
-    super(dtoListCollection.id, dtoListCollection.name, dtoListCollection.secret);
+    super(dtoListCollection.id, dtoListCollection.name, dtoListCollection.isSecret);
     this.thumbId = dtoListCollection.thumbId;
     this.path = dtoListCollection.path;
     this.footerText = dtoListCollection.pictures.toString();
@@ -22,8 +22,8 @@ export class CollectionListItem extends ListItem {
 
   // <editor-fold desc='Private methods'>
   private setLockStatus(currentLock: LockStatus): void {
-    this.overlay = this.secret ? currentLock : undefined;
-    if (this.secret) {
+    this.overlay = this.isSecret ? currentLock : undefined;
+    if (this.isSecret) {
       this.routerLink = currentLock === 'lock' ? undefined : [ `/picture/collection/${this.id}` ];
     } else {
       this.routerLink = [ `/picture/collection/${this.id}` ];

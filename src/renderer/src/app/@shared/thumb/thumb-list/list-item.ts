@@ -10,14 +10,14 @@ export abstract class ListItem extends BaseItem implements ISelectable {
   public thumbId: number;
   public overlay: string;
   public selected: boolean;
-  public readonly secret: boolean;
+  public readonly isSecret: boolean;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
   public constructor(id: number, name: string, secret: boolean) {
     super(id, name);
     this.selected = false;
-    this.secret = secret;
+    this.isSecret = secret;
   }
   // </editor-fold>
 }

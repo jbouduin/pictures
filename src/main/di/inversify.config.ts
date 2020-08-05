@@ -10,6 +10,7 @@ import { IPictureService, PictureService } from '../data';
 import { IQueueService, QueueService } from '../system';
 import { ISecretImageService, SecretImageService } from '../data';
 import { ISecretThumbService, SecretThumbService } from '../data';
+import { ISettingsService, SettingsService } from '../data';
 import { ITagService, TagService } from '../data';
 import { IThumbnailService, ThumbnailService } from '../data';
 
@@ -28,6 +29,7 @@ container.bind<IPictureService>(SERVICETYPES.PictureService).to(PictureService);
 container.bind<IQueueService>(SERVICETYPES.QueueService).to(QueueService).inSingletonScope();
 container.bind<ISecretImageService>(SERVICETYPES.SecretImageService).to(SecretImageService);
 container.bind<ISecretThumbService>(SERVICETYPES.SecretThumbService).to(SecretThumbService);
+container.bind<ISettingsService>(SERVICETYPES.SettingsService).to(SettingsService);
 container.bind<ITagService>(SERVICETYPES.TagService).to(TagService);
 container.bind<IThumbnailService>(SERVICETYPES.ThumbnailService).to(ThumbnailService);
 // </editor-fold>

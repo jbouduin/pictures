@@ -4,6 +4,8 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { BaseItem, DynamicDialogController } from '@shared';
 import { CollectionNewItem } from '../items/collection.new-item';
 import { CollectionEditItem } from '../items/collection.edit-item';
+import { SecretService } from '@core';
+import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 
 
 @Component({
@@ -56,6 +58,7 @@ export class CollectionDialogComponent implements OnInit {
   // <editor-fold desc='Constructor & C°'>
   public constructor(
     private formBuilder: FormBuilder,
+    private secretService: SecretService,
     private controller: DynamicDialogController,
     baseItem: BaseItem) {
 
@@ -79,7 +82,7 @@ export class CollectionDialogComponent implements OnInit {
     if (!this.collection.isNew) {
       nameControl.patchValue(this.collection.name);
       pathControl.patchValue(this.collection.path);
-      secretControl.patchValue(this.collection.secret);
+      secretControl.patchValue(this.collection.isSecret);
     }
   }
   // </editor-fold>
@@ -110,13 +113,22 @@ export class CollectionDialogComponent implements OnInit {
     }
     return undefined;
   }
+
+  public secretChange(event: MatSlideToggleChange) {
+    if (this.collection.isNew && event.checked && !this.secretService.key) {
+      this.secretService.toggleLock();
+    }
+  }
   // </editor-fold>
 
   // <editor-fold desc='Private methods'>
   private commitForm(): void {
     this.collection.name = this.collectionData.get('name').value;
     this.collection.path = this.collectionData.get('path').value;
-    this.collection.secret = this.collectionData.get('secret').value;
+    this.collection.isSecret = this.collectionData.get('secret').value;
+    if (this.collection.isNew && this.collection.isSecret) {
+      (this.collection as CollectionNewItem).key = this.secretService.key
+    }
   }
   // </editor-fold>
 }

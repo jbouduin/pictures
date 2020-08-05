@@ -37,9 +37,9 @@ export class CollectionCardController extends BaseCardController<CollectionEditI
   // <editor-fold desc='Implementation of abstract methods'>
   public thumbCardFooterParams(item: CollectionListItem): Array<ThumbCardFooterParams> {
     return [
-      new ThumbCardFooterParams(undefined, 'icon-button hover green', 'refresh', this.scan.bind(this), item.secret ? this.secretService : undefined),
-      new ThumbCardFooterParams(undefined, 'icon-button hover green', 'edit', this.edit.bind(this), item.secret ? this.secretService : undefined),
-      new ThumbCardFooterParams(undefined, 'icon-button hover red', 'delete', this.remove.bind(this), item.secret ? this.secretService : undefined)
+      new ThumbCardFooterParams(undefined, 'icon-button hover green', 'refresh', this.scan.bind(this), item.isSecret ? this.secretService : undefined),
+      new ThumbCardFooterParams(undefined, 'icon-button hover green', 'edit', this.edit.bind(this), item.isSecret ? this.secretService : undefined),
+      new ThumbCardFooterParams(undefined, 'icon-button hover red', 'delete', this.remove.bind(this), item.isSecret ? this.secretService : undefined)
     ]
   }
   // </editor-fold>
