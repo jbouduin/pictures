@@ -35,10 +35,6 @@ export class IpcService {
     return response;
   }
 
-  // public untypedDataRequest<T>(request: DtoUntypedDataRequest): Promise<DtoDataResponse<T>> {
-  //   return this.dataRequest<any, T>(request);
-  // }
-
   public dataRequest<U>(request: IpcDataRequest): Promise<DtoDataResponse<U>> {
     return new Promise((resolve, reject) => {
       window.api.electronIpcOnce(`data-${request.id}`, (_event, arg) => {

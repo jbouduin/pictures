@@ -70,26 +70,6 @@ ipcMain.on('dev-tools', () => {
   }
 });
 
-// ipcMain.on('request-systeminfo', () => {
-//   const systemInfo:  DtoSystemInfo = {
-//     arch: os.arch(),
-//     hostname: os.hostname(),
-//     platform: os.platform(),
-//     release: os.release()
-//   };
-//   const serializedString = JSON.stringify(systemInfo);
-//   if (win) {
-//     win.webContents.send('systeminfo', serializedString);
-//   }
-// });
-
-// ipcMain.on('request-configuration', () => {
-//   const configuration: DtoConfiguration = container.get<IConfigurationService>(SERVICETYPES.ConfigurationService).configuration;
-//   if (win) {
-//     win.webContents.send('configuration', JSON.stringify(configuration));
-//   }
-// });
-
 ipcMain.on('data', async (event, arg) => {
   logService.debug(LogSource.Main, arg);
   const dtoRequest: DtoDataRequest<any> = JSON.parse(arg);
