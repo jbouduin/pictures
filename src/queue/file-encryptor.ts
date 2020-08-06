@@ -17,10 +17,14 @@ export class FileEncryptor {
           const collectionDirectory = params.collectionPath.split('/').pop();
           const targetDir = `${params.backupPath}/${collectionDirectory}/${params.picturePath}`;
           const target = `${targetDir}/${params.fileName}`;
-          if (!fs.existsSync(targetDir)) {
-            await fs.promises.mkdir(targetDir, { recursive: true });
+          try {
+            if (!fs.existsSync(targetDir)) {
+              await fs.promises.mkdir(targetDir, { recursive: true });
+            }
+            await fs.promises.rename(source, target);
+          } catch (error) {
+            console.error(error)
           }
-          await fs.promises.copyFile(source, target);
         }
       }
     } catch (error) {

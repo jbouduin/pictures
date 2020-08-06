@@ -82,7 +82,7 @@ export class CollectionDialogComponent implements OnInit {
       path: pathControl,
       secret: secretControl,
       deleteFiles: new FormControl(false),
-      backupFiles: new FormControl({ value: false, disabled: true}),
+      backupFiles: new FormControl({ value: true, disabled: true}),
       backupPath: new FormControl({ value: '', disabled: true})
     });
 
@@ -142,10 +142,13 @@ export class CollectionDialogComponent implements OnInit {
 
   public deleteFilesChange(event: MatSlideToggleChange): void {
     const backUpFilesControl = this.collectionData.get('backupFiles');
+    const backupPathControl = this.collectionData.get('backupPath');
     if (event.checked) {
       backUpFilesControl.enable();
+      backupPathControl.enable();
     } else {
       backUpFilesControl.disable();
+      backupPathControl.enable();
     }
   }
 

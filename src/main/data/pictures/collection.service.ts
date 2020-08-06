@@ -480,45 +480,39 @@ export class CollectionService extends DataService implements ICollectionService
   // </editor-fold>
 
   // <editor-fold desc='Private helper methods'>
-  private scanDirectory(collection: Collection, applicationSecret: string, deleteFiles: boolean, backupPath: string): Promise<number> {
-    collection.decryptedKey = this.decryptData(collection.encryptedKey, applicationSecret)
-    return this.fileService
-      .scanDirectory(collection.path, this.fileTypes)
-      .then(
-        files => {
-          const total = files.length;
-          let done = 0;
-          this.logService.info(LogSource.Main, `found ${total} files`);
-          let promises = new Array<Promise<Picture>>();
-          files.forEach( (file, index) => {
-            // save each file in a separate transaction
-            const params: UpsertPictureParams = {
-              collection,
-              relativePath: file,
-              applicationSecret,
-              deleteFile: deleteFiles,
-              backupPath
-            };
-            promises.push(this.pictureService.upsertPicture(params));
-            if (((index + 1) % 10 === 0) || (index === total - 1)) {
-              Promise
-                .all(promises)
-                .then( pictures => {
-                  done += pictures.length;
-                  // TODO send current status to renderer
-                  this.logService.verbose(LogSource.Main, `processed ${done}/${total}pictures`);
-                  // TODO if (done === total) send finished to renderer
-                });
-              promises = new Array<Promise<Picture>>();
-            }
-          });
-          return files.length;
-        },
-        error => {
-          this.logService.error(LogSource.Main, error);
-          return -1
+  private async scanDirectory(collection: Collection, applicationSecret: string, deleteFiles: boolean, backupPath: string): Promise<number> {
+    collection.decryptedKey = this.decryptData(collection.encryptedKey, applicationSecret);
+    try {
+      const files = await this.fileService.scanDirectory(collection.path, this.fileTypes);
+      const total = files.length;
+      let done = 0;
+      this.logService.info(LogSource.Main, `found ${total} files`);
+      let promises = new Array<Promise<Picture>>();
+      files.forEach( (file, index) => {
+        // save each file in a separate transaction
+        const params: UpsertPictureParams = {
+          collection,
+          relativePath: file,
+          applicationSecret,
+          deleteFile: deleteFiles,
+          backupPath
+        };
+        promises.push(this.pictureService.upsertPicture(params));
+        if (((index + 1) % 10 === 0) || (index === total - 1)) {
+          Promise
+            .all(promises)
+            .then( pictures => {
+              done += pictures.length;
+              this.logService.verbose(LogSource.Main, `processed ${done}/${total}pictures`);
+            });
+          promises = new Array<Promise<Picture>>();
         }
-      );
+      });
+      return files.length;
+    } catch (error) {
+      this.logService.error(LogSource.Main, error);
+      return -1
+    }
   }
 
   private appendChildren(level: number, parent: DtoTreeBase, paths: Array<Array<string>>): void {
