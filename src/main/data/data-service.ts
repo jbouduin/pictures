@@ -37,9 +37,9 @@ export abstract class DataService implements IDataService {
   // </editor-fold>
 
   // <editor-fold desc='Protected helper methods'>
-  protected readFileToBase64(path: string): string {
+  protected async readFileToBase64(path: string): Promise<string> {
     if (path) {
-      const img = fs.readFileSync(path);
+      const img = await fs.promises.readFile(path);
       return img.toString('base64');
     }
     else {

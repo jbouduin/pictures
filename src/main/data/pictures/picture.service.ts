@@ -1,8 +1,10 @@
+import { AES, enc } from 'crypto-ts';
+import * as fs from 'fs';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import * as path from 'path';
 
-import { DtoTaskRequest, TaskType, DtoRequestCreateThumb, DtoRequestReadMetaData, DtoResponseReadMetadata, DtoDataResponse, DtoImage, DataStatus, DtoGetPicture, DtoGetPictureCollection } from '@ipc';
+import { DtoTaskRequest, TaskType, DtoRequestCreateThumb, DtoRequestReadMetaData, DtoResponseReadMetadata, DtoDataResponse, DtoImage, DataStatus, DtoGetPicture, DtoGetPictureCollection, DtoRequestEncryptFile } from '@ipc';
 import { LogSource } from '@ipc';
 
 import { Collection, Picture, MetadataPictureMap } from '../../database';
@@ -116,6 +118,17 @@ export class PictureService extends DataService implements IPictureService {
         };
         this.queueService.push(secretThumbDataRequest);
       }
+      const encryptFileRequestData: DtoRequestEncryptFile = {
+        id: picture.id,
+        source: picturePath,
+        secret: collection.decryptedKey || this.decryptData(collection.encryptedKey, applicationSecret)
+      };
+      const encryptFileRequest: DtoTaskRequest<DtoRequestEncryptFile> = {
+        taskType: TaskType.EncryptFile,
+        applicationSecret,
+        data: encryptFileRequestData
+      };
+      this.queueService.push(encryptFileRequest);
     }
     return picture;
   }
@@ -164,14 +177,23 @@ export class PictureService extends DataService implements IPictureService {
     }
   }
 
-  private async getRawImage(routedRequest: RoutedRequest<undefined>): Promise<DtoDataResponse<DtoImage>> {
+  private async getRawImage(request: RoutedRequest<undefined>): Promise<DtoDataResponse<DtoImage>> {
 
     const picture = await this.databaseService
       .getPictureRepository()
-      .findOne(routedRequest.params.id, { relations: [ 'collection' ]});
+      .findOne(request.params.id, { relations: [ 'collection' ]});
 
     const filePath = path.join(picture.collection.path, picture.path, picture.name);
-    const image = this.readFileToBase64(filePath);
+    const encryptedFile = `${filePath}.enc`;
+    let image: string;
+    if (fs.existsSync(encryptedFile)) {
+      const fileContents = await fs.promises.readFile(encryptedFile, 'utf8'); // this.readFileToBase64(encryptedFile);
+      const secret = this.decryptData(picture.collection.encryptedKey, request.applicationSecret);
+      const encrypted = AES.decrypt(fileContents, secret);
+      image = encrypted.toString(enc.Utf8);
+    } else {
+      image = await this.readFileToBase64(filePath);
+    }
     const response: DtoDataResponse<DtoImage> = {
       status: DataStatus.Ok,
       data: { image: image }

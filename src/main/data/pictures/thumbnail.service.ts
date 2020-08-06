@@ -42,7 +42,7 @@ export class ThumbnailService extends DataService implements IThumbnailService {
     let image: string;
 
     if (routedRequest.params.id === 'generic') {
-      image = this.readFileToBase64(`${this.configurationService.configuration.appPath}/dist/renderer/assets/thumb.png`)
+      image = await this.readFileToBase64(`${this.configurationService.configuration.appPath}/dist/renderer/assets/thumb.png`)
     } else {
       const picture = await this.databaseService
         .getPictureRepository()

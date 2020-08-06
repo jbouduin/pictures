@@ -2,6 +2,7 @@ import { DtoTaskRequest, TaskType } from '@ipc';
 
 import { ThumbCreator } from './thumb-creator';
 import { MetadataReader } from './metadata-reader';
+import { FileEncryptor } from 'file-encryptor';
 
 process.on('message', (m) => {
   console.log('Got message:', m);
@@ -43,6 +44,9 @@ class QueueService {
           const thumbResponse = await new ThumbCreator().createThumbIm(next.taskType, next.applicationSecret, next.data);
           process.send(thumbResponse);
           break;
+        }
+        case TaskType.EncryptFile: {
+          await new FileEncryptor().encryptFile(next.data);
         }
         case TaskType.ReadMetaData: {
           const metaResponse = await new MetadataReader().readMetaData(next.applicationSecret, next.data);
