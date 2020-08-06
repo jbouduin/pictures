@@ -1,6 +1,5 @@
 import { DataVerb, DtoDataRequest } from '@ipc';
 
-// TODO (#750) this should become a generic again.
 export class IpcDataRequest implements DtoDataRequest<any> {
   public id: number;
   public verb: DataVerb;

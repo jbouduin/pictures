@@ -6,9 +6,10 @@ import { ILogService } from './log.service';
 
 import SERVICETYPES from '../di/service.types';
 import { IDataRouterService } from 'data';
+import { BrowserWindow } from 'electron';
 
 export interface IQueueService {
-  initialize(queuePath: string, dataRouterService: IDataRouterService): void;
+  initialize(queuePath: string, dataRouterService: IDataRouterService, browserWindow: BrowserWindow): void;
   push(task: DtoTaskRequest<any>): void;
 }
 
@@ -16,6 +17,7 @@ export interface IQueueService {
 export class QueueService implements IQueueService {
 
   // <editor-fold desc='Private properties'>
+  private browserWindow: BrowserWindow;
   private childProcess: ChildProcess;
   private dataRouterService: IDataRouterService;
   // </editor-fold>
@@ -28,8 +30,9 @@ export class QueueService implements IQueueService {
   // </editor-fold>
 
   // <editor-fold desc='Public methods'>
-  public initialize(queuePath: string, dataRouterService: IDataRouterService): void {
+  public initialize(queuePath: string, dataRouterService: IDataRouterService, browserWindow: BrowserWindow): void {
     this.dataRouterService = dataRouterService;
+    this.browserWindow = browserWindow;
     this.childProcess = fork(
       queuePath,
       ['hello'],
@@ -58,6 +61,7 @@ export class QueueService implements IQueueService {
   }
   // </editor-fold>
 
+  // <editor-fold desc='Private methods'>
   private processResponse(response: DtoTaskResponse<any>): void {
     this.logService.debug(LogSource.Main, 'received response from queue: ' + JSON.stringify(response, null, 2));
     let dataRequest: DtoDataRequest<any>;
@@ -93,6 +97,9 @@ export class QueueService implements IQueueService {
           };
           break;
         }
+        case TaskType.StatusMessage: {
+          this.browserWindow.webContents.send('queue-status', JSON.stringify(response.data));
+        }
       }
       if (dataRequest) {
         this.dataRouterService.routeRequest(dataRequest);
@@ -100,6 +107,6 @@ export class QueueService implements IQueueService {
     } else {
       this.logService.error(LogSource.Queue, response.error);
     }
-
   }
+  // </editor-fold>
 }

@@ -3,5 +3,6 @@ export enum TaskType {
   EncryptFile,
   CreateThumb,
   CreateSecretThumb,
-  ReadMetaData
+  ReadMetaData,
+  StatusMessage
 }

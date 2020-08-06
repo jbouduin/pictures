@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { DataStatus, DtoDataResponse } from '@ipc';
+import { DataStatus, DtoDataResponse, DtoQueueStatus, LogSource, LogLevel } from '@ipc';
 
 import { LogService } from '../log.service';
 import { IpcDataRequest } from './ipc-data-request';
@@ -10,7 +10,9 @@ import { IpcDataRequest } from './ipc-data-request';
 export class IpcService {
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor(private logService: LogService) { }
+  public constructor(private logService: LogService) {
+    this.initializeQueue();
+  }
   // </editor-fold>
 
   // <editor-fold desc='Public methods'>
@@ -57,6 +59,24 @@ export class IpcService {
         }
       });
       window.api.electronIpcSend('data', JSON.stringify(request));
+    });
+  }
+  // </editor-fold>
+
+  // <editor-fold desc='Private methods'>
+  private initializeQueue(): void {
+    window.api.electronIpcRemoveAllListeners('queue-status');
+    window.api.electronIpcOn('queue-status', (_event, arg) => {
+      try {
+        const message: DtoQueueStatus = JSON.parse(arg);
+        this.logService.verbose(message);
+      } catch (error) {
+        this.logService.error(
+          LogSource.Renderer,
+          LogLevel.Error,
+          'Error processing message received:',
+          arg);
+      }
     });
   }
   // </editor-fold>

@@ -48,8 +48,12 @@ export abstract class DataService implements IDataService {
   }
 
   public decryptData(value: string, applicationSecret: string): string {
-    const decrypted = AES.decrypt(value, applicationSecret);
-    return decrypted.toString(enc.Utf8);
+    if (value) {
+      const decrypted = AES.decrypt(value, applicationSecret);
+      return decrypted.toString(enc.Utf8);
+    } else {
+      return undefined;
+    }
   }
 
   public encryptData(value: string, applicationSecret: string): string {

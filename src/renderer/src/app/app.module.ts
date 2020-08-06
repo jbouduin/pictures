@@ -4,7 +4,7 @@ import { MaterialModule } from './material.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgxResizableModule } from '@3dgenomes/ngx-resizable';
 
-import { CoreModule, DataRequestFactory } from '@core';
+import { CoreModule, DataRequestFactory, IpcService } from '@core';
 import { SharedModule } from '@shared';
 import { CollectionModule } from './collection';
 import { PictoramaModule } from './pictorama';
@@ -34,7 +34,8 @@ import { TagModule } from './tag';
     AppRoutingModule // must be imported as the last module as it contains the fallback route
   ],
   providers: [
-    DataRequestFactory
+    DataRequestFactory,
+    IpcService
   ],
   bootstrap: [ AppComponent ]
 })

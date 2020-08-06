@@ -1,4 +1,4 @@
-import { DtoTaskRequest, TaskType } from '@ipc';
+import { DtoTaskRequest, TaskType, DtoQueueStatus, DtoTaskResponse } from '@ipc';
 
 import { ThumbCreator } from './thumb-creator';
 import { MetadataReader } from './metadata-reader';
@@ -32,6 +32,7 @@ class QueueService {
   }
 
   public async next(): Promise<any> {
+    const status: DtoQueueStatus = { count: 0 };
     if (this.queue.length > 0) {
       const next = this.queue.shift();
       switch (next.taskType) {
@@ -57,11 +58,19 @@ class QueueService {
           console.error(`Unknown tasktype: ${next.taskType}`);
         }
       }
+      status.count = this.queue.length;
       setTimeout(this.next.bind(this), 100);
     } else {
-      console.debug('queue is empty');
       setTimeout(this.next.bind(this), 5000);
     }
+    const statusResponse: DtoTaskResponse<DtoQueueStatus> = {
+      taskType: TaskType.StatusMessage,
+      success: true,
+      error: undefined,
+      applicationSecret: undefined,
+      data: status
+    };
+    process.send(statusResponse);
   }
   // </editor-fold>
 }

@@ -481,7 +481,7 @@ export class CollectionService extends DataService implements ICollectionService
 
   // <editor-fold desc='Private helper methods'>
   private async scanDirectory(collection: Collection, applicationSecret: string, deleteFiles: boolean, backupPath: string): Promise<number> {
-    collection.decryptedKey = this.decryptData(collection.encryptedKey, applicationSecret);
+    collection.decryptedKey = collection.encryptedKey ? this.decryptData(collection.encryptedKey, applicationSecret) : undefined;
     try {
       const files = await this.fileService.scanDirectory(collection.path, this.fileTypes);
       const total = files.length;

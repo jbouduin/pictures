@@ -6,7 +6,7 @@ import { Configuration } from '../data/configuration';
 
 export interface ILogService {
   injectConfiguraton(configuration: Configuration): void;
-  injectWindow(browserWindow: BrowserWindow): void
+  injectWindow(browserWindow: BrowserWindow): void;
   info(logSource: LogSource, object: any, ...args: Array<any>): void;
   error(logSource: LogSource, object: any, ...args: Array<any>): void;
   verbose(logSource: LogSource, object: any, ...args: Array<any>): void;

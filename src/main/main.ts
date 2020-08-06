@@ -58,7 +58,8 @@ function createWindow() {
           });
           container.get<IQueueService>(SERVICETYPES.QueueService).initialize(
             path.join(app.getAppPath(), 'dist/queue', 'queue.js'),
-            dataRouterService
+            dataRouterService,
+            win
           );
       });
   });
