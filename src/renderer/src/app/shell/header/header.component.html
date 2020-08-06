@@ -12,6 +12,9 @@
     <span translate>Tags</span>
   </button>
   <span fxFlex></span>
+  <mat-icon matBadge="{{queueLength}}" matBadgePosition="after" matBadgeColor="accent">
+    queue
+  </mat-icon>
   <button mat-button (click)="toggleLock()">
     <mat-icon>{{currentLockStatus}}</mat-icon>
   </button>

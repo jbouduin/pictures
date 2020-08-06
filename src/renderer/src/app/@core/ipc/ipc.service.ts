@@ -3,11 +3,16 @@ import { DataStatus, DtoDataResponse, DtoQueueStatus, LogSource, LogLevel } from
 
 import { LogService } from '../log.service';
 import { IpcDataRequest } from './ipc-data-request';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class IpcService {
+
+  // <editor-fold desc='Public properties'>
+  public queueStatus: BehaviorSubject<DtoQueueStatus>;
+  // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
   public constructor(private logService: LogService) {
@@ -65,11 +70,15 @@ export class IpcService {
 
   // <editor-fold desc='Private methods'>
   private initializeQueue(): void {
+    const initial: DtoQueueStatus = { count: 0 };
+    this.queueStatus = new BehaviorSubject<DtoQueueStatus>(initial);
+
     window.api.electronIpcRemoveAllListeners('queue-status');
     window.api.electronIpcOn('queue-status', (_event, arg) => {
       try {
         const message: DtoQueueStatus = JSON.parse(arg);
         this.logService.verbose(message);
+        this.queueStatus.next(message);
       } catch (error) {
         this.logService.error(
           LogSource.Renderer,

@@ -1,5 +1,6 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, NgZone } from '@angular/core';
 import { IpcService, SecretService, LockStatus } from '@core';
+import { DtoQueueStatus } from '@ipc';
 
 @Component({
   selector: 'app-header',
@@ -11,7 +12,10 @@ export class HeaderComponent implements OnInit, AfterViewInit {
   // <editor-fold desc='Private properties'>
   private ipcService: IpcService
   private secretService: SecretService;
+  private ngZone: NgZone;
   // </editor-fold>
+
+  public queueLength: number;
 
   // <editor-fold desc='Public getters'>
   public get currentLockStatus(): LockStatus {
@@ -20,14 +24,17 @@ export class HeaderComponent implements OnInit, AfterViewInit {
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor(ipcService: IpcService, secretService: SecretService) {
+  public constructor(ipcService: IpcService, secretService: SecretService, ngZone: NgZone) {
     this.ipcService = ipcService;
     this.secretService = secretService;
+    this.ngZone = ngZone;
   }
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methods'>
-  public ngOnInit(): void { }
+  public ngOnInit(): void {
+    this.ipcService.queueStatus.subscribe((status: DtoQueueStatus) => this.ngZone.run(() => this.queueLength = status.count));
+  }
 
   public ngAfterViewInit(): void {
     this.secretService.initialize();
