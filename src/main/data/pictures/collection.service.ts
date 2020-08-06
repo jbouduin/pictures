@@ -21,6 +21,7 @@ import { IPictureService } from './picture.service';
 
 import SERVICETYPES from '../../di/service.types';
 import { Like } from 'typeorm';
+import { UpsertPictureParams } from './upsert-picture.params';
 
 export interface ICollectionService extends IDataService { }
 
@@ -67,9 +68,9 @@ export class CollectionService extends DataService implements ICollectionService
     let result: DtoUntypedDataResponse;
 
     try {
-      await repository.findOneOrFail(request.params.collection);
+      const collection = await repository.findOneOrFail(request.params.collection);
       try {
-        await repository.remove(request.params.collection);
+        await repository.remove([ collection ]);
         result = {
           status: DataStatus.Ok
         };
@@ -354,13 +355,13 @@ export class CollectionService extends DataService implements ICollectionService
 
     try {
       const collection = await repository.save(newCollection, { data: { key: request.applicationSecret } });
-      this.scanDirectory(collection, request.applicationSecret);
+      const count = await this.scanDirectory(collection, request.applicationSecret, request.data.deleteFiles, request.data.backupPath);
       const listItem: DtoListCollection = {
         id: collection.id,
         name: collection.name,
         path: collection.path,
         isSecret: collection.isSecret,
-        pictures: 0,
+        pictures: count,
         thumbId: undefined
       };
       const errorResult: DtoDataResponse<DtoListCollection> = {
@@ -383,7 +384,7 @@ export class CollectionService extends DataService implements ICollectionService
     try {
       const collection = await this.databaseService.getCollectionRepository()
         .findOneOrFail(request.params.collection);
-      this.scanDirectory(collection, request.applicationSecret);
+      this.scanDirectory(collection, request.applicationSecret, false, undefined);
       const result: DtoUntypedDataResponse = {
         status: DataStatus.Accepted
       };
@@ -479,34 +480,43 @@ export class CollectionService extends DataService implements ICollectionService
   // </editor-fold>
 
   // <editor-fold desc='Private helper methods'>
-  private scanDirectory(collection: Collection, key: string): void {
-    this.fileService
+  private scanDirectory(collection: Collection, applicationSecret: string, deleteFiles: boolean, backupPath: string): Promise<number> {
+    collection.decryptedKey = this.decryptData(collection.encryptedKey, applicationSecret)
+    return this.fileService
       .scanDirectory(collection.path, this.fileTypes)
       .then(
         files => {
           const total = files.length;
           let done = 0;
           this.logService.info(LogSource.Main, `found ${total} files`);
-          // TODO send a status to the renderer with the number of files found
           let promises = new Array<Promise<Picture>>();
           files.forEach( (file, index) => {
             // save each file in a separate transaction
-            promises.push(this.pictureService.upsertPicture(collection, file, key));
+            const params: UpsertPictureParams = {
+              collection,
+              relativePath: file,
+              applicationSecret,
+              deleteFile: deleteFiles,
+              backupPath
+            };
+            promises.push(this.pictureService.upsertPicture(params));
             if (((index + 1) % 10 === 0) || (index === total - 1)) {
               Promise
                 .all(promises)
                 .then( pictures => {
                   done += pictures.length;
                   // TODO send current status to renderer
-                  this.logService.info(LogSource.Main, `processed ${done}/${total}pictures`);
+                  this.logService.verbose(LogSource.Main, `processed ${done}/${total}pictures`);
                   // TODO if (done === total) send finished to renderer
                 });
               promises = new Array<Promise<Picture>>();
             }
           });
+          return files.length;
         },
         error => {
           this.logService.error(LogSource.Main, error);
+          return -1
         }
       );
   }

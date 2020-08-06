@@ -34,6 +34,20 @@
   <div>
     <mat-slide-toggle formControlName="secret" color=primary (change)=secretChange($event)>Secret collection</mat-slide-toggle>
   </div>
+  <div *ngIf="collection.isNew && isSecret" fxLayout="column">
+    <mat-slide-toggle formControlName="deleteFiles" color=primary (change)=deleteFilesChange($event)>Delete files after encryption</mat-slide-toggle>
+    <mat-slide-toggle formControlName="backupFiles" color=primary (change)=backupFilesChange($event)>Backup files before deleting</mat-slide-toggle>
+    <mat-form-field class="full-width">
+      <mat-label>Folder</mat-label>
+      <input matInput required
+        placeholder="enter the backup location"
+        formControlName="backupPath" />
+        <button mat-button matSuffix mat-icon-button aria-label="Save as" (click)="selectBackupDirectory()">
+          <mat-icon>folder_open</mat-icon>
+        </button>
+      <mat-error>{{ getErrorMessage('path') }}</mat-error>
+    </mat-form-field>
+  </div>
   <div *ngIf="!collection.isNew" fxLayout="row" fxLayoutAlign="space-between center">
     <mat-form-field >
       <mat-label>Created</mat-label>

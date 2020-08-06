@@ -7,7 +7,7 @@ import * as path from 'path';
 import { DtoTaskRequest, TaskType, DtoRequestCreateThumb, DtoRequestReadMetaData, DtoResponseReadMetadata, DtoDataResponse, DtoImage, DataStatus, DtoGetPicture, DtoGetPictureCollection, DtoRequestEncryptFile } from '@ipc';
 import { LogSource } from '@ipc';
 
-import { Collection, Picture, MetadataPictureMap } from '../../database';
+import { Picture, MetadataPictureMap } from '../../database';
 import { IDatabaseService } from '../../database';
 import { ILogService, IQueueService } from '../../system';
 
@@ -17,9 +17,10 @@ import { IDataService, DataService } from '../data-service';
 import { RoutedRequest } from '../routed-request';
 
 import SERVICETYPES from '../../di/service.types';
+import { UpsertPictureParams } from './upsert-picture.params';
 
 export interface IPictureService extends IDataService {
-  upsertPicture(collection: Collection, relativePath: string, key: string): Promise<Picture>;
+  upsertPicture(params: UpsertPictureParams): Promise<Picture>;
 }
 
 @injectable()
@@ -48,59 +49,63 @@ export class PictureService extends DataService implements IPictureService {
   // </editor-fold>
 
   // <editor-fold desc='IPictureService interface methods'>
-  public async upsertPicture(collection: Collection, relativePath: string, applicationSecret: string): Promise<Picture> {
-    const splitted = relativePath.split('/');
-    const name = splitted.pop();
-    const path = splitted.join('/');
+  public async upsertPicture(params: UpsertPictureParams): Promise<Picture> {
+    const splitted = params.relativePath.split('/');
+    const fileName = splitted.pop();
+    const picturePath = splitted.join('/');
     const pictureRepository = this.databaseService.getPictureRepository();
     let picture = await pictureRepository.findOne({
       where: {
-        path: path,
-        name: name,
-        collection: collection
+        path: picturePath,
+        name: fileName,
+        collection: params.collection
       }
     });
 
     if (picture) {
-      this.logService.debug(LogSource.Main, `picture '${path}/${name}' already in '${collection.name}'`);
+      this.logService.debug(LogSource.Main, `picture '${picturePath}/${fileName}' already in '${params.collection.name}'`);
     } else {
-      this.logService.debug(LogSource.Main, `adding '${path}/${name}' to '${collection.name}'`);
+      this.logService.debug(LogSource.Main, `adding '${picturePath}/${fileName}' to '${params.collection.name}'`);
       const newPicture = pictureRepository.create({
-        name: name,
-        path: path,
-        collection: collection
+        name: fileName,
+        path: picturePath,
+        collection: params.collection
       });
 
       picture = await pictureRepository.save(newPicture);
     }
 
-    const picturePath = `${collection.path}/${picture.path}/${picture.name}`;
+
     if (!picture.thumb) {
       const createThumbRequestData: DtoRequestCreateThumb = {
         id: picture.id,
-        source: picturePath,
-        secret: collection.isSecret
+        collectionPath: params.collection.path,
+        picturePath,
+        fileName,
+        secret: params.collection.isSecret
       };
      const thumbRequest: DtoTaskRequest<DtoRequestCreateThumb> = {
         taskType: TaskType.CreateThumb,
-        applicationSecret,
+        applicationSecret: params.applicationSecret,
         data: createThumbRequestData
       };
       this.queueService.push(thumbRequest);
     }
     const readMetaDataRequestData: DtoRequestReadMetaData = {
       id: picture.id,
-      source: picturePath,
+      collectionPath: params.collection.path,
+      picturePath,
+      fileName,
       secret: undefined
     };
     const metaDataRequest : DtoTaskRequest<DtoRequestReadMetaData> =  {
       taskType: TaskType.ReadMetaData,
-      applicationSecret,
+      applicationSecret: params.applicationSecret,
       data: readMetaDataRequestData
     };
     this.queueService.push(metaDataRequest);
 
-    if (collection.isSecret) {
+    if (params.collection.isSecret) {
       const secretThumb = await this.databaseService
         .getSecretThumbRepository()
         .findOne({ where: { pictureId: picture.id} });
@@ -108,24 +113,31 @@ export class PictureService extends DataService implements IPictureService {
       if (!secretThumb) {
         const createSecretThumbRequestData: DtoRequestCreateThumb = {
           id: picture.id,
-          source: picturePath,
+          collectionPath: params.collection.path,
+          picturePath,
+          fileName,
           secret: undefined
         }
         const secretThumbDataRequest : DtoTaskRequest<DtoRequestCreateThumb> = {
           taskType: TaskType.CreateSecretThumb,
-          applicationSecret,
+          applicationSecret: params.applicationSecret,
           data: createSecretThumbRequestData
         };
         this.queueService.push(secretThumbDataRequest);
       }
       const encryptFileRequestData: DtoRequestEncryptFile = {
         id: picture.id,
-        source: picturePath,
-        secret: collection.decryptedKey || this.decryptData(collection.encryptedKey, applicationSecret)
+        collectionPath: params.collection.path,
+        picturePath,
+        fileName,
+        secret: params.collection.decryptedKey ||
+          this.decryptData(params.collection.encryptedKey, params.applicationSecret),
+        deleteFile: params.deleteFile,
+        backupPath: params.backupPath
       };
       const encryptFileRequest: DtoTaskRequest<DtoRequestEncryptFile> = {
         taskType: TaskType.EncryptFile,
-        applicationSecret,
+        applicationSecret: params.applicationSecret,
         data: encryptFileRequestData
       };
       this.queueService.push(encryptFileRequest);

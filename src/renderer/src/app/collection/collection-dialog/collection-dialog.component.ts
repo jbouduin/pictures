@@ -20,6 +20,7 @@ export class CollectionDialogComponent implements OnInit {
   public collection: CollectionNewItem | CollectionEditItem;
   public collectionData: FormGroup;
   public dialogTitle: string;
+  public isSecret: boolean;
   // </editor-fold>
 
   // <editor-fold desc='Public get Methods'>
@@ -72,14 +73,17 @@ export class CollectionDialogComponent implements OnInit {
       this.collection = (baseItem as any) as CollectionEditItem;
       this.dialogTitle = 'Edit collection';
     }
-
+    this.isSecret = false;
     const nameControl = new FormControl('', [Validators.required]);
     const pathControl = new FormControl({ value: '', disabled: !this.collection.isNew }, [Validators.required]);
     const secretControl = new FormControl({ value: false, disabled: !this.collection.isNew } );
     this.collectionData = this.formBuilder.group({
       name: nameControl,
       path: pathControl,
-      secret: secretControl
+      secret: secretControl,
+      deleteFiles: new FormControl(false),
+      backupFiles: new FormControl({ value: false, disabled: true}),
+      backupPath: new FormControl({ value: '', disabled: true})
     });
 
     if (!this.collection.isNew) {
@@ -117,15 +121,43 @@ export class CollectionDialogComponent implements OnInit {
     return undefined;
   }
 
+  public async selectBackupDirectory(): Promise<void> {
+    const request = this.dataRequestFactory.createUntypedDataRequest(DataVerb.GET, '/system/select-directory');
+    const response = await this.ipcService.dataRequest<string>(request);
+    this.collectionData.controls['backupPath'].patchValue(response.data);
+  }
+
   public async selectDirectory(): Promise<void> {
     const request = this.dataRequestFactory.createUntypedDataRequest(DataVerb.GET, '/system/select-directory');
     const response = await this.ipcService.dataRequest<string>(request);
     this.collectionData.controls['path'].patchValue(response.data);
   }
 
-  public secretChange(event: MatSlideToggleChange) {
+  public secretChange(event: MatSlideToggleChange): void {
     if (this.collection.isNew && event.checked && !this.secretService.applicationSecret) {
       this.secretService.toggleLock();
+    }
+    this.isSecret = event.checked;
+  }
+
+  public deleteFilesChange(event: MatSlideToggleChange): void {
+    const backUpFilesControl = this.collectionData.get('backupFiles');
+    if (event.checked) {
+      backUpFilesControl.enable();
+    } else {
+      backUpFilesControl.disable();
+    }
+  }
+
+  public backupFilesChange(event: MatSlideToggleChange): void {
+    const backupPathControl = this.collectionData.get('backupPath');
+    if (event.checked) {
+      backupPathControl.enable();
+      backupPathControl.setValidators(Validators.required);
+      backupPathControl.updateValueAndValidity();
+    } else {
+      backupPathControl.disable();
+      backupPathControl.clearValidators();
     }
   }
   // </editor-fold>
@@ -135,6 +167,10 @@ export class CollectionDialogComponent implements OnInit {
     this.collection.name = this.collectionData.get('name').value;
     this.collection.path = this.collectionData.get('path').value;
     this.collection.isSecret = this.collectionData.get('secret').value;
+    if (this.collection.isNew) {
+      (this.collection as CollectionNewItem).deleteFiles = this.collectionData.get('deleteFiles').value;
+      (this.collection as CollectionNewItem).backupPath = this.collectionData.get('backupPath').value;
+    }
   }
   // </editor-fold>
 }

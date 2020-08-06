@@ -6,12 +6,22 @@ import { DtoRequestEncryptFile } from "@ipc";
 export class FileEncryptor {
 
   public async encryptFile(params: DtoRequestEncryptFile): Promise<void> {
-    const target: string = `${params.source}.enc`;
+    const source = `${params.collectionPath}/${params.picturePath}/${params.fileName}`;
+    const target: string = `${source}.enc`;
     try {
-      if (fs.existsSync(params.source) && !fs.existsSync(target)) {
-        const fileContents = await fs.promises.readFile(params.source);
+      if (fs.existsSync(source) && !fs.existsSync(target)) {
+        const fileContents = await fs.promises.readFile(source);
         const encrypted = AES.encrypt(fileContents.toString('base64'), params.secret);
         await fs.promises.writeFile(target, encrypted.toString(), { encoding : 'utf8'});
+        if (params.deleteFile && params.backupPath) {
+          const collectionDirectory = params.collectionPath.split('/').pop();
+          const targetDir = `${params.backupPath}/${collectionDirectory}/${params.picturePath}`;
+          const target = `${targetDir}/${params.fileName}`;
+          if (!fs.existsSync(targetDir)) {
+            await fs.promises.mkdir(targetDir, { recursive: true });
+          }
+          await fs.promises.copyFile(source, target);
+        }
       }
     } catch (error) {
       console.error(error);

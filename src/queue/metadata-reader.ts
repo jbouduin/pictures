@@ -6,9 +6,9 @@ export class MetadataReader {
   private read = promisify(im.readMetadata);
 
   public async readMetaData(applicationSecret: string, params: DtoRequestReadMetaData): Promise<DtoTaskResponse<DtoResponseReadMetadata>> {
-
+    const source = `${params.collectionPath}/${params.picturePath}/${params.fileName}`;
     return await this
-      .read(params.source)
+      .read(source)
       .then(metaData => {
         const responseData: DtoResponseReadMetadata = {
           id: params.id,
@@ -28,7 +28,7 @@ export class MetadataReader {
           taskType: TaskType.CreateThumb,
           success: false,
           applicationSecret,
-          error: [ `Error reading metadata ${params.source}`, error ],
+          error: [ `Error reading metadata ${source}`, error ],
           data: undefined
         }
         return errorResponse;

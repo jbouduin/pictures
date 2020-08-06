@@ -1,4 +1,6 @@
 export interface DtoRequestFile {
   id: number;
-  source: string;
+  collectionPath: string;
+  picturePath: string;
+  fileName: string;
 }
