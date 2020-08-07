@@ -1,9 +1,9 @@
 import { injectable, inject } from "inversify";
-import { ILogService } from "system";
 import { IDatabaseService } from "../../database/database.service";
 import { IConfigurationService } from "../configuration/configuration.service";
 import { IDataRouterService } from "../data-router.service";
 import { IDataService, DataService } from "../data-service";
+import { ILogService } from "../system/log.service";
 import { RoutedRequest } from "../routed-request";
 
 import SERVICETYPES from "di/service.types";

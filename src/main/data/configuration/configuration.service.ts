@@ -3,16 +3,15 @@ import 'reflect-metadata';
 
 import { DataStatus, DtoConfiguration, DtoEnvironment, DtoDataResponse } from '@ipc';
 
-import { ILogService } from '../../system';
 import { IDataRouterService } from '../data-router.service';
 import { IDataService } from '../data-service';
 import { RoutedRequest } from '../routed-request';
 import { Configuration } from './configuration';
 
-import SERVICETYPES from '../../di/service.types';
 
 export interface IConfigurationService extends IDataService {
-  configuration: DtoConfiguration;
+  readonly configuration: DtoConfiguration;
+  readonly fullConfiguration: Configuration;
   environment: DtoEnvironment;
   initialize(appPath: string): Promise<Configuration>
 }
@@ -25,27 +24,25 @@ export class ConfigurationService implements IConfigurationService {
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor(
-    @inject(SERVICETYPES.LogService) private logService: ILogService) { }
+  public constructor() { }
   // </editor-fold>
 
   // <editor-fold desc='IConfigurationService Interface properties'>
+  // TODO Configuration vs. DtoConfiguration => make sure Configuration implements DtoConfiguration
   public get configuration(): DtoConfiguration {
     return this._configuration;
   }
 
+  public get fullConfiguration(): Configuration {
+    return this._configuration;
+  }
   public get environment(): DtoEnvironment {
     return this._configuration.current;
   }
 
-  public initialize(appPath: string): Promise<Configuration> {
-    return Configuration.loadConfiguration(appPath)
-      .then(
-        configuration => {
-          this.logService.injectConfiguraton(configuration);
-          this._configuration = configuration;
-          return configuration;
-        });
+  public async initialize(appPath: string): Promise<Configuration> {
+    this._configuration = await Configuration.loadConfiguration(appPath);
+    return this._configuration;
   }
   // </editor-fold>
 

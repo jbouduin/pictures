@@ -1,6 +1,7 @@
 export enum TargetType {
   PICTURES = 'pictures',
-  SECRET = 'secret'
+  SECRET = 'secret',
+  LOG = 'log'
 }
 
 export interface DtoTarget {

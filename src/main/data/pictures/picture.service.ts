@@ -6,18 +6,17 @@ import * as path from 'path';
 
 import { DtoTaskRequest, TaskType, DtoRequestCreateThumb, DtoRequestReadMetaData, DtoResponseReadMetadata, DtoDataResponse, DtoImage, DataStatus, DtoGetPicture, DtoGetPictureCollection, DtoRequestEncryptFile } from '@ipc';
 import { LogSource } from '@ipc';
-
 import { Picture, MetadataPictureMap } from '../../database';
 import { IDatabaseService } from '../../database';
-import { ILogService, IQueueService } from '../../system';
-
 import { IConfigurationService } from '../configuration';
-import { IDataRouterService } from '../data-router.service';
 import { IDataService, DataService } from '../data-service';
+import { ILogService } from "../system/log.service";
+import { IDataRouterService } from '../data-router.service';
 import { RoutedRequest } from '../routed-request';
 
 import SERVICETYPES from '../../di/service.types';
 import { UpsertPictureParams } from './upsert-picture.params';
+import { IQueueService } from '../../system';
 
 export interface IPictureService extends IDataService {
   upsertPicture(params: UpsertPictureParams): Promise<Picture>;

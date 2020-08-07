@@ -2,13 +2,11 @@ import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 
 import { DtoResponseCreateThumb, DtoDataResponse, DtoImage, DataStatus } from '@ipc';
-
 import { IDatabaseService } from '../../database';
-import { ILogService } from '../../system';
-
 import { IConfigurationService } from '../configuration';
 import { IDataRouterService } from '../data-router.service';
 import { IDataService, DataService } from '../data-service';
+import { ILogService } from "../system/log.service";
 import { RoutedRequest } from '../routed-request';
 
 import SERVICETYPES from '../../di/service.types';

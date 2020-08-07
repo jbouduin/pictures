@@ -6,9 +6,8 @@ import { promisify } from 'util'
 
 import { LogSource } from '@ipc';
 
-import { ILogService } from './log.service';
-
 import SERVICETYPES from '../di/service.types';
+import { ILogService } from '../data';
 
 export interface IFileService {
   createDirSync(directory: string): void;

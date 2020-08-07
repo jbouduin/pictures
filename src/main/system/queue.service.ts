@@ -2,7 +2,7 @@ import { ChildProcess, fork } from 'child_process';
 import { inject, injectable } from 'inversify';
 
 import { DtoTaskRequest, LogSource, DtoTaskResponse, TaskType, DtoDataRequest, DataVerb } from '@ipc';
-import { ILogService } from './log.service';
+import { ILogService } from '../data';
 
 import SERVICETYPES from '../di/service.types';
 import { IDataRouterService } from 'data';

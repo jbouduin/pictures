@@ -1,32 +1,28 @@
-import * as fs from 'fs';
 import { AES, enc } from 'crypto-ts';
+import * as fs from 'fs';
+import { injectable } from 'inversify';
 
 import { IDataRouterService } from './data-router.service';
 import { IDatabaseService } from '../database/database.service';
-import { ILogService } from '../system/log.service';
 import { IConfigurationService } from './configuration/configuration.service';
-import { injectable } from 'inversify';
+import { ILogService } from './system/log.service';
 
 export interface IDataService {
   setRoutes(router: IDataRouterService): void;
 }
 
 @injectable()
-export abstract class DataService implements IDataService {
+export abstract class BaseDataService implements IDataService {
 
   // <editor-fold desc='Protected properties'>
-  protected logService: ILogService;
   protected configurationService: IConfigurationService;
   protected databaseService: IDatabaseService
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
   public constructor(
-    logService: ILogService,
     configurationService: IConfigurationService,
     databaseService: IDatabaseService) {
-
-    this.logService = logService;
     this.configurationService = configurationService;
     this.databaseService = databaseService;
   }
@@ -47,7 +43,16 @@ export abstract class DataService implements IDataService {
     }
   }
 
-  public decryptData(value: string, applicationSecret: string): string {
+  protected dateToSqlParameter(date: Date): string {
+    return date.getUTCFullYear() + '-' +
+      (date.getUTCMonth() + 1) + '-' +
+      date.getUTCDate() + ' ' +
+      date.getUTCHours() + ':' +
+      date.getUTCMinutes() + ':' +
+      date.getUTCSeconds();
+  }
+
+  protected decryptData(value: string, applicationSecret: string): string {
     if (value) {
       const decrypted = AES.decrypt(value, applicationSecret);
       return decrypted.toString(enc.Utf8);
@@ -56,8 +61,29 @@ export abstract class DataService implements IDataService {
     }
   }
 
-  public encryptData(value: string, applicationSecret: string): string {
+  protected encryptData(value: string, applicationSecret: string): string {
     return AES.encrypt(value, applicationSecret).toString();
   }
   // </editor-fold>
+}
+
+@injectable()
+export abstract class DataService extends BaseDataService {
+  // <editor-fold desc='Protected properties'>
+  protected logService: ILogService;
+  // </editor-fold>
+
+  // <editor-fold desc='Constructor & C°'>
+  public constructor(
+    logService: ILogService,
+    configurationService: IConfigurationService,
+    databaseService: IDatabaseService) {
+    super(configurationService, databaseService);
+
+    this.logService = logService;
+    this.configurationService = configurationService;
+    this.databaseService = databaseService;
+  }
+  // </editor-fold>
+
 }

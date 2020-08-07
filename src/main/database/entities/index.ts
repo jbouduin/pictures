@@ -4,5 +4,7 @@ export * from './pictures/collection';
 export * from './pictures/picture';
 export * from './secret/secret-image';
 export * from './secret/secret-thumb';
+export * from './system/log-detail';
+export * from './system/log-master';
 export * from './system/setting';
 export * from './tags/tag';

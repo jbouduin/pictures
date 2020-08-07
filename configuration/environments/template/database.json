@@ -6,6 +6,9 @@
     }, {
       "connectionName": "mysql_local",
       "targetType": "secret"
+    }, {
+      "connectionName": "mysql_local",
+      "targetType": "log"
     }
   ],
   "connections": [

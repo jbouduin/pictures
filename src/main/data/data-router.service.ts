@@ -6,11 +6,11 @@ import 'reflect-metadata';
 
 import { DataStatus, DataVerb, DtoDataRequest, DtoDataResponse, DtoUntypedDataResponse, LogSource } from '@ipc';
 
-import { ILogService } from '../system/log.service';
 import { IConfigurationService } from './configuration/configuration.service';
 import { ICollectionService } from './pictures/collection.service';
 import { IPictureService } from './pictures/picture.service';
 import { IThumbnailService } from './pictures/thumbnail.service';
+import { ILogService } from './system/log.service';
 import { ISettingsService } from './system/settings.service';
 import { ISystemService } from './system/system.service';
 import { ITagService } from './tags/tag.service';

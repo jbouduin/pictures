@@ -4,10 +4,10 @@ import { IDataService, DataService } from "../data-service";
 import { IDataRouterService } from "../data-router.service";
 
 import { IDatabaseService, Tag } from "../../database";
-import { ILogService } from "../../system";
+import { ILogService } from "../system/log.service";
 
 import SERVICETYPES from "di/service.types";
-import { DtoUntypedDataResponse, DtoDataResponse, DtoListDataResponse, DtoTreeBase, DataStatus, LogSource, DtoTreeItemData, DtoSetTag, DtoNewTag } from "@ipc";
+import { DtoUntypedDataResponse, DtoDataResponse, DtoListDataResponse, DtoTreeBase, DataStatus, LogSource, DtoTreeItemData, DtoSetTag, DtoNewTag, TargetType } from "@ipc";
 import { DtoGetTag, DtoListTag } from "@ipc";
 import { IConfigurationService } from "../configuration/configuration.service";
 import { RoutedRequest } from "../routed-request";
@@ -52,7 +52,7 @@ export class TagService extends DataService implements ITagService {
     try {
       await repository.findOneOrFail(request.params.tag);
       try {
-        const deleteQueryBuilder = this.databaseService.getDeleteQueryBuilder();
+        const deleteQueryBuilder = this.databaseService.getDeleteQueryBuilder(TargetType.PICTURES);
         await deleteQueryBuilder
           .from('tag_closure')
           .where('tag_closure.id_ancestor = :id', { id: Number.parseInt(request.params.tag) })

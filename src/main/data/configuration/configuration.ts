@@ -93,7 +93,7 @@ export class Configuration {
     return prop.join('.');
   }
 
-  private templateConfiguration(obj: object, configPath) {
+  private templateConfiguration(obj: object, configPath: string) {
     const regex = /\$\{[^()]*\}/g;
     const excludeConfigPaths = ['info.scripts'];
 

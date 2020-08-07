@@ -4,13 +4,13 @@ import { Connection as TypeOrmConnection } from 'typeorm';
 import { Repository } from 'typeorm';
 import 'reflect-metadata';
 
-import { ConnectionType, LogSource, TargetType } from '@ipc';
+import { ConnectionType, TargetType, LogSource } from '@ipc';
 import { DtoConnection } from '@ipc';
-import { IConfigurationService } from '../data';
-import { ILogService } from '../system';
+import { IConfigurationService, ILogService } from '../data';
 
-import { MetadataKey, MetadataPictureMap } from './entities';
 import { Collection, Picture } from './entities';
+import { LogMaster, LogDetail } from './entities';
+import { MetadataKey, MetadataPictureMap,  } from './entities';
 import { SecretImage, SecretThumb } from './entities';
 import { Setting } from './entities';
 import { Tag } from './entities';
@@ -20,7 +20,9 @@ import SERVICETYPES from '../di/service.types';
 
 export interface IDatabaseService {
   getCollectionRepository(): Repository<Collection>;
-  getDeleteQueryBuilder(): DeleteQueryBuilder<any>;
+  getDeleteQueryBuilder(targetType: TargetType): DeleteQueryBuilder<any>;
+  getLogMasterRepository(): Repository<LogMaster>;
+  getLogDetailRepository(): Repository<LogDetail>;
   getMetaDataKeyRepository(): Repository<MetadataKey>;
   getMetaDataPictureMapRepository(): Repository<MetadataPictureMap>;
   getPictureRepository(): Repository<Picture>;
@@ -28,15 +30,18 @@ export interface IDatabaseService {
   getSecretThumbRepository(): Repository<SecretThumb>;
   getSettingRepository(): Repository<Setting>;
   getTagRepository(): TreeRepository<Tag>;
-  initialize(): Promise<[TypeOrmConnection, TypeOrmConnection]>
+  initialize(logService: ILogService): Promise<void>;
 }
 
 @injectable()
 export class DatabaseService implements IDatabaseService {
 
+  // <editor-fold desc=''>
+  private logService: ILogService;
+  // </editor-fold>
+
   // <editor-fold desc='Constructor & C°'>
   public constructor(
-    @inject(SERVICETYPES.LogService) private logService: ILogService,
     @inject(SERVICETYPES.ConfigurationService) private configurationService: IConfigurationService) { }
   // </editor-fold>
 
@@ -47,8 +52,20 @@ export class DatabaseService implements IDatabaseService {
       .getRepository(Collection);
   }
 
-  public getDeleteQueryBuilder(): DeleteQueryBuilder<any> {
-    return this.getConnectionByTargetType(TargetType.PICTURES).createQueryBuilder().delete();
+  public getDeleteQueryBuilder(targetType: TargetType): DeleteQueryBuilder<any> {
+    return this.getConnectionByTargetType(targetType).createQueryBuilder().delete();
+  }
+
+  public getLogDetailRepository(): Repository<LogDetail> {
+    return this
+      .getConnectionByTargetType(TargetType.LOG)
+      .getRepository(LogDetail);
+  }
+
+  public getLogMasterRepository(): Repository<LogMaster> {
+    return this
+      .getConnectionByTargetType(TargetType.LOG)
+      .getRepository(LogMaster);
   }
 
   public getMetaDataKeyRepository(): Repository<MetadataKey> {
@@ -93,17 +110,25 @@ export class DatabaseService implements IDatabaseService {
       .getTreeRepository(Tag);
   }
 
-  public initialize(): Promise<[TypeOrmConnection, TypeOrmConnection]> {
-    this.logService.debug(LogSource.Main, 'in initialize DatabaseService');
-    return Promise.all([
+  public async initialize(logService: ILogService): Promise<void> {
+    this.logService = logService;
+
+    await Promise.all([
       this.connectByName(
         this.getConnectionNameForTargetType(TargetType.SECRET),
         [ SecretImage, SecretThumb ]),
       this.connectByName(
         this.getConnectionNameForTargetType(TargetType.PICTURES),
         [ Collection, MetadataKey, MetadataPictureMap, Picture, Setting, Tag ],
-        [ CollectionSubscriber, PictureSubscriber ])
+        [ CollectionSubscriber, PictureSubscriber ]),
+      this.connectByName(
+          this.getConnectionNameForTargetType(TargetType.LOG),
+          [ LogMaster, LogDetail ]),
     ]);
+    if (this.configurationService.fullConfiguration.current.clearLogsAtStartup) {
+      await this.logService.clearLogs(this.configurationService.fullConfiguration.launchedAt);
+    }
+    this.logService.verbose(LogSource.Main, 'Initializing database service');
   }
   // </editor-fold>
 

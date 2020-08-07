@@ -10,9 +10,9 @@ import { LogSource } from '@ipc';
 
 import { Collection, Picture } from '../../database';
 import { IDatabaseService } from '../../database';
-import { IFileService, ILogService } from '../../system';
-
+import { IFileService } from '../../system';
 import { IConfigurationService } from '../configuration';
+import { ILogService } from "../system/log.service";
 import { IDataRouterService } from '../data-router.service';
 import { IDataService, DataService } from '../data-service';
 import { RoutedRequest } from '../routed-request';

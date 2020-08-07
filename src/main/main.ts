@@ -4,9 +4,9 @@ import { DtoDataRequest, LogSource } from '@ipc';
 
 import container from './di/inversify.config';
 import { IConfigurationService, ISystemService } from './data';
-import { IDataRouterService } from './data';
+import { ILogService, IDataRouterService } from './data';
 import { IDatabaseService } from './database';
-import { ILogService, IQueueService } from './system';
+import { IQueueService } from './system';
 
 import SERVICETYPES from './di/service.types';
 
@@ -26,13 +26,14 @@ function createWindow() {
 
   container.get<IConfigurationService>(SERVICETYPES.ConfigurationService)
     .initialize(app.getAppPath())
-    .then( _configuration => {
+    .then( configuration => {
       logService = container.get<ILogService>(SERVICETYPES.LogService);
+      logService.verbose(LogSource.Main, configuration);
       const dataRouterService = container.get<IDataRouterService>(SERVICETYPES.DataRouterService)
       dataRouterService.initialize();
       container.get<IDatabaseService>(SERVICETYPES.DatabaseService)
-        .initialize()
-        .then( _connection => {
+        .initialize(logService)
+        .then( _connections => {
           win = new BrowserWindow({
             width: 800,
             height: 600,
@@ -51,8 +52,8 @@ function createWindow() {
               // https://stackoverflow.com/a/58548866/600559
           Menu.setApplicationMenu(null);
           container.get<ISystemService>(SERVICETYPES.SystemService).injectWindow(win);
-          win.loadFile(path.join(app.getAppPath(), 'dist/renderer', 'index.html'));
           logService.injectWindow(win);
+          win.loadFile(path.join(app.getAppPath(), 'dist/renderer', 'index.html'));
           win.on('closed', () => {
             win = null;
           });

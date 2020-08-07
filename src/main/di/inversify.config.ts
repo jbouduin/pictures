@@ -5,7 +5,7 @@ import { IConfigurationService, ConfigurationService } from '../data';
 import { IDatabaseService, DatabaseService } from '../database';
 import { IDataRouterService, DataRouterService } from '../data';
 import { IFileService, FileService } from '../system';
-import { ILogService, LogService } from '../system';
+import { ILogService, LogService } from '../data';
 import { IPictureService, PictureService } from '../data';
 import { IQueueService, QueueService } from '../system';
 import { ISecretImageService, SecretImageService } from '../data';

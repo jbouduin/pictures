@@ -11,6 +11,7 @@ export class CfgEnvironment implements DtoEnvironment {
   public mainLogLevel: LogLevel;
   public rendererLogLevel: LogLevel;
   public queueLogLevel: LogLevel;
+  public clearLogsAtStartup: boolean;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
@@ -19,6 +20,7 @@ export class CfgEnvironment implements DtoEnvironment {
     this.mainLogLevel = LogLevel.Verbose;
     this.rendererLogLevel = LogLevel.Verbose;
     this.queueLogLevel = LogLevel.Verbose;
+    this.clearLogsAtStartup = true;
   }
   // </editor-fold>
 }
