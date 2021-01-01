@@ -4,16 +4,16 @@ import { MatDialog } from '@angular/material/dialog';
 import { ParamMap } from '@angular/router';
 
 import { DtoListPicture, DtoNewPicture } from '@ipc';
-
-import { IpcService, DataRequestFactory } from '@core';
+import { IpcService, DataRequestFactory } from '@ipc';
 import { PaginationController, BaseListController } from '@shared';
 import { FloatingButtonParams } from '@shared';
+
 import { CarouselComponent } from '../../pictorama/carousel/carousel.component';
+import { CarouselParams } from '../../pictorama/carousel/carousel.params';
 import { PictureNewItem } from '../items/picture.new-item';
 import { PictureListItem } from '../items/picture.list-item';
 import { PictureListItemFactory } from '../factories/picture.list-item-factory';
 import { PictureDialogComponent } from '../picture-dialog/picture-dialog.component';
-import { CarouselParams } from 'src/app/pictorama/carousel/carousel.params';
 
 @Injectable()
 export class PictureListController extends BaseListController<

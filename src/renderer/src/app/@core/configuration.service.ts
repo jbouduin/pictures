@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
 
 import { DataVerb, DtoConfiguration, DtoImage } from '@ipc';
-import { IpcService } from './ipc/ipc.service';
-import { DataRequestFactory } from './ipc/data-request-factory';
+import { IpcService, IpcDataRequest, DataRequestFactory } from '@ipc';
 import { LogService } from './log.service';
-import { IpcDataRequest } from './ipc/ipc-data-request';
 
 @Injectable({
   providedIn: 'root'

@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { ParamMap } from '@angular/router';
 
 import { DtoTreeBase } from '@ipc';
-
-import { IpcService, DataRequestFactory } from '@core';
+import { IpcService, DataRequestFactory } from '@ipc';
 import { BaseTreeController } from '@shared';
+
 import { PictureTreeItem } from '../items/picture.tree-item';
 import { PictureTreeItemFactory } from '../factories/picture.tree-item.factory';
 

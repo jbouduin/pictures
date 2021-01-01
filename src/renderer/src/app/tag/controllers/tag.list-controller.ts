@@ -5,7 +5,7 @@ import { ParamMap } from '@angular/router';
 
 import { DtoListTag, DtoNewTag } from '@ipc';
 
-import { IpcService, DataRequestFactory } from '@core';
+import { IpcService, DataRequestFactory } from '@ipc';
 import { PaginationController, BaseListController } from '@shared';
 import { FloatingButtonParams } from '@shared';
 import { TagListItem } from '../items/tag.list-item';

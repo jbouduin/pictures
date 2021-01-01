@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { KeyDialogComponent } from './components/key-dialog/key-dialog.component';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
-import { IpcService, DataRequestFactory } from './ipc';
+import { IpcService, DataRequestFactory } from '@ipc';
 import { DataVerb, DtoSetting, DataStatus } from '@ipc';
 import { IKeyDialogParams } from './components/key-dialog/key-dialog.params';
 
@@ -122,6 +122,7 @@ export class SecretService {
       this.dialogRef.close();
       this.lockStatus.next('lock_open');
     } else {
+      console.log('wrong key');
       return 'wrong key';
     }
   }

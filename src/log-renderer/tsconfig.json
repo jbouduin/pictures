@@ -1,0 +1,32 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths" : {
+      "@shared": ["./src/app/@shared"],
+      "@shared/*": ["./src/app/@shared/*"],
+      "@ipc": ["../shared/ipc"],
+      "@ipc/*": ["../shared/ipc*"],
+    },
+    "outDir": "./dist/out-tsc",
+    "sourceMap": true,
+    "declaration": false,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es5", // https://github.com/electron/electron/issues/12011
+    "types": [
+      "../window-interface",
+      "node"
+    ],
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "lib": [
+      "es2018",
+      "dom"
+    ]
+  }
+}

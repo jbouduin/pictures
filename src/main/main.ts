@@ -11,6 +11,7 @@ import { IQueueService } from './system';
 import SERVICETYPES from './di/service.types';
 
 let win: BrowserWindow;
+let logWin: BrowserWindow;
 let logService: ILogService;
 
 app.on('ready', createWindow);
@@ -50,11 +51,15 @@ function createWindow() {
             }
           });
               // https://stackoverflow.com/a/58548866/600559
-          Menu.setApplicationMenu(null);
+          //Menu.setApplicationMenu(null);
           container.get<ISystemService>(SERVICETYPES.SystemService).injectWindow(win);
           logService.injectWindow(win);
           win.loadFile(path.join(app.getAppPath(), 'dist/renderer', 'index.html'));
           win.on('closed', () => {
+            if (logWin) {
+              logWin.close();
+              logWin = null;
+            }
             win = null;
           });
           container.get<IQueueService>(SERVICETYPES.QueueService).initialize(
@@ -67,8 +72,35 @@ function createWindow() {
 }
 
 ipcMain.on('dev-tools', () => {
+  logService = container.get<ILogService>(SERVICETYPES.LogService);
+  logService.verbose(LogSource.Main, 'toggle dev-tool');
+
   if (win) {
     win.webContents.toggleDevTools();
+  }
+
+  if (logWin) {
+    logWin.close();
+  } else {
+    logWin = new BrowserWindow({
+      width: 800,
+      height: 600,
+      webPreferences: {
+        devTools: true,
+        // Disabled Node integration
+        nodeIntegration: false,
+        // protect against prototype pollution
+        contextIsolation: true,
+        // turn off remote
+        enableRemoteModule: false,
+        // Preload script
+        preload: path.join(app.getAppPath(), 'dist/preload', 'preload.js')
+      }
+    });
+    logWin.loadFile(path.join(app.getAppPath(), 'dist/log-renderer', 'index.html'));
+    logWin.on('closed', () => {
+        logWin = null;
+    });
   }
 });
 

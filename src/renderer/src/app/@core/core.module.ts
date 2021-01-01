@@ -1,13 +1,14 @@
 import { NgModule, Optional, SkipSelf } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouteReuseStrategy, RouterModule } from '@angular/router';
 import { MaterialModule } from '../material.module';
-
+import { BaseLogService } from '@ipc';
 import { OnLongPressDirective } from './on-long-press.directive';
 import { RouteReusableStrategy } from './route-reusable-strategy';
 import { KeyDialogComponent } from './components/key-dialog/key-dialog.component';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { LogService } from './log.service';
 
 @NgModule({
   imports: [
@@ -26,6 +27,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     {
       provide: RouteReuseStrategy,
       useClass: RouteReusableStrategy
+    },
+    {
+      provide: BaseLogService,
+      useClass: LogService
     }
   ],
   exports: [

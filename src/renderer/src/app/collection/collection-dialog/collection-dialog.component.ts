@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
+import { SecretService } from '@core';
+import { IpcService, DataRequestFactory } from '@ipc';
 import { BaseItem, DynamicDialogController } from '@shared';
 import { CollectionNewItem } from '../items/collection.new-item';
 import { CollectionEditItem } from '../items/collection.edit-item';
-import { SecretService, IpcService, DataRequestFactory } from '@core';
 import { MatSlideToggleChange } from '@angular/material/slide-toggle';
 import { DataVerb } from '@ipc';
 

@@ -4,10 +4,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { ParamMap } from '@angular/router';
 
 import { DtoListCollection, DtoNewCollection } from '@ipc';
-
-import { IpcService, DataRequestFactory } from '@core';
+import { IpcService, DataRequestFactory } from '@ipc';
 import { PaginationController, BaseListController } from '@shared';
 import { FloatingButtonParams } from '@shared';
+
 import { CollectionListItem } from '../items/collection.list-item';
 import { CollectionNewItem } from '../items/collection.new-item';
 import { CollectionDialogComponent } from '../collection-dialog/collection-dialog.component';

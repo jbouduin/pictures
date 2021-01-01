@@ -23,7 +23,7 @@ export class DataRequestFactory {
   }
   // </editor-fold>
 
-  // <editor-fold desc='Pubic methods'>
+  // <editor-fold desc='Public methods'>
   public createUntypedDataRequest(verb: DataVerb, path: string): IpcDataRequest {
     return new IpcDataRequest(++this.requestId, verb, path, this.applicationSecret, undefined);
   }

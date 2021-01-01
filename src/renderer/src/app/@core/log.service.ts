@@ -1,17 +1,19 @@
 import { Injectable } from '@angular/core';
-import { DtoConfiguration, DtoLogMessage, LogLevel, LogSource } from '@ipc';
+import { DtoConfiguration, DtoLogMessage, LogLevel, LogSource, BaseLogService } from '@ipc';
 
 @Injectable({
   providedIn: 'root'
 })
-export class LogService {
+export class LogService extends BaseLogService {
 
   // <editor-fold desc='Private properties'>
   private configuration: DtoConfiguration;
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor() { }
+  public constructor() {
+    super()
+  }
   // </editor-fold>
 
   // <editor-fold desc='public methods'>

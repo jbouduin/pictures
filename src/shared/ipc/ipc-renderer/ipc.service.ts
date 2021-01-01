@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { DataStatus, DtoDataResponse, DtoQueueStatus, LogSource, LogLevel } from '@ipc';
-
-import { LogService } from '../log.service';
+import { DataStatus, DtoDataResponse } from '../data';
+import { DtoQueueStatus }  from '../task-response';
+import { LogSource, LogLevel, BaseLogService } from '../system';
 import { IpcDataRequest } from './ipc-data-request';
 import { BehaviorSubject } from 'rxjs';
 
@@ -15,7 +15,7 @@ export class IpcService {
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor(private logService: LogService) {
+  public constructor(private logService: BaseLogService) {
     this.initializeQueue();
   }
   // </editor-fold>

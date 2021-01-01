@@ -2,12 +2,12 @@ import { Injectable } from '@angular/core';
 import { ComponentType } from '@angular/cdk/portal';
 import { MatDialog } from '@angular/material/dialog';
 
-import { DataVerb } from '@ipc';
+import { SecretService } from '@core';
+import { DataVerb, IpcService, DataRequestFactory, IpcDataRequest } from '@ipc';
 import { DtoGetCollection, DtoSetCollection } from '@ipc';
-
-import { IpcService, DataRequestFactory, IpcDataRequest, SecretService } from '@core';
 import { BaseCardController } from '@shared';
 import { ThumbCardFooterParams } from '@shared';
+
 import { CollectionEditItem } from '../items/collection.edit-item';
 import { CollectionDialogComponent } from '../collection-dialog/collection-dialog.component';
 import { CollectionListItem } from '../items/collection.list-item';

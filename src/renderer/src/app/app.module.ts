@@ -4,13 +4,13 @@ import { MaterialModule } from './material.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgxResizableModule } from '@3dgenomes/ngx-resizable';
 
-import { CoreModule, DataRequestFactory, IpcService } from '@core';
+import { CoreModule } from '@core';
+import { DataRequestFactory, IpcService } from '@ipc';
 import { SharedModule } from '@shared';
 import { CollectionModule } from './collection';
 import { PictoramaModule } from './pictorama';
 import { PictureModule } from './picture';
 import { ShellModule } from './shell';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TagModule } from './tag';

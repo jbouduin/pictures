@@ -1,6 +1,6 @@
 import { Component, Inject, Injector, OnInit } from '@angular/core';
 import { ComponentType } from '@angular/cdk/portal';
-import { MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import { MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { BaseItem } from '../thumb/base-item';
 import { DynamicDialogParamsData } from './dynamic-dialog.params';
 import { DynamicDialogController } from './dynamic-dialog.types';
@@ -21,7 +21,6 @@ export class DynamicDialogComponent implements OnInit {
   // <editor-fold desc='Constructor & C°'>
   public constructor(
     private readonly inj: Injector,
-    private dialogRef: MatDialogRef<DynamicDialogComponent>,
     @Inject(MAT_DIALOG_DATA) private params: DynamicDialogParamsData<any>) {
     this.component = params.component;
     }

@@ -1,6 +1,6 @@
 import { Component, OnInit, AfterViewInit, NgZone } from '@angular/core';
-import { IpcService, SecretService, LockStatus } from '@core';
-import { DtoQueueStatus } from '@ipc';
+import { SecretService, LockStatus } from '@core';
+import { IpcService, DtoQueueStatus } from '@ipc';
 
 @Component({
   selector: 'app-header',
