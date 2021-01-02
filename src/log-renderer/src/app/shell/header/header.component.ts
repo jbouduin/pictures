@@ -1,44 +1,39 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-
-// import { IpcService, DtoQueueStatus } from '@ipc';
+import { DtoLogFilter } from '@ipc';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, AfterViewInit {
 
+  @Output() filterChanged: EventEmitter<DtoLogFilter> = new EventEmitter();
+
+  private formBuilder: FormBuilder;
   // <editor-fold desc='Private properties'>
   public filterGroup: FormGroup;
-
-  // private ipcService: IpcService
-
-  // private ngZone: NgZone;
-  // </editor-fold>
-
-
-
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
   public constructor(formBuilder: FormBuilder) {
-    this.buildForm(formBuilder);
-    // ipcService: IpcService, ngZone: NgZone) {
-    // this.ipcService = ipcService;
-    // this.ngZone = ngZone;
+    this.formBuilder = formBuilder;
   }
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methods'>
   public ngOnInit(): void {
-    // this.ipcService.queueStatus.subscribe((status: DtoQueueStatus) => this.ngZone.run(() => this.queueLength = status.count));
+    this.buildForm();
+  }
+
+  public ngAfterViewInit(): void {
+    this.filterChanged.emit(this.filterGroup.value);
   }
   // </editor-fold>
 
-  private buildForm(formBuilder: FormBuilder): void {
-    this.filterGroup = formBuilder.group({
+  private buildForm(): void {
+    this.filterGroup = this.formBuilder.group({
       mainSelected: new FormControl(true),
       rendererSelected: new FormControl(true),
       queueSelected: new FormControl(true),
@@ -46,6 +41,9 @@ export class HeaderComponent implements OnInit {
       infoSelected: new FormControl(true),
       verboseSelected: new FormControl(true),
       debugSelected: new FormControl(true)
+    });
+    this.filterGroup.valueChanges.subscribe(x => {
+      this.filterChanged.emit(x);
     });
   }
 

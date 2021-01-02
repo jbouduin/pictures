@@ -1,6 +1,7 @@
 <div fxFlex>
-  <app-header></app-header>
-  <div fxFill>
-
+  <app-header (filterChanged)="filterChanged($event)"></app-header>
+  <div class="bodyclass">
+    <span>text</span>
+    <span>{{content}}</span>
   </div>
 </div>

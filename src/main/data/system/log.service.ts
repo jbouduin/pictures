@@ -1,13 +1,14 @@
 import { BrowserWindow } from 'electron';
 import { injectable, inject } from 'inversify';
 
-import { DtoLogMessage, LogLevel, LogSource, TargetType } from '@ipc';
+import { DtoLogFilter, DtoDataResponse, DtoLogMessage, LogLevel, LogSource, TargetType, DataStatus, DtoLogMaster } from '@ipc';
 import { IDatabaseService } from '../../database/database.service';
 import { Configuration, IConfigurationService } from '../configuration';
 import { IDataRouterService } from '../data-router.service';
 import { IDataService, BaseDataService } from '../data-service';
 import SERVICETYPES from 'di/service.types';
-import { LogMaster } from 'database';
+import { LogDetail, LogMaster } from 'database';
+import { RoutedRequest } from 'data/routed-request';
 
 export interface ILogService extends IDataService {
   clearLogs(before?: Date): Promise<void>;
@@ -42,10 +43,70 @@ export class LogService extends BaseDataService implements ILogService {
   // </editor-fold>
 
   // <editor-fold desc='IDataService interface methods'>
-  public setRoutes(_router: IDataRouterService): void {
-
+  public setRoutes(router: IDataRouterService): void {
+    router.get('/log', this.loadLogs.bind(this));
   }
   // </editor-fold>
+
+  public async loadLogs(request: RoutedRequest<undefined>): Promise<DtoDataResponse<Array<DtoLogMaster>>> {
+    let result: DtoDataResponse<Array<DtoLogMaster>>;
+    const logMasterRepository = this.databaseService.getLogMasterRepository();
+    console.log(request.queryParams);
+
+    const sourceArray = new Array<string>();
+    if (request.queryParams.renderer === 'true') {
+      sourceArray.push('Renderer')
+    }
+    if (request.queryParams.queue === 'true') {
+      sourceArray.push('Queue')
+    }
+    if (request.queryParams.renderer === 'true') {
+      sourceArray.push('Main')
+    }
+
+    const levelArray = new Array<string>();
+    if (request.queryParams.error === 'true') {
+      levelArray.push('Error')
+    }
+
+    if (request.queryParams.info === 'true') {
+      levelArray.push('Info')
+    }
+
+    if (request.queryParams.verbose === 'true') {
+      levelArray.push('Verbose')
+    }
+
+    if (request.queryParams.debug === 'true') {
+      levelArray.push('Debug')
+    }
+    const logMastersQryBuilder = logMasterRepository
+      .createQueryBuilder('logMaster')
+      .where('source in (:...sources)', { sources: sourceArray })
+      .andWhere('logLevel in (:...levels)', { levels: levelArray })
+      .leftJoinAndSelect('logMaster.logDetails', 'logDetails');
+
+    this.debug(LogSource.Main, logMastersQryBuilder.getQueryAndParameters());
+    const logs = await logMastersQryBuilder.getMany();
+
+    const dtoLogs = Promise.all(logs.map(async log => {
+      const dtoLog: DtoLogMaster = {
+        created: log.created,
+        logLevel: log.logLevel,
+        source: log.source,
+        value: log.value,
+        details: undefined
+      };
+      dtoLog.details = await log.logDetails.then(d => d.map(v => v.value));
+      return dtoLog;
+    }));
+
+    result = {
+      status: DataStatus.Ok,
+      data: await dtoLogs
+    }
+    return result;
+  }
 
   // <editor-fold desc='ILogService interface members'>
   public async clearLogs(before?: Date): Promise<void> {

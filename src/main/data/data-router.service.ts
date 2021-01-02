@@ -73,6 +73,7 @@ export class DataRouterService implements IDataRouterService {
     this.systemService.setRoutes(this);
     this.tagService.setRoutes(this);
     this.thumbnailService.setRoutes(this);
+    this.logService.setRoutes(this);
     this.logService.verbose(LogSource.Main, 'registered DELETE routes:');
     this.deleteRoutes.keys().forEach(route => this.logService.verbose(LogSource.Main, route));
     this.logService.verbose(LogSource.Main, 'registered GET routes:');
@@ -187,7 +188,7 @@ export class DataRouterService implements IDataRouterService {
         result = Promise.resolve(response);
       }
     } else {
-      this.logService.error(LogSource.Main, 'Route not found', request.path);
+      this.logService.error(LogSource.Main, 'Route not found', splittedPath);
       const response: DtoDataResponse<string> = {
         status: DataStatus.NotFound,
         data: ''
