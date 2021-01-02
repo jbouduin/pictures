@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DataRequestFactory, DataVerb, DtoLogFilter, IpcService } from '@ipc';
+import { DataRequestFactory, DataVerb, DtoLogFilter, DtoLogMaster, IpcService } from '@ipc';
 
 @Component({
   selector: 'app-main',
@@ -11,11 +11,14 @@ export class MainComponent implements OnInit {
   private dataRequestFactory: DataRequestFactory;
   private ipcService: IpcService;
 
-  public content: string;
+  public displayedColumns: Array<string>
+  public content: Array<DtoLogMaster>;
+
   // <editor-fold desc='Constructor & C°'>
   public constructor(ipcService: IpcService, dataRequestFactory: DataRequestFactory) {
     this.ipcService = ipcService;
     this.dataRequestFactory = dataRequestFactory;
+    this.displayedColumns = ['created', 'source', 'level', 'value'];
   }
   // </editor-fold>
 
@@ -26,13 +29,8 @@ export class MainComponent implements OnInit {
   public filterChanged(filterValues: DtoLogFilter): void {
     console.log('in filterchanged', filterValues);
     const request = this.dataRequestFactory.createUntypedDataRequest(DataVerb.GET, `/log?${this.filterValuesToQueryString(filterValues)}`);
-    this.ipcService.dataRequest<unknown>(request)
-      .then(x => {
-        console.log(x);
-        this.content = JSON.stringify(x, undefined, 2);
-        console.log(this.content);
-      })
-      .catch(e => console.log(e));
+    this.ipcService.dataRequest<Array<DtoLogMaster>>(request)
+      .then(response => this.content = response.data);
   }
 
   private filterValuesToQueryString(filterValues: DtoLogFilter): string {

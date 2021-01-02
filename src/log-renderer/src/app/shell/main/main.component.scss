@@ -3,3 +3,25 @@
 .bodyclass {
   padding-top: 64px;
 }
+
+.mat-table {
+  width: 100%;
+  font-family: monospace;
+}
+
+.mat-row {
+  height: auto;
+}
+.mat-column-created {
+  width: 210px;
+}
+
+.mat-column-source,
+.mat-column-level {
+  width: 80px;
+}
+
+.mat-cell {
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
