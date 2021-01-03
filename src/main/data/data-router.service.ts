@@ -74,14 +74,10 @@ export class DataRouterService implements IDataRouterService {
     this.tagService.setRoutes(this);
     this.thumbnailService.setRoutes(this);
     this.logService.setRoutes(this);
-    this.logService.verbose(LogSource.Main, 'registered DELETE routes:');
-    this.deleteRoutes.keys().forEach(route => this.logService.verbose(LogSource.Main, route));
-    this.logService.verbose(LogSource.Main, 'registered GET routes:');
-    this.getRoutes.keys().forEach(route => this.logService.verbose(LogSource.Main, route));
-    this.logService.verbose(LogSource.Main, 'registered POST routes:');
-    this.postRoutes.keys().forEach(route => this.logService.verbose(LogSource.Main, route));
-    this.logService.verbose(LogSource.Main, 'registered PUT routes:');
-    this.putRoutes.keys().forEach(route => this.logService.verbose(LogSource.Main, route));
+    this.deleteRoutes.keys().forEach(route => this.logService.verbose(LogSource.Main, `registered route DELETE ${route}`));
+    this.getRoutes.keys().forEach(route => this.logService.verbose(LogSource.Main, `registered route GET ${route}`));
+    this.postRoutes.keys().forEach(route => this.logService.verbose(LogSource.Main, `registered route POST ${route}`));
+    this.putRoutes.keys().forEach(route => this.logService.verbose(LogSource.Main, `registered route PUT ${route}`));
   }
   // </editor-fold>
 

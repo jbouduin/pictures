@@ -77,7 +77,6 @@ export class SecretThumbService extends DataService implements ISecretThumbServi
       thumb.data = this.encryptData(request.data.thumb, picture.collection.decryptedKey);
       await thumbRepository.save(thumb);
     } catch (error) {
-      console.log(error);
       this.logService.error(LogSource.Main, error);
     }
     return;

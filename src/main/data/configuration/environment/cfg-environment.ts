@@ -17,8 +17,8 @@ export class CfgEnvironment implements DtoEnvironment {
   // <editor-fold desc='Constructor & C°'>
   public constructor() {
     this.database = new CfgDatabase();
-    this.mainLogLevel = LogLevel.Verbose;
-    this.rendererLogLevel = LogLevel.Verbose;
+    this.mainLogLevel = LogLevel.Debug;
+    this.rendererLogLevel = LogLevel.Debug;
     this.queueLogLevel = LogLevel.Verbose;
     this.clearLogsAtStartup = true;
   }

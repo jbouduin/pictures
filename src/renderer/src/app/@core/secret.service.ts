@@ -122,7 +122,6 @@ export class SecretService {
       this.dialogRef.close();
       this.lockStatus.next('lock_open');
     } else {
-      console.log('wrong key');
       return 'wrong key';
     }
   }

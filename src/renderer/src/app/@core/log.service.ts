@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
-import { DtoConfiguration, DtoLogMessage, LogLevel, LogSource, BaseLogService } from '@ipc';
+import { DtoConfiguration, DtoLogMessage } from '@ipc';
+import { LogLevel, LogSource, BaseLogService } from '@ipc';
+import { IpcService, DataRequestFactory, DataVerb } from '@ipc';
+import { ConfigurationService } from '@ipc';
 
 @Injectable({
   providedIn: 'root'
@@ -7,31 +10,27 @@ import { DtoConfiguration, DtoLogMessage, LogLevel, LogSource, BaseLogService } 
 export class LogService extends BaseLogService {
 
   // <editor-fold desc='Private properties'>
-  private configuration: DtoConfiguration;
+  private configurationService: ConfigurationService;
+  private ipcService: IpcService;
+  private dataRequestFactory: DataRequestFactory;
+  private get configuration(): DtoConfiguration {
+    return this.configurationService.configuration;
+  }
+
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor() {
-    super()
+  public constructor(configurationService: ConfigurationService, dataRequestFactory: DataRequestFactory, ipcService: IpcService) {
+    super();
+    this.configurationService = configurationService;
+    this.dataRequestFactory = dataRequestFactory;
+    this.ipcService = ipcService;
   }
   // </editor-fold>
 
   // <editor-fold desc='public methods'>
-  public injectConfiguraton(configuration: DtoConfiguration): void {
-    this.configuration = configuration;
-    window.api.electronIpcRemoveAllListeners('log');
-    window.api.electronIpcOn('log', (_event, arg) => {
-      try {
-        const message: DtoLogMessage = JSON.parse(arg);
-        this.log(message.logSource, message.logLevel, message.object, message.args);
-      } catch (error) {
-        this.log(
-          LogSource.Renderer,
-          LogLevel.Error,
-          'Error processing message received:',
-          arg);
-      }
-    });
+  public initializeService(ipcService: IpcService): void {
+    this.ipcService = ipcService;
   }
 
   public info(object: any, ...args: Array<any>): void {
@@ -50,31 +49,23 @@ export class LogService extends BaseLogService {
     this.log(LogSource.Renderer, LogLevel.Debug, object, ...args);
   }
 
-  public log(logSource: LogSource, logLevel: LogLevel, object: any, ...args: Array<any>): void {
-    if (!this.configuration) {
+  private log(logSource: LogSource, logLevel: LogLevel, object: any, ...args: Array<any>): void {
+    if (!this.configurationService) {
       return;
     }
     if ((logSource === LogSource.Renderer && logLevel <= this.configuration.current.rendererLogLevel) ||
-      (logSource === LogSource.Main && logLevel <= this.configuration.current.mainLogLevel)||
+      (logSource === LogSource.Main && logLevel <= this.configuration.current.mainLogLevel) ||
       (logSource === LogSource.Queue && logLevel <= this.configuration.current.queueLogLevel)) {
-      switch (logLevel) {
-        case LogLevel.Info: {
-          console.info(`[${LogSource[logSource]}]`, object, ...args);
-          break;
-        }
-        case LogLevel.Error: {
-          console.error(`[${LogSource[logSource]}]`, object, ...args);
-          break;
-        }
-        case LogLevel.Verbose: {
-          console.log(`[${LogSource[logSource]}]`, object, ...args);
-          break;
-        }
-        case LogLevel.Debug: {
-          console.debug(`[${LogSource[logSource]}]`, object, ...args);
-          break;
-        }
-      }
+      const logMessage: DtoLogMessage =
+      {
+        logLevel: logLevel,
+        logSource: logSource,
+        object: object,
+        args: args
+      };
+
+      const logRequest = this.dataRequestFactory.createDataRequest<DtoLogMessage>(DataVerb.POST, "/log", logMessage);
+      this.ipcService.dataRequest(logRequest);
     }
   }
   // </editor-fold>

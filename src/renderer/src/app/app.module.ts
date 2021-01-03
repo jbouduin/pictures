@@ -4,7 +4,7 @@ import { MaterialModule } from './material.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgxResizableModule } from '@3dgenomes/ngx-resizable';
 
-import { CoreModule } from '@core';
+import { CoreModule, LogService } from '@core';
 import { DataRequestFactory, IpcService } from '@ipc';
 import { SharedModule } from '@shared';
 import { CollectionModule } from './collection';
