@@ -2,12 +2,10 @@ import { Injectable } from '@angular/core';
 import { ComponentType } from '@angular/cdk/portal';
 import { MatDialog } from '@angular/material/dialog';
 
-import { DataVerb } from '@ipc';
-import { DtoGetTag, DtoSetTag } from '@ipc';
-
-import { IpcService, DataRequestFactory, IpcDataRequest, SecretService } from '@core';
-import { BaseCardController } from '@shared';
-import { ThumbCardFooterParams } from '@shared';
+import { SecretService } from '@core';
+import { DataVerb, DtoGetTag, DtoSetTag } from '@ipc';
+import { IpcService, DataRequestFactory, IpcDataRequest } from '@ipc';
+import { BaseCardController, ThumbCardFooterParams } from '@shared';
 import { TagEditItem } from '../items/tag.edit-item';
 import { TagDialogComponent } from '../tag-dialog/tag-dialog.component';
 import { TagListItem } from '../items/tag.list-item';

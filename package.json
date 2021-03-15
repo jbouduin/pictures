@@ -8,8 +8,9 @@
   "scripts": {
     "start": "electron . --allow-file-access-from-files",
     "dev": "nodemon",
-    "build:dev:renderer": "ng build",
+    "build:dev:renderer": "ng build renderer",
     "build:prod:renderer": "ng build --prod",
+    "build:dev:log": "ng build log-renderer",
     "build:dev:main": "webpack --config ./src/main/webpack.ts --mode development",
     "build:prod:main": "webpack --config ./src/main/webpack.ts --mode production",
     "build:dev:queue": "webpack --config ./src/queue/webpack.ts --mode development",

@@ -1,5 +1,3 @@
-export * from './ipc';
-export * from './configuration.service';
 export * from './identifiable';
 export * from './log.service';
 export * from './core.module';

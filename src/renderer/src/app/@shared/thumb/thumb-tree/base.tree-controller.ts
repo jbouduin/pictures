@@ -1,6 +1,6 @@
 import { ParamMap } from '@angular/router';
 
-import { IpcService, IpcDataRequest, DataRequestFactory } from '@core';
+import { IpcService, IpcDataRequest, DataRequestFactory } from '@ipc';
 import { DataVerb, DtoTreeBase, DtoTreeItemData } from '@ipc';
 
 import { BaseTreeItem } from './base.tree-item';

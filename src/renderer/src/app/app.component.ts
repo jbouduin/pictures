@@ -1,6 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-// import { Router } from '@angular/router';
-import { ConfigurationService } from '@core';
 
 @Component({
   selector: 'app-root',
@@ -10,12 +8,14 @@ import { ConfigurationService } from '@core';
 export class AppComponent implements OnInit {
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor(configurationService: ConfigurationService) {
-    configurationService.configuration;
+  public constructor() {
+    // configurationService.configuration;
   }
   // </editor-fold>
 
   // <editor-fold desc='Angular interface methods'>
-  public ngOnInit(): void { }
+  public ngOnInit(): void {
+
+  }
   // </editor-fold>
 }

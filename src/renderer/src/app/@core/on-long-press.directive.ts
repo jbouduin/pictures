@@ -40,7 +40,7 @@ export class OnLongPressDirective implements OnInit {
   public onMouseDown(event: MouseEvent) {
     // don't do right/middle clicks
     if(event.which !== 1) return;
-    console.log('mouseDown');
+
     this.mouseX = event.clientX;
     this.mouseY = event.clientY;
 
@@ -69,7 +69,6 @@ export class OnLongPressDirective implements OnInit {
 
   @HostListener('mouseup', ['$event'])
   public onMouseUp(event: MouseEvent) {
-    console.log('mouseUp');
     this.endPress(event, true);
   }
 
@@ -78,7 +77,6 @@ export class OnLongPressDirective implements OnInit {
       this.timeout = setTimeout(() => {
         this.onLongPressing.emit(event);
         this.loop(event);
-        console.log('long pressing');
       }, 50);
     }
   }

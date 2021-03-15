@@ -371,7 +371,6 @@ export class CollectionService extends DataService implements ICollectionService
       return errorResult;
     }
     catch (error) {
-      console.log(error);
       const errorResult: DtoDataResponse<DtoListCollection> = {
         status: DataStatus.Conflict,
         message: `${error.name}: ${error.message}`

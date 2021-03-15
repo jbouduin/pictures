@@ -1,9 +1,9 @@
 import { ComponentType } from '@angular/cdk/portal';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
-import { IpcService, IpcDataRequest, DataRequestFactory, SecretService } from '@core';
-import { DataVerb } from '@ipc';
-import { DtoGetBase, DtoSetBase } from '@ipc';
+import { SecretService } from '@core'
+import { IpcService, IpcDataRequest, DataRequestFactory } from '@ipc';
+import { DataVerb, DtoGetBase, DtoSetBase } from '@ipc';
 
 import { ConfirmationDialogComponent } from '../../confirmation-dialog/confirmation-dialog.component';
 import { ConfirmationDialogParams } from '../../confirmation-dialog/confirmation-dialog.params';

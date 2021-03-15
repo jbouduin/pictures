@@ -5,7 +5,6 @@ import { BaseItem, DynamicDialogController, BaseTreeItem } from '@shared';
 import { TagNewItem } from '../items/tag.new-item';
 import { TagEditItem } from '../items/tag.edit-item';
 
-
 @Component({
   selector: 'app-tag-dialog',
   templateUrl: './tag-dialog.component.html',

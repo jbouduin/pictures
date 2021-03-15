@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { DataStatus, DtoDataResponse, DtoQueueStatus, LogSource, LogLevel } from '@ipc';
-
-import { LogService } from '../log.service';
+import { DataStatus, DtoDataResponse } from '../data';
+import { DtoQueueStatus }  from '../task-response';
+import { LogSource, LogLevel, BaseLogService } from '../system';
 import { IpcDataRequest } from './ipc-data-request';
 import { BehaviorSubject } from 'rxjs';
 
@@ -15,7 +15,7 @@ export class IpcService {
   // </editor-fold>
 
   // <editor-fold desc='Constructor & C°'>
-  public constructor(private logService: LogService) {
+  public constructor() {
     this.initializeQueue();
   }
   // </editor-fold>
@@ -28,12 +28,10 @@ export class IpcService {
   public dataRequestSync<U>(request: IpcDataRequest): DtoDataResponse<U> {
     const json = JSON.stringify(request);
     const result = window.api.electronIpcSendSync('data-sync', json);
-    this.logService.debug(result);
     let response: DtoDataResponse<U>;
     try {
       response = JSON.parse(result);
     } catch (error) {
-      this.logService.error(error);
       response = {
         status: DataStatus.RendererError,
         message: `${error.name}: ${error.message}`
@@ -48,10 +46,8 @@ export class IpcService {
         try {
           const result: DtoDataResponse<U> = JSON.parse(arg);
           if (result.status < DataStatus.BadRequest) {
-            this.logService.debug(result);
             resolve(result);
           } else {
-            this.logService.error(result);
             reject(result);
           }
         } catch (error) {
@@ -59,7 +55,6 @@ export class IpcService {
             status: DataStatus.RendererError,
             message: `${error.name}: ${error.message}`
           }
-          this.logService.error(error);
           reject(errorResult);
         }
       });
@@ -77,14 +72,9 @@ export class IpcService {
     window.api.electronIpcOn('queue-status', (_event, arg) => {
       try {
         const message: DtoQueueStatus = JSON.parse(arg);
-        this.logService.verbose(message);
         this.queueStatus.next(message);
       } catch (error) {
-        this.logService.error(
-          LogSource.Renderer,
-          LogLevel.Error,
-          'Error processing message received:',
-          arg);
+        // TODO
       }
     });
   }

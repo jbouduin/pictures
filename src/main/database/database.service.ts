@@ -4,7 +4,7 @@ import { Connection as TypeOrmConnection } from 'typeorm';
 import { Repository } from 'typeorm';
 import 'reflect-metadata';
 
-import { ConnectionType, TargetType, LogSource } from '@ipc';
+import { ConnectionType, TargetType, LogSource, LogLevel } from '@ipc';
 import { DtoConnection } from '@ipc';
 import { IConfigurationService, ILogService } from '../data';
 
@@ -30,7 +30,7 @@ export interface IDatabaseService {
   getSecretThumbRepository(): Repository<SecretThumb>;
   getSettingRepository(): Repository<Setting>;
   getTagRepository(): TreeRepository<Tag>;
-  initialize(logService: ILogService): Promise<void>;
+  initialize(logService: ILogService): Promise<Array<TypeOrmConnection>>;
 }
 
 @injectable()
@@ -110,10 +110,10 @@ export class DatabaseService implements IDatabaseService {
       .getTreeRepository(Tag);
   }
 
-  public async initialize(logService: ILogService): Promise<void> {
+  public async initialize(logService: ILogService): Promise<Array<TypeOrmConnection>> {
     this.logService = logService;
 
-    await Promise.all([
+    const result = await Promise.all([
       this.connectByName(
         this.getConnectionNameForTargetType(TargetType.SECRET),
         [ SecretImage, SecretThumb ]),
@@ -128,7 +128,8 @@ export class DatabaseService implements IDatabaseService {
     if (this.configurationService.fullConfiguration.current.clearLogsAtStartup) {
       await this.logService.clearLogs(this.configurationService.fullConfiguration.launchedAt);
     }
-    this.logService.verbose(LogSource.Main, 'Initializing database service');
+    await this.logService.log(LogSource.Main, LogLevel.Verbose, 'Initialized database service');
+    return result;
   }
   // </editor-fold>
 

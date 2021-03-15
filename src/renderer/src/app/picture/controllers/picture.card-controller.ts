@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { ComponentType } from '@angular/cdk/portal';
 import { MatDialog } from '@angular/material/dialog';
 
+import { SecretService } from '@core';
 import { DtoGetPicture, DtoSetPicture, DataVerb } from '@ipc';
-
-import { IpcService, DataRequestFactory, IpcDataRequest, SecretService } from '@core';
+import { IpcService, DataRequestFactory, IpcDataRequest } from '@ipc';
 import { BaseCardController, ThumbCardFooterParams } from '@shared';
+
 import { PictureEditItem } from '../items/picture.edit-item';
 import { PictureCardItemFactory } from '../factories/picture.card-item-factory';
 import { PictureDialogComponent } from '../picture-dialog/picture-dialog.component';

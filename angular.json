@@ -122,6 +122,128 @@
           }
         }
       }
+    },
+    "log-renderer": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "src/log-renderer",
+      "sourceRoot": "src/log-renderer/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/log-renderer",
+            "index": "src/log-renderer/src/index.html",
+            "main": "src/log-renderer/src/main.ts",
+            "polyfills": "src/log-renderer/src/polyfills.ts",
+            "tsConfig": "src/log-renderer/tsconfig.app.json",
+            "aot": true,
+            "assets": [
+              "src/log-renderer/src/favicon.ico",
+              "src/log-renderer/src/assets"
+            ],
+            "styles": [
+              "src/log-renderer/src/styles.scss",
+              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/log-renderer/src/environments/environment.ts",
+                  "with": "src/log-renderer/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "log-renderer:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "log-renderer:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "log-renderer:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "src/log-renderer/src/test.ts",
+            "polyfills": "src/log-renderer/src/polyfills.ts",
+            "tsConfig": "src/log-renderer/tsconfig.spec.json",
+            "karmaConfig": "src/log-renderer/karma.conf.js",
+            "assets": [
+              "src/log-renderer/src/favicon.ico",
+              "src/log-renderer/src/assets"
+            ],
+            "styles": [
+              "src/log-renderer/src/styles.scss"
+            ],
+            "scripts": []
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "src/log-renderer/tsconfig.app.json",
+              "src/log-renderer/tsconfig.spec.json",
+              "src/log-renderer/e2e/tsconfig.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        },
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "src/log-renderer/e2e/protractor.conf.js",
+            "devServerTarget": "log-renderer:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "log-renderer:serve:production"
+            }
+          }
+        }
+      }
     }},
   "defaultProject": "renderer"
 }

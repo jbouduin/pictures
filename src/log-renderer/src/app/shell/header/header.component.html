@@ -1,0 +1,36 @@
+<mat-toolbar class="mat-elevation-z6 navbar" color="primary">
+  <div [formGroup]="filterGroup">
+    <button mat-button [matMenuTriggerFor]="menuSource">Source</button>
+    <mat-menu #menuSource="matMenu">
+      <button mat-menu-item>
+        <mat-checkbox formControlName="mainSelected">Main</mat-checkbox>
+      </button>
+      <button mat-menu-item>
+        <mat-checkbox formControlName="rendererSelected">Renderer</mat-checkbox>
+      </button>
+      <button mat-menu-item>
+        <mat-checkbox formControlName="queueSelected">Queue</mat-checkbox>
+      </button>
+    </mat-menu>
+
+    <button mat-button [matMenuTriggerFor]="menuLevel">Level</button>
+    <mat-menu #menuLevel="matMenu">
+      <button mat-menu-item>
+        <mat-checkbox formControlName="errorSelected">Error</mat-checkbox>
+      </button>
+      <button mat-menu-item>
+        <mat-checkbox formControlName="infoSelected">Info</mat-checkbox>
+      </button>
+      <button mat-menu-item>
+        <mat-checkbox formControlName="verboseSelected">Verbose</mat-checkbox>
+      </button>
+      <button mat-menu-item>
+        <mat-checkbox formControlName="debugSelected">Debug</mat-checkbox>
+      </button>
+    </mat-menu>
+  </div>
+  <span fxFlex></span>
+  <button mat-button>
+    <mat-icon>settings</mat-icon>
+  </button>
+</mat-toolbar>

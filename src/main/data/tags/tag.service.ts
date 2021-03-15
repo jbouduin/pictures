@@ -227,14 +227,13 @@ export class TagService extends DataService implements ITagService {
         .createDescendantsQueryBuilder("tag", "tagClosure", tag)
         .getOne();
       const parents = await treeRepository.findAncestors(tag);
-      // console.log('parents', parents);
+      this.logService.debug(LogSource.Main, 'parents', parents);
       const result: DtoTreeItemData<DtoTreeBase> = {
         treeItem: this.convertTagToTreeBase(tagWithChildren),
         parent: parents.length > 1 ? parents[1].id : 0
       };
-      // const parents2 = await treeRepository.findAncestorsTree(tag);
-      // console.log('parents2', parents);
-      // console.log(JSON.stringify(result, null, 2));
+      const parents2 = await treeRepository.findAncestorsTree(tag);
+      this.logService.debug(LogSource.Main, 'parents2', parents);
       const response: DtoDataResponse<DtoTreeItemData<DtoTreeBase>> = {
         status: DataStatus.Ok,
         data: result

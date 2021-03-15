@@ -1,10 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 
-import { DtoGetBase, DtoSetBase, DataVerb, DtoImage } from '@ipc';
 import { SelectionService, SelectionModus } from '@core';
 import { SecretService, LockStatus } from '@core';
-import { IpcService, DataRequestFactory, ConfigurationService } from '@core';
+import { DtoGetBase, DtoSetBase, DataVerb, DtoImage, ConfigurationService } from '@ipc';
+import { IpcService, DataRequestFactory } from '@ipc'
 import { BaseItem } from '../base-item';
 import { ListItem } from '../thumb-list/list-item';
 import { BaseCardController } from './base.card-controller';

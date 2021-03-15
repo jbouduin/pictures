@@ -1,12 +1,13 @@
-import { Component, Inject, OnInit, HostListener } from "@angular/core";
 import { trigger, transition, useAnimation } from '@angular/animations';
+import { Component, Inject, OnInit, HostListener } from "@angular/core";
+import { DomSanitizer } from '@angular/platform-browser';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { IpcService, DataRequestFactory } from '@ipc';
+import { DataVerb, DtoListData, DtoListPicture, DtoImage } from '@ipc';
+
 import { fadeIn, fadeOut } from './carousel.animations';
 import { CarouselParams } from './carousel.params';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { IpcService, DataRequestFactory } from '@core';
-import { DataVerb, DtoListData, DtoListPicture, DtoImage } from '@ipc';
 import { Slide } from './slide';
-import { DomSanitizer } from '@angular/platform-browser';
 
 enum KEY_CODE {
   RIGHT_ARROW = 39,

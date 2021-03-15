@@ -2,9 +2,8 @@ import { ComponentType } from '@angular/cdk/portal';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ParamMap } from '@angular/router';
 
-import { IpcService, IpcDataRequest, DataRequestFactory } from '@core';
-import { DataVerb } from '@ipc';
-import { DtoListData, DtoListBase, DtoNewBase } from '@ipc';
+import { IpcService, IpcDataRequest, DataRequestFactory } from '@ipc';
+import { DataVerb, DtoListData, DtoListBase, DtoNewBase } from '@ipc';
 
 import { FloatingButtonParams } from '../../floating-button/floating-button.params';
 import { DynamicDialogComponent } from '../../dynamic-dialog/dynamic-dialog.component';
